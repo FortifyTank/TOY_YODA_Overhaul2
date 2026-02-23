@@ -41,25 +41,14 @@ body {
 
 /* --- ANIMATION 1: STAR BURST & TITLE --- */
 .main-title {
-    font-size: 5rem;
+    font-family: 'Audiowide', cursive;
+    font-size: 4.5rem;
     letter-spacing: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.letter-o {
-    position: relative;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* The actual text starts invisible */
-.text-hidden {
+    color: var(--terminal-green);
+    
+    /* Starts invisible, snaps in during the whiteout (2 seconds in) */
     opacity: 0;
-    /* Fades in right as the star reaches its brightest point */
-    animation: revealText 1.5s ease-out forwards 1.8s; 
+    animation: snapVisible 0.1s forwards 2.0s; 
 }
 
 /* --- THE STAR BURST CORE --- */
@@ -95,8 +84,16 @@ body {
     white-space: nowrap;
     border-right: 2px solid var(--terminal-green);
     width: 0;
-    /* Types twice as fast (1s) and starts way sooner (1.4s) */
-    animation: typing 1s steps(30, end) forwards 1.4s, blinkCursor 0.5s step-end infinite alternate;
+    
+    /* THE FIX: Start totally invisible */
+    opacity: 0; 
+    
+    /* Pushed the delay back to 3.5s. 
+       Reused your 'showBox' keyframe to make it snap visible right before typing! */
+    animation: 
+        showBox 0.1s forwards 3.5s, 
+        typing 1s steps(30, end) forwards 3.5s, 
+        blinkCursor 0.5s step-end infinite alternate 3.5s;
 }
 
 /* --- ANIMATION 3: EXPANDING BOX --- */
@@ -105,11 +102,17 @@ body {
     background-color: var(--box-bg);
     border: 2px solid var(--terminal-green);
     overflow: hidden;
+    
+    /* Start invisible and flat */
     opacity: 0;
     width: 0px;
     height: 2px;
-    /* Box kicks in at 2.6s, right after the typewriter finishes */
-    animation: showBox 0.1s forwards 2.6s, expandWidth 0.3s forwards 2.7s, expandHeight 0.3s forwards 3.0s;
+    
+    /* THE FIX: Box now kicks in at 4.6s, right after the typing finishes! */
+    animation: 
+        showBox 0.1s forwards 4.6s, 
+        expandWidth 0.3s forwards 4.7s, 
+        expandHeight 0.3s forwards 5.0s;
 }
 
 /* Invalid State styling */
@@ -196,28 +199,102 @@ input:focus { border-color: var(--terminal-green); }
 
 /* --- KEYFRAMES --- */
 
-/* --- KEYFRAMES FOR STAR & TITLE --- */
-@keyframes supernovaText {
-    0% { 
-        opacity: 0; 
-        transform: translate(-50%, -50%) scale(0) rotate(0deg); 
-    }
-    40% { 
-        /* The peak of the explosion. Adding a slight rotation makes it feel dynamic */
-        opacity: 1; 
-        transform: translate(-50%, -50%) scale(4) rotate(45deg); 
-        text-shadow: 0 0 40px white, 0 0 80px var(--terminal-green);
-    }
-    100% { 
-        /* Fades out smoothly */
-        opacity: 0; 
-        transform: translate(-50%, -50%) scale(0) rotate(90deg); 
-    }
+@keyframes snapVisible { 
+    to { opacity: 1; text-shadow: 0 0 20px var(--terminal-green); } 
 }
-.text-hidden {
+/* --- KEYFRAMES FOR STAR & TITLE --- */
+/* 1. The Core & The Long Beams */
+.epic-star {
+    position: fixed;
+    top: 50%; 
+    left: 50%;
+    margin-left: -90px; 
+    margin-top: -40px; 
+    width: 20px; 
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 40px 20px white, 0 0 80px 40px var(--terminal-green);
+    z-index: 50;
+    
+    /* THE FIX: Let mouse clicks pass straight through the star! */
+    pointer-events: none; 
+    
     opacity: 0;
-    /* Snaps in right as the diamond hits its peak (0.6s) */
-    animation: revealText 0.8s ease-out forwards 0.6s; 
+    transform: translate(-50%, -50%) scale(0);
+    animation: epicExplosion 3.5s linear forwards 0.2s;
+}
+
+/* Long Horizontal Beam */
+.epic-star::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px; height: 3px; 
+    background: white;
+    box-shadow: 0 0 20px 5px var(--terminal-green);
+    border-radius: 50%;
+}
+
+/* Long Vertical Beam */
+.epic-star::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3px; height: 300px; 
+    background: white;
+    box-shadow: 0 0 20px 5px var(--terminal-green);
+    border-radius: 50%;
+}
+
+/* 2. The Shorter Diagonal Beams */
+.epic-star-diagonals {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.epic-star-diagonals::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px; height: 2px; /* Shorter than the main beams */
+    background: white;
+    box-shadow: 0 0 15px 3px var(--terminal-green);
+    border-radius: 50%;
+}
+
+.epic-star-diagonals::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px; height: 120px; /* Shorter than the main beams */
+    background: white;
+    box-shadow: 0 0 15px 3px var(--terminal-green);
+    border-radius: 50%;
+}
+
+/* --- THE EXPLOSION SEQUENCE --- */
+@keyframes epicExplosion {
+    /* 1. Spark ignites */
+    0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; filter: brightness(1); }
+    
+    /* 2. Smoothly grows and spins to build energy (No pauses!) */
+    30% { transform: translate(-50%, -50%) scale(1.5) rotate(135deg); opacity: 1; filter: brightness(2); }
+    
+    /* 3. KABOOM: Violently swallows the screen */
+    50% { transform: translate(-50%, -50%) scale(150) rotate(220deg); opacity: 1; filter: brightness(3); }
+    
+    /* 4. Holds the pure white screen to hide the text transition */
+    70% { transform: translate(-50%, -50%) scale(150) rotate(290deg); opacity: 1; }
+    
+    /* 5. DISSIPATES: Gracefully fades away */
+    100% { transform: translate(-50%, -50%) scale(150) rotate(360deg); opacity: 0; }
 }
 
 @keyframes revealText {
