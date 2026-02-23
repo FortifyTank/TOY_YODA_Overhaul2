@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toy Yoda | Customs Checkpoint</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="space-background"></div>
+
+    <div id="hyperspace-overlay"></div>
+
+    <main class="terminal-container">
+        <div class="brand-header">
+            <h1 class="main-title">
+                <span class="text-hidden">T</span>
+                <span class="letter-o">
+                    <span class="css-star">✦</span> 
+                    <span class="text-hidden">O</span>
+                </span>
+                <span class="text-hidden">Y YODA</span>
+            </h1>
+        </div>
+
+        <div class="typewriter-container">
+            <p class="typewriter-text">> AWAITING CLEARANCE. PLEASE LOGIN_</p>
+        </div>
+
+        <div class="auth-box" id="authBox">
+            
+            <form id="loginForm" class="auth-form active-form">
+                <h2>// IDENTIFICATION REQUIRED</h2>
+                <div class="input-group">
+                    <label>> CITIZEN EMAIL</label>
+                    <input type="email" id="loginEmail" required placeholder="name@sector.com">
+                </div>
+                <div class="input-group">
+                    <label>> PASSCODE</label>
+                    <input type="password" id="loginPass" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="action-btn">[ SUBMIT CREDENTIALS ]</button>
+                <p class="toggle-link" id="showRegister">> NO DOSSIER? [ CREATE ACCOUNT ]</p>
+            </form>
+
+            <form id="registerForm" class="auth-form hidden-form">
+                <h2>// NEW DOSSIER ENTRY</h2>
+                <div class="input-group">
+                    <label>> DESIGNATION (NAME)</label>
+                    <input type="text" required placeholder="CT-5555">
+                </div>
+                <div class="input-group">
+                    <label>> CITIZEN EMAIL</label>
+                    <input type="email" required placeholder="name@sector.com">
+                </div>
+                <div class="input-group">
+                    <label>> PASSCODE</label>
+                    <input type="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="action-btn">[ REGISTER ]</button>
+                <p class="toggle-link" id="showLogin">> BACK TO CHECKPOINT</p>
+            </form>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+:root {
+    --bg-dark: #050505;
+    --terminal-green: #4af626;
+    --error-red: #ff2a2a;
+    --box-bg: #111111;
+    --border-color: #333333;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'VT323', monospace; /* Papers, Please terminal vibe */
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--terminal-green);
+    overflow: hidden; /* Prevents scrollbars during animations */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#space-background {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+    z-index: -2;
+    /* GUIDE: Add background-image: url('images/stars.gif'); here later */
+}
+
+.terminal-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+/* --- ANIMATION 1: STAR BURST & TITLE --- */
+.main-title {
+    font-size: 5rem;
+    letter-spacing: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.letter-o {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* The actual text starts invisible */
+.text-hidden {
+    opacity: 0;
+    /* Fades in right as the star reaches its brightest point */
+    animation: revealText 1.5s ease-out forwards 1.8s; 
+}
+
+/* --- THE STAR BURST CORE --- */
+.css-star {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    
+    font-size: 3rem;       /* Base size of the star */
+    color: #ffffff;        /* Pure white center */
+    font-family: Arial, sans-serif; /* Keep it a clean, basic font so the shape is crisp */
+    
+    /* The glowing effect */
+    text-shadow: 0 0 20px white, 0 0 50px var(--terminal-green);
+    
+    opacity: 0;
+    z-index: 10;
+    
+    /* Running the same 1.2s explosion animation */
+    animation: supernovaText 1.2s ease-out forwards 0.2s;
+}
+
+/* --- ANIMATION 2: TYPEWRITER --- */
+.typewriter-container {
+    margin-top: 20px;
+    height: 30px; /* Reserves space so the box doesn't jump */
+}
+
+.typewriter-text {
+    font-size: 1.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--terminal-green);
+    width: 0;
+    /* Types twice as fast (1s) and starts way sooner (1.4s) */
+    animation: typing 1s steps(30, end) forwards 1.4s, blinkCursor 0.5s step-end infinite alternate;
+}
+
+/* --- ANIMATION 3: EXPANDING BOX --- */
+.auth-box {
+    margin-top: 30px;
+    background-color: var(--box-bg);
+    border: 2px solid var(--terminal-green);
+    overflow: hidden;
+    opacity: 0;
+    width: 0px;
+    height: 2px;
+    /* Box kicks in at 2.6s, right after the typewriter finishes */
+    animation: showBox 0.1s forwards 2.6s, expandWidth 0.3s forwards 2.7s, expandHeight 0.3s forwards 3.0s;
+}
+
+/* Invalid State styling */
+.auth-box.error-state {
+    background-color: var(--error-red);
+    color: black;
+    border-color: white;
+    animation: shake 0.4s;
+}
+.auth-box.error-state input {
+    background-color: #880000;
+    color: white;
+}
+
+/* --- FORM STYLES --- */
+.auth-form {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: opacity 0.3s ease;
+}
+
+.hidden-form {
+    display: none;
+    opacity: 0;
+}
+
+.active-form {
+    display: flex;
+    opacity: 1;
+}
+
+h2 { font-size: 1.8rem; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+
+label { font-size: 1.2rem; }
+
+input {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--terminal-green);
+    padding: 10px;
+    font-size: 1.2rem;
+    outline: none;
+}
+input:focus { border-color: var(--terminal-green); }
+
+.action-btn {
+    background: transparent;
+    border: 2px solid var(--terminal-green);
+    color: var(--terminal-green);
+    padding: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.2s;
+}
+.action-btn:hover {
+    background: var(--terminal-green);
+    color: black;
+}
+
+.toggle-link {
+    text-align: center;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+.toggle-link:hover { text-decoration: underline; }
+
+/* --- HYPERSPACE OVERLAY --- */
+#hyperspace-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: white;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.5s ease-in;
+}
+#hyperspace-overlay.active {
+    opacity: 1;
+}
+
+/* --- KEYFRAMES --- */
+
+/* --- KEYFRAMES FOR STAR & TITLE --- */
+@keyframes supernovaText {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0) rotate(0deg); 
+    }
+    40% { 
+        /* The peak of the explosion. Adding a slight rotation makes it feel dynamic */
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(4) rotate(45deg); 
+        text-shadow: 0 0 40px white, 0 0 80px var(--terminal-green);
+    }
+    100% { 
+        /* Fades out smoothly */
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0) rotate(90deg); 
+    }
+}
+.text-hidden {
+    opacity: 0;
+    /* Snaps in right as the diamond hits its peak (0.6s) */
+    animation: revealText 0.8s ease-out forwards 0.6s; 
+}
+
+@keyframes revealText {
+    0% { opacity: 0; text-shadow: none; }
+    50% { opacity: 1; text-shadow: 0 0 20px white; } 
+    100% { opacity: 1; text-shadow: 0 0 10px var(--terminal-green); } 
+}
+
+@keyframes typing { to { width: 100%; } }
+@keyframes blinkCursor { 50% { border-color: transparent; } }
+
+@keyframes showBox { to { opacity: 1; } }
+@keyframes expandWidth { to { width: 100%; } }
+@keyframes expandHeight { to { height: 420px; } } /* Adjust this if form needs more space */
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-10px); }
+    100% { transform: translateX(0); }
+}
