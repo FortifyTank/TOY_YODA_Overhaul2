@@ -55,16 +55,27 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.style.background = "var(--terminal-green)";
             btn.style.color = "black";
 
-            setTimeout(() => {
-                hyperspaceOverlay.classList.add("active");
-                
-                // Redirect to store page after the white flash covers the screen
-                setTimeout(() => {
-                    // window.location.href = "store.html"; 
-                    alert("Transition to Store Page!"); 
-                }, 1500);
+            // Grab the hyperspace video element
+            const hyperspaceVid = document.getElementById("hyperspace-video");
 
-            }, 500);
+            setTimeout(() => {
+                // 1. Play the hyperspace video
+                hyperspaceVid.play();
+                
+                // 2. Fade it into view (covers the slow stars)
+                hyperspaceVid.classList.add("jump-active");
+                
+                // 3. Optional: Fade out the terminal UI so they just see the hyperspace jump
+                document.querySelector(".terminal-container").style.opacity = "0";
+                document.querySelector(".terminal-container").style.transition = "opacity 1s ease";
+                
+                // Redirect to store page after the jump finishes (adjust timing based on your video length!)
+                setTimeout(() => {
+                    // window.location.href = "products.html"; 
+                    alert("Transition to Store Page!"); 
+                }, 3000); // 3000ms = 3 seconds of hyperspace before loading the next page
+
+            }, 500); // Small delay after clicking submit
         }
     });
 });

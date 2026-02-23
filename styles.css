@@ -23,12 +23,29 @@ body {
     height: 100vh;
 }
 
-#space-background {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
-    z-index: -2;
-    /* GUIDE: Add background-image: url('images/stars.gif'); here later */
+#space-bg-video, #hyperspace-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover; /* Ensures the video fills the screen perfectly */
+    pointer-events: none;
+}
+
+#space-bg-video {
+    z-index: -3; /* The deepest background */
+}
+
+#hyperspace-video {
+    z-index: -2; /* Sits right above the slow stars */
+    opacity: 0;  /* Hidden until login is successful */
+    transition: opacity 0.5s ease-in; /* Smooth fade in */
+}
+
+/* A helper class we will trigger with Javascript */
+#hyperspace-video.jump-active {
+    opacity: 1;
 }
 
 .terminal-container {
@@ -120,8 +137,14 @@ body {
     background-color: var(--error-red);
     color: black;
     border-color: white;
+    /* WE REMOVED THE SHAKE ANIMATION FROM HERE */
+}
+
+/* WE ADDED THIS SO ONLY THE INSIDE OF THE BOX SHAKES */
+.auth-box.error-state .active-form {
     animation: shake 0.4s;
 }
+
 .auth-box.error-state input {
     background-color: #880000;
     color: white;
