@@ -4,6 +4,12 @@
     --error-red: #ff2a2a;
     --box-bg: #111111;
     --border-color: #333333;
+    --bg-crt: #0a0f0a; /* Very dark grey-green */
+    --term-green: #4af626;
+    --term-glow: 0 0 8px rgba(74, 246, 38, 0.4);
+    --amber-accent: #ffb000; /* New Warning Amber */
+    --amber-glow: 0 0 10px rgba(255, 176, 0, 0.6);
+    --border-dim: #1a2b1a;
 }
 
 * {
@@ -339,4 +345,190 @@ input:focus { border-color: var(--terminal-green); }
     50% { transform: translateX(10px); }
     75% { transform: translateX(-10px); }
     100% { transform: translateX(0); }
+}
+
+/* Base theme applied to the body of internal pages */
+.crt-theme {
+    background-color: var(--bg-crt);
+    color: var(--term-green);
+    overflow-y: auto; /* Allow scrolling on this page! */
+    padding: 20px;
+    height: auto;
+    display: block;
+}
+
+/* FAKE SCANLINES EFFECT */
+.scanlines {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+    background-size: 100% 4px; /* Creates the tiny horizontal lines */
+    pointer-events: none; /* Lets clicks pass through! */
+    z-index: 100;
+}
+
+/* --- 1. GLOBAL HEADER --- */
+.global-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--term-green);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    text-shadow: var(--term-glow);
+}
+
+.header-logo {
+    font-family: 'Audiowide', cursive;
+    font-size: 2rem;
+    letter-spacing: 2px;
+}
+
+.header-search { display: flex; gap: 10px; align-items: center; font-size: 1.5rem; }
+.header-search input {
+    background: transparent; border: none; border-bottom: 1px solid var(--term-green);
+    color: var(--term-green); font-size: 1.5rem; outline: none; width: 200px;
+}
+
+.header-user { display: flex; gap: 20px; font-size: 1.5rem; }
+.cart-status { color: var(--amber-accent); text-shadow: var(--amber-glow); cursor: pointer; }
+
+/* --- 2. NAVIGATION BAR --- */
+.global-nav {
+    display: flex; gap: 30px;
+    border-bottom: 1px solid var(--border-dim);
+    padding-bottom: 15px; margin-bottom: 30px;
+}
+
+.nav-link {
+    color: var(--term-green); text-decoration: none; font-size: 1.5rem;
+    transition: 0.2s;
+}
+.nav-link:hover, .nav-link.active {
+    color: var(--bg-crt); background-color: var(--term-green); padding: 0 10px;
+}
+
+/* --- 3. HERO SECTION --- */
+.dashboard-container { max-width: 1200px; margin: 0 auto; }
+
+.hero-banner {
+    border: 1px solid var(--term-green);
+    padding: 40px; text-align: center; margin-bottom: 40px;
+    background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(74, 246, 38, 0.03) 10px, rgba(74, 246, 38, 0.03) 20px);
+}
+.system-alert { font-size: 2rem; margin-bottom: 15px; color: var(--amber-accent); text-shadow: var(--amber-glow); }
+.hero-banner p { font-size: 1.5rem; margin-bottom: 25px; }
+
+.action-btn-large {
+    display: inline-block; padding: 15px 30px; font-size: 1.8rem;
+    color: var(--term-green); text-decoration: none; border: 2px solid var(--term-green);
+    transition: 0.2s; cursor: pointer;
+}
+.action-btn-large:hover { background: var(--term-green); color: black; }
+
+/* --- 4. BOUNTY GRID (Featured Items) --- */
+.section-title { font-size: 1.8rem; border-bottom: 1px solid var(--term-green); padding-bottom: 5px; margin-bottom: 20px; }
+
+.bounty-grid {
+    display: grid;
+    /* This automatically makes it responsive! Columns shrink and stack on mobile */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 20px;
+}
+
+.bounty-card {
+    border: 1px solid var(--border-dim);
+    padding: 15px; display: flex; flex-direction: column; gap: 15px;
+    transition: all 0.2s;
+}
+.bounty-card:hover { border-color: var(--term-green); box-shadow: 0 0 15px rgba(74, 246, 38, 0.1); }
+
+.card-header { font-size: 1.2rem; border-bottom: 1px dotted var(--border-dim); padding-bottom: 5px; }
+.card-image-placeholder {
+    height: 200px; background: #111; display: flex; justify-content: center; align-items: center;
+    border: 1px solid var(--border-dim); font-size: 1.5rem; opacity: 0.5;
+}
+.card-details p { font-size: 1.4rem; }
+
+.acquire-btn {
+    background: transparent; border: 1px solid var(--term-green);
+    color: var(--term-green); padding: 10px; font-size: 1.5rem;
+    cursor: pointer; transition: 0.2s;
+}
+.acquire-btn:hover { background: var(--amber-accent); color: black; border-color: var(--amber-accent); }
+
+.cyber-panel {
+    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    position: relative; /* Needed for absolute elements inside */
+    overflow: hidden;
+}
+
+/* 2. Hero Banner Restyling */
+.hero-banner {
+    border: 1px solid var(--term-green);
+    padding: 60px 40px; 
+    text-align: center; 
+    margin-bottom: 40px;
+    background-color: transparent; /* Removed the old repeating gradient */
+}
+
+/* 3. The Spaceship Background */
+.hero-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    
+    /* Change this to a real image path once you download one! */
+    background-image: url('images/spaceship-bg.jpg'); 
+    background-size: cover;
+    background-position: center;
+    
+    /* Makes the image black-and-white and very faint */
+    filter: grayscale(100%);
+    opacity: 0.15; 
+    z-index: 0;
+}
+
+/* 4. The Interactive Hover Grid */
+.hero-grid {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 100%;
+    
+    /* Draws the glowing green grid lines */
+    background-size: 40px 40px;
+    background-image:
+        linear-gradient(to right, rgba(74, 246, 38, 0.2) 1px, transparent 1px),
+        linear-gradient(to top, rgba(74, 246, 38, 0.2) 1px, transparent 1px);
+        
+    /* Masks the grid so it's 100% visible at the bottom, fading to 0% in the middle */
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
+    mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
+    
+    /* Starts invisible */
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+    z-index: 1;
+}
+
+/* THE MAGIC TRIGGER: If the hero-banner contains a hovered button, fade the grid in! */
+.hero-banner:has(.action-btn-large:hover) .hero-grid {
+    opacity: 1;
+}
+
+/* 5. Data Greebles (Fake technical details) */
+.greeble {
+    position: absolute;
+    font-size: 0.9rem;
+    color: var(--term-green);
+    opacity: 0.5;
+    z-index: 2;
+    letter-spacing: 1px;
+}
+.greeble.top-left { top: 10px; left: 15px; }
+.greeble.top-right { top: 10px; right: 15px; }
+.greeble.bottom-right { bottom: 10px; right: 15px; }
+
+/* 6. Push the text above the backgrounds */
+.hero-content {
+    position: relative;
+    z-index: 10; /* Ensures the text and buttons are clickable and visible */
 }

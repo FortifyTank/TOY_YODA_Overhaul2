@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 // Redirect to store page after the jump finishes (adjust timing based on your video length!)
                 setTimeout(() => {
-                    // window.location.href = "products.html"; 
+                    window.location.href = "home.html"; 
                     alert("Transition to Store Page!"); 
                 }, 3000); // 3000ms = 3 seconds of hyperspace before loading the next page
 

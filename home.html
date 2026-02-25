@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toy Yoda | Command Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="crt-theme">
+
+    <div class="scanlines"></div>
+
+    <header class="global-header">
+        <div class="header-logo">TOY_YODA</div>
+        
+        <div class="header-search">
+            <span>> QUERY:</span>
+            <input type="text" placeholder="Search database...">
+        </div>
+        
+        <div class="header-user">
+            <span class="clearance">[ CITIZEN_01 ]</span>
+            <span class="cart-status">[ CARGO: 0 ]</span> 
+        </div>
+    </header>
+
+    <nav class="global-nav">
+        <a href="#" class="nav-link active">> OVERVIEW</a>
+        <a href="products.html" class="nav-link">> CARGO_MANIFEST</a>
+        <a href="#" class="nav-link">> COMMS_LINK</a>
+        <a href="#" class="nav-link">> SECURE_DOSSIER</a>
+    </nav>
+
+    <main class="dashboard-container">
+        
+        <section class="hero-banner cyber-panel">
+            
+            <div class="hero-bg"></div>
+            
+            <div class="hero-grid"></div>
+
+            <span class="greeble top-left">SCN_RATE: 144hz</span>
+            <span class="greeble top-right">SYS_TEMP: 34°C // VOL: 44.1</span>
+            <span class="greeble bottom-right">CLASS: CONTRABAND</span>
+
+            <div class="hero-content">
+                <h2 class="system-alert">// SYSTEM ALERT: INCOMING HIGH-VALUE CARGO</h2>
+                <p>The latest shipment from the Outer Rim has cleared customs. Inspect manifests before sector lockdown.</p>
+                <a href="products.html" class="action-btn-large">[ INITIATE FULL SYSTEM SCAN ]</a>
+            </div>
+            
+        </section>
+
+        <div class="section-title">> PRIORITY_BOUNTIES // RECENT INTERCEPTS</div>
+        
+        <section class="bounty-grid">
+            <div class="bounty-card cyber-panel">
+                <div class="card-header">[!] CLASSIFIED</div>
+                <div class="card-image-placeholder">IMG_NO_SIGNAL</div>
+                <div class="card-details">
+                    <p>ID: SW-001</p>
+                    <p>CREDITS: ₱400.00</p>
+                </div>
+                <button class="acquire-btn">[ ACQUIRE ]</button>
+            </div>
+            
+            </section>
+
+    </main>
+</body>
+</html>
