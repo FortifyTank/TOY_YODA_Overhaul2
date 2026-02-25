@@ -12,19 +12,23 @@
 ========================================= */
 :root {
     /* Backgrounds */
-    --bg-deep: #050505;        /* Pitch black for deep space */
-    --bg-crt: #0a0f0a;         /* Dark grey-green for the monitor screen */
-    --bg-panel: rgba(5, 10, 5, 0.85); /* Smoked glass for panels/headers */
+    --bg-deep: #050505;        
+    --bg-crt: #0a0f0a;         
+    --bg-panel: rgba(5, 10, 5, 0.85); 
     
-    /* Terminal Green (Merged from terminal-green and term-green) */
+    /* Terminal Colors */
     --term-green: #4af626;
     --term-glow: 0 0 8px rgba(74, 246, 38, 0.4);
     
+    /* ADD THIS: The new Cyan color for Citizen UI */
+    --term-cyan: #00f0ff;
+    --cyan-glow: 0 0 10px rgba(0, 240, 255, 0.5);
+    
     /* Accents & Borders */
-    --amber-accent: #ffb000;   /* Warning Amber for highlights/cart */
+    --amber-accent: #ffb000;   
     --amber-glow: 0 0 10px rgba(255, 176, 0, 0.6);
-    --error-red: #ff2a2a;      /* For Access Denied */
-    --border-dim: #1a2b1a;     /* Faint green for grid borders */
+    --error-red: #ff2a2a;      
+    --border-dim: #1a2b1a;     
 }
 
 * {
@@ -57,15 +61,6 @@ body {
 /* =========================================
    2. GLOBAL UI & EFFECTS
 ========================================= */
-/* FAKE SCANLINES EFFECT */
-.scanlines {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-    background-size: 100% 4px; 
-    pointer-events: none; 
-    z-index: 100;
-}
 
 /* SHARED ANIMATIONS */
 @keyframes revealText {
@@ -90,37 +85,79 @@ body {
 /* =========================================
    3. REUSABLE COMPONENTS
 ========================================= */
-/* --- GLOBAL HEADER (The "Smoked Glass" Top Bar) --- */
+/* --- 1. GLOBAL HEADER (Tactical LED Hardware) --- */
 .global-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     
-    /* The Fix: Darker background + shadow to make it pop */
-    background-color: var(--bg-panel);
-    border-bottom: 2px solid var(--term-green);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 2px 10px rgba(74, 246, 38, 0.1);
+    /* Pitch Black Background */
+    background-color: var(--bg-deep); 
     
-    padding: 15px 20px;
-    margin-bottom: 10px;
-    border-radius: 4px;
+    /* Clean, sharp bottom border to separate it from the content */
+    border-bottom: 2px solid var(--term-green); 
+    
+    position: sticky;
+    top: 0;
+    z-index: 100; 
+    padding: 15px 20px; 
+    margin-bottom: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+}
+
+/* 1. The Logo (Glowing Green) */
+.header-logo {
+    font-family: 'Audiowide', cursive;
+    font-size: 2.2rem;
+    letter-spacing: 2px;
+    color: var(--term-green);
     text-shadow: var(--term-glow);
 }
 
-.header-logo {
-    font-family: 'Audiowide', cursive;
-    font-size: 2rem;
-    letter-spacing: 2px;
-}
-
-.header-search { display: flex; gap: 10px; align-items: center; font-size: 1.5rem; }
+/* 2. The Search Area (Minimalist Underline) */
+.header-search { display: flex; gap: 10px; align-items: center; font-size: 1.5rem; color: var(--term-green); }
 .header-search input {
-    background: transparent; border: none; border-bottom: 1px solid var(--term-green);
-    color: var(--term-green); font-size: 1.5rem; outline: none; width: 200px;
+    background: transparent; 
+    color: var(--term-green); 
+    border: none; 
+    border-bottom: 1px solid var(--term-green); /* Just a clean line underneath */
+    font-size: 1.5rem; 
+    outline: none; 
+    width: 250px;
+    padding: 4px 8px;
+    font-family: 'VT323', monospace;
+}
+.header-search input:focus { border-bottom: 2px solid var(--term-green); }
+.header-search input::placeholder { color: rgba(74, 246, 38, 0.4); }
+
+/* 3. The User & Cart Buttons (Hollow Tactical Outlines) */
+.header-user { display: flex; gap: 15px; font-size: 1.5rem; align-items: center; }
+
+/* Citizen Box - Cyan Outline */
+.clearance { 
+    background-color: transparent; 
+    color: var(--term-cyan); 
+    padding: 4px 12px; 
+    border: 1px solid var(--term-cyan); 
+    font-weight: bold;
 }
 
-.header-user { display: flex; gap: 20px; font-size: 1.5rem; }
-.cart-status { color: var(--amber-accent); text-shadow: var(--amber-glow); cursor: pointer; }
+/* Cargo Box - Amber Outline */
+.cart-status { 
+    background-color: transparent; /* Hollow! */
+    color: var(--amber-accent); 
+    padding: 4px 12px; 
+    border: 1px solid var(--amber-accent);
+    font-weight: bold;
+    cursor: pointer; 
+    transition: 0.2s;
+}
+
+/* Flashes solid Amber when hovered */
+.cart-status:hover {
+    background-color: var(--amber-accent); 
+    color: var(--bg-deep); 
+}
 
 /* --- NAVIGATION BAR --- */
 .global-nav {
@@ -329,3 +366,137 @@ body {
     cursor: pointer; transition: 0.2s;
 }
 .acquire-btn:hover { background: var(--amber-accent); color: black; border-color: var(--amber-accent); }
+
+/* --- 6. OTHER SYSTEMS (Category Cards) --- */
+.system-grid {
+    display: grid; 
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    margin-bottom: 50px;
+}
+
+.system-card {
+    height: 420px; /* 1. EVEN TALLER CARDS! */
+    border: 1px solid var(--border-dim);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    
+    /* 2. Aligns everything to the bottom */
+    justify-content: flex-end; 
+    
+    padding: 20px;
+    cursor: pointer;
+}
+
+/* The Background Images */
+.system-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    
+    /* 1. Set the default scale to normal (1) */
+    transform: scale(1); 
+    
+    /* 2. Animate BOTH opacity and the zoom (transform) */
+    transition: opacity 0.4s ease, transform 0.5s ease-out; 
+    
+    z-index: 0;
+    filter: grayscale(80%) brightness(0.5); 
+}
+.system-card .animated-bg {
+    opacity: 0; 
+}
+
+/* CARDS GLOW GREEN ON HOVER */
+/* THE HOVER MAGIC */
+.system-card:hover {
+    border-color: var(--term-green); 
+    box-shadow: var(--term-glow);
+}
+
+.system-card:hover .static-bg { opacity: 0; }
+.system-card:hover .animated-bg { 
+    opacity: 1; 
+    filter: grayscale(0%) brightness(0.8); 
+    
+    /* 3. ADD THIS: Zooms the GIF in slightly while playing! */
+    transform: scale(1.05); 
+}
+
+/* Content Alignment */
+.system-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    
+    /* 2. CENTER ALIGNED! */
+    align-items: center; 
+    gap: 10px;
+}
+
+.sector-name {
+    font-size: 1.8rem;
+    color: var(--term-green);
+    background: rgba(0,0,0,0.8); /* Low opacity black background */
+    padding: 5px 15px;
+    border: 1px solid var(--border-dim);
+    transition: 0.3s;
+    text-align: center;
+}
+
+/* 3. SECTOR TURNS AMBER ON HOVER */
+.system-card:hover .sector-name {
+    color: var(--amber-accent); 
+    border-color: var(--amber-accent);
+}
+
+/* 4. INITIATE JUMP IS AMBER BY DEFAULT */
+.travel-btn {
+    background: rgba(0,0,0,0.8); /* Low opacity black background */
+    
+    border: 1px solid var(--amber-accent); /* Amber border */
+    color: var(--amber-accent); /* Amber text */
+    
+    padding: 8px 20px;
+    font-size: 1.5rem;
+    text-decoration: none;
+    font-weight: bold;
+    
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.system-card:hover .travel-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* BUTTON INVERTS TO SOLID AMBER WHEN HOVERED OVER */
+.travel-btn:hover {
+    background: var(--amber-accent); 
+    color: black;
+    box-shadow: var(--amber-glow); /* Adds that satisfying LED glow */
+}
+
+/* THE TACTICAL PLANET BACKGROUND */
+.crt-theme::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    
+    /* Link your new planet image here */
+    background-image: url('images/planet-bg.png'); 
+    background-size: cover;
+    background-position: center bottom;
+    
+    /* THE FILTER MAGIC: Strips the color and makes it incredibly faint */
+    filter: grayscale(100%) contrast(120%);
+    opacity: 0.08; /* Barely visible! */
+    
+    z-index: -1; /* Pushes it behind all your boxes */
+    pointer-events: none;
+}
