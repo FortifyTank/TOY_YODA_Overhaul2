@@ -1,344 +1,83 @@
+/* =========================================
+   TABLE OF CONTENTS
+   1. Variables & Global Reset
+   2. Global UI & Effects (Scanlines, Animations)
+   3. Reusable Components (Header, Nav, Panels)
+   4. Checkpoint Page (index.html)
+   5. Dashboard Page (home.html)
+========================================= */
+
+/* =========================================
+   1. VARIABLES & GLOBAL RESET
+========================================= */
 :root {
-    --bg-dark: #050505;
-    --terminal-green: #4af626;
-    --error-red: #ff2a2a;
-    --box-bg: #111111;
-    --border-color: #333333;
-    --bg-crt: #0a0f0a; /* Very dark grey-green */
+    /* Backgrounds */
+    --bg-deep: #050505;        /* Pitch black for deep space */
+    --bg-crt: #0a0f0a;         /* Dark grey-green for the monitor screen */
+    --bg-panel: rgba(5, 10, 5, 0.85); /* Smoked glass for panels/headers */
+    
+    /* Terminal Green (Merged from terminal-green and term-green) */
     --term-green: #4af626;
     --term-glow: 0 0 8px rgba(74, 246, 38, 0.4);
-    --amber-accent: #ffb000; /* New Warning Amber */
+    
+    /* Accents & Borders */
+    --amber-accent: #ffb000;   /* Warning Amber for highlights/cart */
     --amber-glow: 0 0 10px rgba(255, 176, 0, 0.6);
-    --border-dim: #1a2b1a;
+    --error-red: #ff2a2a;      /* For Access Denied */
+    --border-dim: #1a2b1a;     /* Faint green for grid borders */
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'VT323', monospace; /* Papers, Please terminal vibe */
+    font-family: 'VT323', monospace;
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: var(--terminal-green);
-    overflow: hidden; /* Prevents scrollbars during animations */
+    background-color: var(--bg-deep);
+    color: var(--term-green);
+    overflow: hidden; /* Default to hidden for Checkpoint */
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
-#space-bg-video, #hyperspace-video {
+/* Base theme applied to the body of internal pages (Dashboard/Store) */
+.crt-theme {
+    background-color: var(--bg-crt);
+    overflow-y: auto; /* Allows scrolling on internal pages */
+    padding: 20px;
+    height: auto;
+    display: block;
+}
+
+
+/* =========================================
+   2. GLOBAL UI & EFFECTS
+========================================= */
+/* FAKE SCANLINES EFFECT */
+.scanlines {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover; /* Ensures the video fills the screen perfectly */
-    pointer-events: none;
-}
-
-#space-bg-video {
-    z-index: -3; /* The deepest background */
-}
-
-#hyperspace-video {
-    z-index: -2; /* Sits right above the slow stars */
-    opacity: 0;  /* Hidden until login is successful */
-    transition: opacity 0.5s ease-in; /* Smooth fade in */
-}
-
-/* A helper class we will trigger with Javascript */
-#hyperspace-video.jump-active {
-    opacity: 1;
-}
-
-.terminal-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 500px;
-}
-
-/* --- ANIMATION 1: STAR BURST & TITLE --- */
-.main-title {
-    font-family: 'Audiowide', cursive;
-    font-size: 4.5rem;
-    letter-spacing: 5px;
-    color: var(--terminal-green);
-    
-    /* Starts invisible, snaps in during the whiteout (2 seconds in) */
-    opacity: 0;
-    animation: snapVisible 0.1s forwards 2.0s; 
-}
-
-/* --- THE STAR BURST CORE --- */
-.css-star {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    
-    font-size: 3rem;       /* Base size of the star */
-    color: #ffffff;        /* Pure white center */
-    font-family: Arial, sans-serif; /* Keep it a clean, basic font so the shape is crisp */
-    
-    /* The glowing effect */
-    text-shadow: 0 0 20px white, 0 0 50px var(--terminal-green);
-    
-    opacity: 0;
-    z-index: 10;
-    
-    /* Running the same 1.2s explosion animation */
-    animation: supernovaText 1.2s ease-out forwards 0.2s;
-}
-
-/* --- ANIMATION 2: TYPEWRITER --- */
-.typewriter-container {
-    margin-top: 20px;
-    height: 30px; /* Reserves space so the box doesn't jump */
-}
-
-.typewriter-text {
-    font-size: 1.5rem;
-    overflow: hidden;
-    white-space: nowrap;
-    border-right: 2px solid var(--terminal-green);
-    width: 0;
-    
-    /* THE FIX: Start totally invisible */
-    opacity: 0; 
-    
-    /* Pushed the delay back to 3.5s. 
-       Reused your 'showBox' keyframe to make it snap visible right before typing! */
-    animation: 
-        showBox 0.1s forwards 3.5s, 
-        typing 1s steps(30, end) forwards 3.5s, 
-        blinkCursor 0.5s step-end infinite alternate 3.5s;
-}
-
-/* --- ANIMATION 3: EXPANDING BOX --- */
-.auth-box {
-    margin-top: 30px;
-    background-color: var(--box-bg);
-    border: 2px solid var(--terminal-green);
-    overflow: hidden;
-    
-    /* Start invisible and flat */
-    opacity: 0;
-    width: 0px;
-    height: 2px;
-    
-    /* THE FIX: Box now kicks in at 4.6s, right after the typing finishes! */
-    animation: 
-        showBox 0.1s forwards 4.6s, 
-        expandWidth 0.3s forwards 4.7s, 
-        expandHeight 0.3s forwards 5.0s;
-}
-
-/* Invalid State styling */
-.auth-box.error-state {
-    background-color: var(--error-red);
-    color: black;
-    border-color: white;
-    /* WE REMOVED THE SHAKE ANIMATION FROM HERE */
-}
-
-/* WE ADDED THIS SO ONLY THE INSIDE OF THE BOX SHAKES */
-.auth-box.error-state .active-form {
-    animation: shake 0.4s;
-}
-
-.auth-box.error-state input {
-    background-color: #880000;
-    color: white;
-}
-
-/* --- FORM STYLES --- */
-.auth-form {
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    transition: opacity 0.3s ease;
-}
-
-.hidden-form {
-    display: none;
-    opacity: 0;
-}
-
-.active-form {
-    display: flex;
-    opacity: 1;
-}
-
-h2 { font-size: 1.8rem; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
-
-label { font-size: 1.2rem; }
-
-input {
-    background-color: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--terminal-green);
-    padding: 10px;
-    font-size: 1.2rem;
-    outline: none;
-}
-input:focus { border-color: var(--terminal-green); }
-
-.action-btn {
-    background: transparent;
-    border: 2px solid var(--terminal-green);
-    color: var(--terminal-green);
-    padding: 10px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: all 0.2s;
-}
-.action-btn:hover {
-    background: var(--terminal-green);
-    color: black;
-}
-
-.toggle-link {
-    text-align: center;
-    margin-top: 10px;
-    cursor: pointer;
-    font-size: 1.1rem;
-}
-.toggle-link:hover { text-decoration: underline; }
-
-/* --- HYPERSPACE OVERLAY --- */
-#hyperspace-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: white;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 1.5s ease-in;
-}
-#hyperspace-overlay.active {
-    opacity: 1;
-}
-
-/* --- KEYFRAMES --- */
-
-@keyframes snapVisible { 
-    to { opacity: 1; text-shadow: 0 0 20px var(--terminal-green); } 
-}
-/* --- KEYFRAMES FOR STAR & TITLE --- */
-/* 1. The Core & The Long Beams */
-.epic-star {
-    position: fixed;
-    top: 50%; 
-    left: 50%;
-    margin-left: -90px; 
-    margin-top: -40px; 
-    width: 20px; 
-    height: 20px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 0 40px 20px white, 0 0 80px 40px var(--terminal-green);
-    z-index: 50;
-    
-    /* THE FIX: Let mouse clicks pass straight through the star! */
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+    background-size: 100% 4px; 
     pointer-events: none; 
-    
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0);
-    animation: epicExplosion 3.5s linear forwards 0.2s;
+    z-index: 100;
 }
 
-/* Long Horizontal Beam */
-.epic-star::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px; height: 3px; 
-    background: white;
-    box-shadow: 0 0 20px 5px var(--terminal-green);
-    border-radius: 50%;
-}
-
-/* Long Vertical Beam */
-.epic-star::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 3px; height: 300px; 
-    background: white;
-    box-shadow: 0 0 20px 5px var(--terminal-green);
-    border-radius: 50%;
-}
-
-/* 2. The Shorter Diagonal Beams */
-.epic-star-diagonals {
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 100%; height: 100%;
-    transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.epic-star-diagonals::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 120px; height: 2px; /* Shorter than the main beams */
-    background: white;
-    box-shadow: 0 0 15px 3px var(--terminal-green);
-    border-radius: 50%;
-}
-
-.epic-star-diagonals::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 2px; height: 120px; /* Shorter than the main beams */
-    background: white;
-    box-shadow: 0 0 15px 3px var(--terminal-green);
-    border-radius: 50%;
-}
-
-/* --- THE EXPLOSION SEQUENCE --- */
-@keyframes epicExplosion {
-    /* 1. Spark ignites */
-    0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; filter: brightness(1); }
-    
-    /* 2. Smoothly grows and spins to build energy (No pauses!) */
-    30% { transform: translate(-50%, -50%) scale(1.5) rotate(135deg); opacity: 1; filter: brightness(2); }
-    
-    /* 3. KABOOM: Violently swallows the screen */
-    50% { transform: translate(-50%, -50%) scale(150) rotate(220deg); opacity: 1; filter: brightness(3); }
-    
-    /* 4. Holds the pure white screen to hide the text transition */
-    70% { transform: translate(-50%, -50%) scale(150) rotate(290deg); opacity: 1; }
-    
-    /* 5. DISSIPATES: Gracefully fades away */
-    100% { transform: translate(-50%, -50%) scale(150) rotate(360deg); opacity: 0; }
-}
-
+/* SHARED ANIMATIONS */
 @keyframes revealText {
     0% { opacity: 0; text-shadow: none; }
     50% { opacity: 1; text-shadow: 0 0 20px white; } 
-    100% { opacity: 1; text-shadow: 0 0 10px var(--terminal-green); } 
+    100% { opacity: 1; text-shadow: 0 0 10px var(--term-green); } 
 }
-
 @keyframes typing { to { width: 100%; } }
 @keyframes blinkCursor { 50% { border-color: transparent; } }
-
 @keyframes showBox { to { opacity: 1; } }
 @keyframes expandWidth { to { width: 100%; } }
-@keyframes expandHeight { to { height: 420px; } } /* Adjust this if form needs more space */
-
+@keyframes expandHeight { to { height: 420px; } }
 @keyframes shake {
     0% { transform: translateX(0); }
     25% { transform: translateX(-10px); }
@@ -347,34 +86,24 @@ input:focus { border-color: var(--terminal-green); }
     100% { transform: translateX(0); }
 }
 
-/* Base theme applied to the body of internal pages */
-.crt-theme {
-    background-color: var(--bg-crt);
-    color: var(--term-green);
-    overflow-y: auto; /* Allow scrolling on this page! */
-    padding: 20px;
-    height: auto;
-    display: block;
-}
 
-/* FAKE SCANLINES EFFECT */
-.scanlines {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-    background-size: 100% 4px; /* Creates the tiny horizontal lines */
-    pointer-events: none; /* Lets clicks pass through! */
-    z-index: 100;
-}
-
-/* --- 1. GLOBAL HEADER --- */
+/* =========================================
+   3. REUSABLE COMPONENTS
+========================================= */
+/* --- GLOBAL HEADER (The "Smoked Glass" Top Bar) --- */
 .global-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
+    /* The Fix: Darker background + shadow to make it pop */
+    background-color: var(--bg-panel);
     border-bottom: 2px solid var(--term-green);
-    padding-bottom: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 2px 10px rgba(74, 246, 38, 0.1);
+    
+    padding: 15px 20px;
     margin-bottom: 10px;
+    border-radius: 4px;
     text-shadow: var(--term-glow);
 }
 
@@ -393,13 +122,12 @@ input:focus { border-color: var(--terminal-green); }
 .header-user { display: flex; gap: 20px; font-size: 1.5rem; }
 .cart-status { color: var(--amber-accent); text-shadow: var(--amber-glow); cursor: pointer; }
 
-/* --- 2. NAVIGATION BAR --- */
+/* --- NAVIGATION BAR --- */
 .global-nav {
     display: flex; gap: 30px;
     border-bottom: 1px solid var(--border-dim);
     padding-bottom: 15px; margin-bottom: 30px;
 }
-
 .nav-link {
     color: var(--term-green); text-decoration: none; font-size: 1.5rem;
     transition: 0.2s;
@@ -408,13 +136,143 @@ input:focus { border-color: var(--terminal-green); }
     color: var(--bg-crt); background-color: var(--term-green); padding: 0 10px;
 }
 
-/* --- 3. HERO SECTION --- */
+/* --- CYBER PANELS & GREEBLES --- */
+.cyber-panel {
+    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    position: relative;
+    overflow: hidden;
+}
+
+.greeble {
+    position: absolute; font-size: 0.9rem; color: var(--term-green);
+    opacity: 0.5; z-index: 2; letter-spacing: 1px;
+}
+.greeble.top-left { top: 10px; left: 15px; }
+.greeble.top-right { top: 10px; right: 15px; }
+.greeble.bottom-right { bottom: 10px; right: 15px; }
+
+
+/* =========================================
+   4. CHECKPOINT PAGE (index.html)
+========================================= */
+/* Video Backgrounds */
+#space-bg-video, #hyperspace-video {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    object-fit: cover; pointer-events: none;
+}
+#space-bg-video { z-index: -3; }
+#hyperspace-video {
+    z-index: -2; opacity: 0; transition: opacity 0.5s ease-in;
+}
+#hyperspace-video.jump-active { opacity: 1; }
+
+/* Layout & Title */
+.terminal-container {
+    display: flex; flex-direction: column; align-items: center;
+    width: 100%; max-width: 500px;
+}
+
+.main-title {
+    font-family: 'Audiowide', cursive; font-size: 4.5rem; letter-spacing: 5px;
+    color: var(--term-green); opacity: 0;
+    animation: snapVisible 0.1s forwards 2.0s; 
+}
+@keyframes snapVisible { to { opacity: 1; text-shadow: var(--term-glow); } }
+
+/* The Epic Star Explosion */
+.epic-star {
+    position: fixed; top: 50%; left: 50%;
+    margin-left: -90px; margin-top: -40px; 
+    width: 20px; height: 20px;
+    background: white; border-radius: 50%;
+    box-shadow: 0 0 40px 20px white, 0 0 80px 40px var(--term-green);
+    z-index: 50; pointer-events: none; opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+    animation: epicExplosion 3.5s linear forwards 0.2s;
+}
+.epic-star::before {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 300px; height: 3px; background: white; border-radius: 50%;
+    box-shadow: 0 0 20px 5px var(--term-green);
+}
+.epic-star::after {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 3px; height: 300px; background: white; border-radius: 50%;
+    box-shadow: 0 0 20px 5px var(--term-green);
+}
+.epic-star-diagonals {
+    position: absolute; top: 50%; left: 50%; width: 100%; height: 100%;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.epic-star-diagonals::before {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 120px; height: 2px; background: white; border-radius: 50%;
+    box-shadow: 0 0 15px 3px var(--term-green);
+}
+.epic-star-diagonals::after {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 2px; height: 120px; background: white; border-radius: 50%;
+    box-shadow: 0 0 15px 3px var(--term-green);
+}
+
+@keyframes epicExplosion {
+    0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; filter: brightness(1); }
+    30% { transform: translate(-50%, -50%) scale(1.5) rotate(135deg); opacity: 1; filter: brightness(2); }
+    50% { transform: translate(-50%, -50%) scale(150) rotate(220deg); opacity: 1; filter: brightness(3); }
+    70% { transform: translate(-50%, -50%) scale(150) rotate(290deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(150) rotate(360deg); opacity: 0; }
+}
+
+/* Auth Box & Form */
+.typewriter-container { margin-top: 20px; height: 30px; }
+.typewriter-text {
+    font-size: 1.5rem; overflow: hidden; white-space: nowrap;
+    border-right: 2px solid var(--term-green); width: 0; opacity: 0; 
+    animation: showBox 0.1s forwards 3.5s, typing 1s steps(30, end) forwards 3.5s, blinkCursor 0.5s step-end infinite alternate 3.5s;
+}
+
+.auth-box {
+    margin-top: 30px; background-color: var(--bg-deep);
+    border: 2px solid var(--term-green); overflow: hidden;
+    opacity: 0; width: 0px; height: 2px;
+    animation: showBox 0.1s forwards 4.6s, expandWidth 0.3s forwards 4.7s, expandHeight 0.3s forwards 5.0s;
+}
+.auth-form { padding: 30px; display: flex; flex-direction: column; gap: 15px; transition: opacity 0.3s ease; }
+.hidden-form { display: none; opacity: 0; }
+.active-form { display: flex; opacity: 1; }
+
+.auth-box h2 { font-size: 1.8rem; margin-bottom: 10px; border-bottom: 1px solid var(--border-dim); padding-bottom: 5px; }
+.auth-box label { font-size: 1.2rem; }
+.auth-box input {
+    background-color: transparent; border: 1px solid var(--border-dim);
+    color: var(--term-green); padding: 10px; font-size: 1.2rem; outline: none;
+}
+.auth-box input:focus { border-color: var(--term-green); }
+
+.action-btn {
+    background: transparent; border: 2px solid var(--term-green); color: var(--term-green);
+    padding: 10px; font-size: 1.5rem; cursor: pointer; margin-top: 10px; transition: all 0.2s;
+}
+.action-btn:hover { background: var(--term-green); color: black; }
+
+.toggle-link { text-align: center; margin-top: 10px; cursor: pointer; font-size: 1.1rem; }
+.toggle-link:hover { text-decoration: underline; }
+
+/* Invalid Login State */
+.auth-box.error-state { background-color: var(--error-red); color: black; border-color: white; }
+.auth-box.error-state .active-form { animation: shake 0.4s; }
+.auth-box.error-state input { background-color: #880000; color: white; }
+
+
+/* =========================================
+   5. DASHBOARD PAGE (home.html)
+========================================= */
 .dashboard-container { max-width: 1200px; margin: 0 auto; }
 
+/* Hero Banner */
 .hero-banner {
-    border: 1px solid var(--term-green);
-    padding: 40px; text-align: center; margin-bottom: 40px;
-    background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(74, 246, 38, 0.03) 10px, rgba(74, 246, 38, 0.03) 20px);
+    border: 1px solid var(--term-green); padding: 60px 40px; 
+    text-align: center; margin-bottom: 40px; background-color: transparent; 
 }
 .system-alert { font-size: 2rem; margin-bottom: 15px; color: var(--amber-accent); text-shadow: var(--amber-glow); }
 .hero-banner p { font-size: 1.5rem; margin-bottom: 25px; }
@@ -426,20 +284,35 @@ input:focus { border-color: var(--terminal-green); }
 }
 .action-btn-large:hover { background: var(--term-green); color: black; }
 
-/* --- 4. BOUNTY GRID (Featured Items) --- */
+.hero-bg {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('images/spaceship-bg.jpg'); 
+    background-size: cover; background-position: center;
+    filter: grayscale(100%); opacity: 0.15; z-index: 0;
+}
+
+.hero-grid {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, rgba(74, 246, 38, 0.2) 1px, transparent 1px), linear-gradient(to top, rgba(74, 246, 38, 0.2) 1px, transparent 1px);
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
+    mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
+    opacity: 0; transition: opacity 0.4s ease-in-out; z-index: 1;
+}
+.hero-banner:has(.action-btn-large:hover) .hero-grid { opacity: 1; }
+.hero-content { position: relative; z-index: 10; }
+
+/* Bounty Grid */
 .section-title { font-size: 1.8rem; border-bottom: 1px solid var(--term-green); padding-bottom: 5px; margin-bottom: 20px; }
 
 .bounty-grid {
-    display: grid;
-    /* This automatically makes it responsive! Columns shrink and stack on mobile */
+    display: grid; gap: 20px;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-    gap: 20px;
 }
 
 .bounty-card {
-    border: 1px solid var(--border-dim);
-    padding: 15px; display: flex; flex-direction: column; gap: 15px;
-    transition: all 0.2s;
+    border: 1px solid var(--border-dim); padding: 15px; 
+    display: flex; flex-direction: column; gap: 15px; transition: all 0.2s;
 }
 .bounty-card:hover { border-color: var(--term-green); box-shadow: 0 0 15px rgba(74, 246, 38, 0.1); }
 
@@ -456,79 +329,3 @@ input:focus { border-color: var(--terminal-green); }
     cursor: pointer; transition: 0.2s;
 }
 .acquire-btn:hover { background: var(--amber-accent); color: black; border-color: var(--amber-accent); }
-
-.cyber-panel {
-    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
-    position: relative; /* Needed for absolute elements inside */
-    overflow: hidden;
-}
-
-/* 2. Hero Banner Restyling */
-.hero-banner {
-    border: 1px solid var(--term-green);
-    padding: 60px 40px; 
-    text-align: center; 
-    margin-bottom: 40px;
-    background-color: transparent; /* Removed the old repeating gradient */
-}
-
-/* 3. The Spaceship Background */
-.hero-bg {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    
-    /* Change this to a real image path once you download one! */
-    background-image: url('images/spaceship-bg.jpg'); 
-    background-size: cover;
-    background-position: center;
-    
-    /* Makes the image black-and-white and very faint */
-    filter: grayscale(100%);
-    opacity: 0.15; 
-    z-index: 0;
-}
-
-/* 4. The Interactive Hover Grid */
-.hero-grid {
-    position: absolute;
-    bottom: 0; left: 0; width: 100%; height: 100%;
-    
-    /* Draws the glowing green grid lines */
-    background-size: 40px 40px;
-    background-image:
-        linear-gradient(to right, rgba(74, 246, 38, 0.2) 1px, transparent 1px),
-        linear-gradient(to top, rgba(74, 246, 38, 0.2) 1px, transparent 1px);
-        
-    /* Masks the grid so it's 100% visible at the bottom, fading to 0% in the middle */
-    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
-    mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
-    
-    /* Starts invisible */
-    opacity: 0;
-    transition: opacity 0.4s ease-in-out;
-    z-index: 1;
-}
-
-/* THE MAGIC TRIGGER: If the hero-banner contains a hovered button, fade the grid in! */
-.hero-banner:has(.action-btn-large:hover) .hero-grid {
-    opacity: 1;
-}
-
-/* 5. Data Greebles (Fake technical details) */
-.greeble {
-    position: absolute;
-    font-size: 0.9rem;
-    color: var(--term-green);
-    opacity: 0.5;
-    z-index: 2;
-    letter-spacing: 1px;
-}
-.greeble.top-left { top: 10px; left: 15px; }
-.greeble.top-right { top: 10px; right: 15px; }
-.greeble.bottom-right { bottom: 10px; right: 15px; }
-
-/* 6. Push the text above the backgrounds */
-.hero-content {
-    position: relative;
-    z-index: 10; /* Ensures the text and buttons are clickable and visible */
-}
