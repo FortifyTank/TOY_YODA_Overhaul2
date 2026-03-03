@@ -4,31 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Toy Yoda | Command Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="crt-theme">
 
-    <header class="global-header">
-        <div class="header-logo">TOY_YODA</div>
+    <div class="top-command-bar">
+    
+        <header class="global-header">
+            <div class="header-left">
+                <span class="clearance">[ CITIZEN_01 ]</span>
+            </div>
+            <div class="header-logo">TOY_YODA</div>
+            <div class="header-right">
+                <div class="header-search">
+                    <input type="text" placeholder="SEARCH DATABASE...">
+                </div>
+                <span class="cart-status">[ CARGO: 0 ]</span> 
+            </div>
+        </header>
+    
+        <nav class="global-nav">
+            <div class="nav-status-light"></div> 
+    
+            <a href="#" class="nav-link active">> OVERVIEW</a>
+            <a href="products.html" class="nav-link">> CARGO_MANIFEST</a>
+            <a href="#" class="nav-link">> COMMS_LINK</a>
+            <a href="#" class="nav-link">> SECURE_DOSSIER</a>
+        </nav>
         
-        <div class="header-search">
-            <span>> QUERY:</span>
-            <input type="text" placeholder="Search database...">
-        </div>
-        
-        <div class="header-user">
-            <span class="clearance">[ CITIZEN_01 ]</span>
-            <span class="cart-status">[ CARGO: 0 ]</span> 
-        </div>
-    </header>
-
-    <nav class="global-nav">
-        <a href="#" class="nav-link active">> OVERVIEW</a>
-        <a href="products.html" class="nav-link">> CARGO_MANIFEST</a>
-        <a href="#" class="nav-link">> COMMS_LINK</a>
-        <a href="#" class="nav-link">> SECURE_DOSSIER</a>
-    </nav>
+    </div>
 
     <main class="dashboard-container">
         
