@@ -16,15 +16,16 @@
     --bg-crt: #0a0f0a;         
     --bg-panel: rgba(5, 10, 5, 0.85); 
     
+    /* ADD THIS: The new dark military green for the hardware casing */
+    --bg-header: #0b220b;
+    
     /* Terminal Colors */
     --term-green: #4af626;
     --term-glow: 0 0 8px rgba(74, 246, 38, 0.4);
     
-    /* ADD THIS: The new Cyan color for Citizen UI */
+    /* Accents & Borders */
     --term-cyan: #00f0ff;
     --cyan-glow: 0 0 10px rgba(0, 240, 255, 0.5);
-    
-    /* Accents & Borders */
     --amber-accent: #ffb000;   
     --amber-glow: 0 0 10px rgba(255, 176, 0, 0.6);
     --error-red: #ff2a2a;      
@@ -52,7 +53,6 @@ body {
 .crt-theme {
     background-color: var(--bg-crt);
     overflow-y: auto; /* Allows scrolling on internal pages */
-    padding: 20px;
     height: auto;
     display: block;
 }
@@ -91,8 +91,8 @@ body {
     justify-content: space-between;
     align-items: center;
     
-    /* Pitch Black Background */
-    background-color: var(--bg-deep); 
+    /* USE THE NEW VARIABLE HERE! */
+    background-color: var(--bg-header); 
     
     /* Clean, sharp bottom border to separate it from the content */
     border-bottom: 2px solid var(--term-green); 
@@ -163,7 +163,7 @@ body {
 .global-nav {
     display: flex; gap: 30px;
     border-bottom: 1px solid var(--border-dim);
-    padding-bottom: 15px; margin-bottom: 30px;
+    padding: 0 20px 15px 20px; margin-bottom: 30px;
 }
 .nav-link {
     color: var(--term-green); text-decoration: none; font-size: 1.5rem;
@@ -304,7 +304,13 @@ body {
 /* =========================================
    5. DASHBOARD PAGE (home.html)
 ========================================= */
-.dashboard-container { max-width: 1200px; margin: 0 auto; }
+.dashboard-container { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    
+    /* ADDED padding here to protect your content */
+    padding: 0 20px 40px 20px; 
+}
 
 /* Hero Banner */
 .hero-banner {
