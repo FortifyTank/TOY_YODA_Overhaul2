@@ -5,33 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Toy Yoda | Customs Checkpoint</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <video id="space-bg-video" autoplay loop muted playsinline>
-        <source src="images/slow-stars.mp4" type="video/mp4">
-    </video>
+    <div class="intro-overlay"></div>
 
-    <video id="hyperspace-video" muted playsinline>
-        <source src="images/hyperspace.mp4" type="video/mp4">
-    </video>
+    <div class="camera-rig" id="cameraRig">
+        <div class="parallax-layer" data-speed="1">
+            <div class="parallax-img intro-bg" style="background-image: url('images/bg-space.png');"></div>
+        </div>
+        
+        <div class="parallax-layer" data-speed="3">
+            <div class="parallax-img intro-planet" style="background-image: url('images/planet-main.png');"></div>
+        </div>
+        
+        <div class="parallax-layer" data-speed="5">
+            <div class="parallax-img intro-rim" style="background-image: url('images/planet-rim.png');"></div>
+        </div>
+        
+        <div class="parallax-layer" data-speed="8">
+            <div class="parallax-img intro-ship" style="background-image: url('images/ship-right.png');"></div>
+        </div>
+        <div class="parallax-layer" data-speed="9">
+            <div class="parallax-img intro-ship" style="background-image: url('images/ship-left.png');"></div>
+        </div>
+    </div>
 
     <main class="terminal-container">
         
-        <div class="epic-star">
-            <div class="epic-star-diagonals"></div>
+        <div class="ui-wrapper ui-reveal">
+            <div class="brand-header">
+                <h1 class="main-title">TOY YODA</h1>
+            </div>
+
+            <div id="startPrompt" class="start-prompt">
+                <p class="blink-text">PRESS [ ENTER ] TO DEPLOY</p>
+            </div>
         </div>
 
-        <div class="brand-header">
-            <h1 class="main-title">TOY YODA</h1>
-        </div>
-
-        <div class="typewriter-container">
-            <p class="typewriter-text">> AWAITING CLEARANCE. PLEASE LOGIN_</p>
-        </div>
-
-        <div class="auth-box" id="authBox">
-            
+        <div class="auth-box hidden" id="authBox">
             <form id="loginForm" class="auth-form active-form">
                 <h2>// IDENTIFICATION REQUIRED</h2>
                 <div class="input-group">
@@ -42,15 +54,19 @@
                     <label>> PASSCODE</label>
                     <input type="password" id="loginPass" required placeholder="••••••••">
                 </div>
+                
+                <p class="error-msg hidden" id="loginError">> ERROR: INVALID CREDENTIALS</p>
+                
                 <button type="submit" class="action-btn">[ SUBMIT CREDENTIALS ]</button>
                 <p class="toggle-link" id="showRegister">> NO DOSSIER? [ CREATE ACCOUNT ]</p>
             </form>
 
             <form id="registerForm" class="auth-form hidden-form">
+                <div class="tactical-line"></div>
                 <h2>// NEW DOSSIER ENTRY</h2>
                 <div class="input-group">
                     <label>> DESIGNATION (NAME)</label>
-                    <input type="text" required placeholder="CT-5555">
+                    <input type="text" id="regName" required placeholder="CT-5555">
                 </div>
                 <div class="input-group">
                     <label>> CITIZEN EMAIL</label>
@@ -60,10 +76,12 @@
                     <label>> PASSCODE</label>
                     <input type="password" required placeholder="••••••••">
                 </div>
+                
+                <p class="error-msg hidden" id="registerError">> ERROR: DOSSIER ALREADY EXISTS</p>
+                
                 <button type="submit" class="action-btn">[ REGISTER ]</button>
                 <p class="toggle-link" id="showLogin">> BACK TO CHECKPOINT</p>
             </form>
-
         </div>
     </main>
 

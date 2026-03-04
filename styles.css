@@ -49,7 +49,6 @@ body {
     
     /* ADD YOUR HELLDIVERS PLANET IMAGE HERE */
     /* Make sure you have a cool space background in your images folder */
-    background-image: url('images/your-planet-bg.jpg'); 
     background-size: cover;
     background-position: center;
     background-attachment: fixed; /* Keeps the background still while scrolling */
@@ -71,16 +70,6 @@ body {
 ========================================= */
 
 /* SHARED ANIMATIONS */
-@keyframes revealText {
-    0% { opacity: 0; text-shadow: none; }
-    50% { opacity: 1; text-shadow: 0 0 20px white; } 
-    100% { opacity: 1; text-shadow: 0 0 10px var(--term-green); } 
-}
-@keyframes typing { to { width: 100%; } }
-@keyframes blinkCursor { 50% { border-color: transparent; } }
-@keyframes showBox { to { opacity: 1; } }
-@keyframes expandWidth { to { width: 100%; } }
-@keyframes expandHeight { to { height: 420px; } }
 @keyframes shake {
     0% { transform: translateX(0); }
     25% { transform: translateX(-10px); }
@@ -332,118 +321,175 @@ body {
 .greeble.top-right { top: 10px; right: 15px; }
 .greeble.bottom-right { bottom: 10px; right: 15px; }
 
-
-/* =========================================
-   4. CHECKPOINT PAGE (index.html)
-========================================= */
-/* Video Backgrounds */
-#space-bg-video, #hyperspace-video {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    object-fit: cover; pointer-events: none;
-}
-#space-bg-video { z-index: -3; }
-#hyperspace-video {
-    z-index: -2; opacity: 0; transition: opacity 0.5s ease-in;
-}
-#hyperspace-video.jump-active { opacity: 1; }
-
-/* Layout & Title */
-.terminal-container {
-    display: flex; flex-direction: column; align-items: center;
-    width: 100%; max-width: 500px;
-}
-
 .main-title {
-    font-family: 'Audiowide', cursive; font-size: 4.5rem; letter-spacing: 5px;
-    color: var(--term-green); opacity: 0;
-    animation: snapVisible 0.1s forwards 2.0s; 
-}
-@keyframes snapVisible { to { opacity: 1; text-shadow: var(--term-glow); } }
-
-/* The Epic Star Explosion */
-.epic-star {
-    position: fixed; top: 50%; left: 50%;
-    margin-left: -90px; margin-top: -40px; 
-    width: 20px; height: 20px;
-    background: white; border-radius: 50%;
-    box-shadow: 0 0 40px 20px white, 0 0 80px 40px var(--term-green);
-    z-index: 50; pointer-events: none; opacity: 0;
-    transform: translate(-50%, -50%) scale(0);
-    animation: epicExplosion 3.5s linear forwards 0.2s;
-}
-.epic-star::before {
-    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 300px; height: 3px; background: white; border-radius: 50%;
-    box-shadow: 0 0 20px 5px var(--term-green);
-}
-.epic-star::after {
-    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 3px; height: 300px; background: white; border-radius: 50%;
-    box-shadow: 0 0 20px 5px var(--term-green);
-}
-.epic-star-diagonals {
-    position: absolute; top: 50%; left: 50%; width: 100%; height: 100%;
-    transform: translate(-50%, -50%) rotate(45deg);
-}
-.epic-star-diagonals::before {
-    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 120px; height: 2px; background: white; border-radius: 50%;
-    box-shadow: 0 0 15px 3px var(--term-green);
-}
-.epic-star-diagonals::after {
-    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 2px; height: 120px; background: white; border-radius: 50%;
-    box-shadow: 0 0 15px 3px var(--term-green);
+    font-family: 'Audiowide', cursive; font-size: 4.5rem; letter-spacing: 5px; color: #ffffff; 
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    transform: scaleX(1.2); transform-origin: center; 
+    animation: titleStretch 1.2s ease-out forwards 2s; /* Faster stretch */
 }
 
-@keyframes epicExplosion {
-    0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; filter: brightness(1); }
-    30% { transform: translate(-50%, -50%) scale(1.5) rotate(135deg); opacity: 1; filter: brightness(2); }
-    50% { transform: translate(-50%, -50%) scale(150) rotate(220deg); opacity: 1; filter: brightness(3); }
-    70% { transform: translate(-50%, -50%) scale(150) rotate(290deg); opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(150) rotate(360deg); opacity: 0; }
+@keyframes titleStretch {
+    to { transform: scaleX(1); }
 }
 
-/* Auth Box & Form */
-.typewriter-container { margin-top: 20px; height: 30px; }
-.typewriter-text {
-    font-size: 1.5rem; overflow: hidden; white-space: nowrap;
-    border-right: 2px solid var(--term-green); width: 0; opacity: 0; 
-    animation: showBox 0.1s forwards 3.5s, typing 1s steps(30, end) forwards 3.5s, blinkCursor 0.5s step-end infinite alternate 3.5s;
-}
+/* The !important forces the browser to collapse the invisible space! */
+.hidden-form { display: none !important; opacity: 0; }
+.active-form { display: flex !important; opacity: 1; }
 
 .auth-box {
-    margin-top: 30px; background-color: var(--bg-deep);
-    border: 2px solid var(--term-green); overflow: hidden;
-    opacity: 0; width: 0px; height: 2px;
-    animation: showBox 0.1s forwards 4.6s, expandWidth 0.3s forwards 4.7s, expandHeight 0.3s forwards 5.0s;
+    margin-top: 30px; background-color: #1a1e24; 
+    border: 4px solid var(--amber-accent); 
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8), 0 10px 20px rgba(0,0,0,0.5); 
+    position: relative; width: 100%; 
+    /* Removed transition line here to allow for the scan animation */
 }
-.auth-form { padding: 30px; display: flex; flex-direction: column; gap: 15px; transition: opacity 0.3s ease; }
-.hidden-form { display: none; opacity: 0; }
-.active-form { display: flex; opacity: 1; }
 
-.auth-box h2 { font-size: 1.8rem; margin-bottom: 10px; border-bottom: 1px solid var(--border-dim); padding-bottom: 5px; }
-.auth-box label { font-size: 1.2rem; }
+.auth-box.hidden {
+    opacity: 0; visibility: hidden; pointer-events: none; position: absolute;
+}
+
+/* THE NEW DEPLOY ANIMATION */
+.auth-box.deploying {
+    animation: boxDeploy 0.6s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes boxDeploy {
+    0% {
+        opacity: 1;
+        /* Hides everything except a 0-width dot in the top center border */
+        clip-path: inset(0 50% calc(100% - 4px) 50%);
+    }
+    40% {
+        /* Shoots outwards into a full-width yellow line */
+        clip-path: inset(0 0 calc(100% - 4px) 0);
+    }
+    100% {
+        /* Drops the curtain down to reveal the rest of the box! (-50px stops it from clipping the shadow) */
+        clip-path: inset(-50px);
+    }
+}
+
+/* Force everything inside the form to the left */
+.auth-form { 
+    padding: 35px; 
+    display: flex; flex-direction: column; gap: 15px; 
+    transition: opacity 0.3s ease; 
+    text-align: left; 
+    align-items: stretch; 
+    min-height: 460px; /* ADD THIS: Locks the height. Adjust this number if needed! */
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Adds a little breathing room between the label and the text box */
+    width: 100%;
+}
+
+/* 3. Force the inputs to reach the very end of the box */
 .auth-box input {
-    background-color: transparent; border: 1px solid var(--border-dim);
-    color: var(--term-green); padding: 10px; font-size: 1.2rem; outline: none;
+    width: 100%; /* ADD THIS: Forces the box to stretch to the right edge */
+    box-sizing: border-box; /* ADD THIS: Prevents the padding from breaking the width */
+    background-color: rgba(255, 255, 255, 0.05); 
+    border: 1px solid var(--border-dim);
+    color: var(--term-text); 
+    padding: 10px; font-size: 1.2rem; outline: none;
+    transition: all 0.3s ease;
 }
-.auth-box input:focus { border-color: var(--term-green); }
 
+.auth-box input:focus { 
+    border-color: var(--amber-accent); 
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Yellow Headers */
+.auth-box h2 { 
+    font-size: 1.6rem; 
+    margin-bottom: 15px; 
+    border-bottom: 1px solid var(--border-dim); 
+    padding-bottom: 5px; 
+    color: var(--amber-accent); 
+    text-align: left; /* Keeps title left-aligned */
+}
+
+/* Crisp, Bold labels (Matching the "CLASSIFIED" font) */
+.auth-box label { 
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; /* Forces it bold */
+    font-size: 1.2rem; 
+    letter-spacing: 1.5px; /* Adds that tactical tracking */
+    color: var(--term-muted); 
+    text-align: left;
+}
+
+/* 6. Action Button matched to "Initiate Full System Scan" */
 .action-btn {
-    background: transparent; border: 2px solid var(--term-green); color: var(--term-green);
-    padding: 10px; font-size: 1.5rem; cursor: pointer; margin-top: 10px; transition: all 0.2s;
+    align-self: center; /* FIX: Centers the button! */
+    background: rgba(0,0,0,0.5); 
+    border: 2px solid var(--amber-accent); 
+    color: var(--amber-accent);
+    padding: 10px 25px; 
+    font-size: 1.4rem; cursor: pointer; margin-top: 15px; 
+    transition: all 0.2s ease;
+    font-weight: bold;
 }
-.action-btn:hover { background: var(--term-green); color: black; }
+.action-btn:hover { 
+    background: var(--amber-accent); 
+    color: var(--bg-deep); 
+    box-shadow: var(--amber-glow); 
+}
 
-.toggle-link { text-align: center; margin-top: 10px; cursor: pointer; font-size: 1.1rem; }
-.toggle-link:hover { text-decoration: underline; }
+/* 7. Toggle Link matched to "Cargo Manifest" Nav Links */
+.toggle-link { 
+    display: inline-block;
+    text-align: center; margin-top: 15px; cursor: pointer; font-size: 1.1rem; 
+    color: var(--term-muted);
+    border-bottom: 2px solid transparent;
+    padding-bottom: 2px;
+    transition: all 0.2s ease;
+}
+.toggle-link:hover { 
+    color: var(--amber-accent);
+    border-bottom-color: var(--amber-accent);
+    text-decoration: none;
+}
 
 /* Invalid Login State */
-.auth-box.error-state { background-color: var(--error-red); color: black; border-color: white; }
-.auth-box.error-state .active-form { animation: shake 0.4s; }
-.auth-box.error-state input { background-color: #880000; color: white; }
+/* =========================================
+   AUTOMATON ERROR STATE (Red & Black)
+========================================= */
+/* Turns the entire box into dark steel and glowing crimson */
+.auth-box.error-state {
+    background-color: #0d0202; /* Deep Automaton Black/Red */
+    border-color: #ff2a2a; /* Harsh Red */
+    box-shadow: inset 0 0 30px rgba(255, 0, 0, 0.3), 0 10px 20px rgba(255, 0, 0, 0.4);
+    
+    /* Triggers the UI to violently shake when an error occurs */
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
 
+/* Turns all headers, text, and inputs red */
+.auth-box.error-state h2 { color: #ff2a2a; border-bottom-color: #ff2a2a; }
+.auth-box.error-state label { color: #ff6666; }
+.auth-box.error-state input { border-color: #ff2a2a; background-color: rgba(255, 42, 42, 0.05); color: #ff2a2a; }
+.auth-box.error-state input:focus { background-color: rgba(255, 42, 42, 0.15); box-shadow: 0 0 10px rgba(255, 42, 42, 0.4); }
+
+/* Turns the button red */
+.auth-box.error-state .action-btn { border-color: #ff2a2a; color: #ff2a2a; }
+.auth-box.error-state .action-btn:hover { background: #ff2a2a; color: #000; box-shadow: 0 0 15px rgba(255, 42, 42, 0.8); }
+
+/* The Error Message Text */
+.error-msg {
+    color: #ff2a2a;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: -5px; /* Pulls it tight to the button */
+    text-shadow: 0 0 8px rgba(255, 42, 42, 0.6);
+    animation: blink 1s infinite; /* Uses your existing blink animation! */
+}
+.error-msg.hidden { display: none !important; }
 
 /* =========================================
    5. DASHBOARD PAGE (home.html)
@@ -673,19 +719,113 @@ body {
 }
 
 /* =========================================
-   ANTI-SQUISH ZOOM PROTECTION
+   CINEMATIC INTRO ANIMATIONS
 ========================================= */
-@media (max-width: 1150px) {
-    .global-header {
-        flex-wrap: wrap; /* Allows items to drop to a new line */
-        gap: 20px;
-    }
-    
-    /* Forces the logo to take its own row so nothing crashes into it */
-    .header-logo {
-        order: -1; 
-        width: 100%; 
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--border-dim);
-    }
+.intro-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #000; z-index: 999; pointer-events: none;
+    /* Fades out very fast so we see the massive rim immediately */
+    animation: fadeOverlay 0.8s ease-out 0.2s forwards;
 }
+@keyframes fadeOverlay { to { opacity: 0; visibility: hidden; } }
+
+.parallax-img { width: 100%; height: 100%; background-size: cover; background-position: center; background-repeat: no-repeat; }
+
+/* 1. Background */
+.intro-bg { 
+    transform: scale(1.3);
+    animation: introZoom 3.5s cubic-bezier(0.25, 1, 0.3, 1) forwards; 
+}
+
+/* 2. THE RIM */
+.intro-rim { 
+    transform: translate(15%, -100%) scale(4);
+    animation: introRimSettle 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s forwards; 
+}
+
+/* 3. THE PLANET */
+.intro-planet { 
+    transform: translateY(40%) scale(0.9);
+    animation: introPlanetRise 2.5s cubic-bezier(0.25, 1, 0.3, 1) 0.3s forwards; 
+}
+
+/* 4. THE SHIPS (Warp in much sooner!) */
+.intro-ship { 
+    opacity: 0; transform: scale(5); filter: blur(20px);
+    animation: introWarp 1s cubic-bezier(0.1, 0.9, 0.2, 1) 1.5s forwards; 
+}
+
+/* The Keyframes that bring everything to their normal positions */
+@keyframes introZoom { to { transform: scale(1); } }
+@keyframes introRimSettle { to { transform: translate(0, 0) scale(1); } }
+@keyframes introPlanetRise { to { transform: translateY(0) scale(1); } }
+@keyframes introWarp { to { opacity: 1; transform: scale(1); filter: blur(0); } }
+
+
+/* =========================================
+   PARALLAX CAMERA RIG (FRAMING)
+========================================= */
+body { overflow: hidden; background-color: #000; }
+
+.camera-rig {
+    position: fixed; 
+    
+    /* Pulled all the way back. Just 10% extra so the mouse parallax still works without showing black edges */
+    width: 130vw; 
+    height: 130vh; 
+    
+    /* Dead center. */
+    top: -25%; 
+    left: -25%;
+    
+    transition: transform 1.5s cubic-bezier(0.25, 1, 0.2, 1); 
+    z-index: -1;
+}
+
+/* STRONGER PAN RIGHT: Swings the camera hard to look at the left ship */
+.camera-rig.pan-to-ship {
+    transform: translate(25%, 5%) scale(1.5); 
+}
+
+.parallax-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    transition: transform 0.1s ease-out; 
+}
+
+/* =========================================
+   UI & PROMPT ALIGNMENT
+========================================= */
+.terminal-container {
+    position: absolute;
+    top: 50%; 
+    left: 50%; /* FIX: Moves it back to the exact middle of the screen */
+    transform: translate(-50%, -50%); /* FIX: Centers it perfectly on both the X and Y axis */
+    display: flex; flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    width: 100%; 
+    max-width: 600px; /* FIX: Increased from 500px to make the box wider and more spacious! */
+    z-index: 10;
+}
+
+.ui-wrapper {
+    display: flex; flex-direction: column; 
+    align-items: center; /* FIX: Centers the TOY YODA Title */
+}
+
+/* Title waits for ships to arrive before fading in */
+.ui-reveal {
+    opacity: 0;
+    animation: revealWrapper 1s ease forwards 2s; 
+}
+@keyframes revealWrapper { to { opacity: 1; } }
+
+.start-prompt {
+    margin-top: 30px; font-size: 2rem; color: var(--amber-accent);
+    letter-spacing: 4px; cursor: pointer;
+    text-shadow: 0 0 10px rgba(255, 232, 0, 0.5);
+    transition: opacity 0.3s;
+}
+
+.blink-text { animation: blink 1.5s infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
