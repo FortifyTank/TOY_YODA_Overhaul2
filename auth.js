@@ -110,15 +110,41 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     // Form Submit Intercepts (Fake Validation)
     loginForm.addEventListener("submit", (e) => {
-        e.preventDefault(); // Stops the page from reloading
+        e.preventDefault();
         const pass = document.getElementById("loginPass").value;
 
-        // FAKE LOGIC: If password isn't exactly "demo", trigger error!
-        if(pass !== "demo") {
-            triggerError("loginError", "> ERROR: INVALID CREDENTIALS");
+        // FAKE LOGIC: If password is "demo", trigger the hyperspace sequence!
+        if(pass === "demo") {
+            const terminal = document.querySelector(".terminal-container");
+            const ships = document.querySelectorAll(".intro-ship"); // [0] is right ship, [1] is left ship
+
+            // 1. The UI slides down and disappears
+            terminal.classList.add("ui-hyperspace-hide");
+
+            // 2. Right ship goes to hyperspace (0.4s delay)
+            setTimeout(() => {
+                ships[0].classList.add("jump-to-lightspeed");
+            }, 400);
+
+            // 3. Left ship goes to hyperspace right after (0.55s delay)
+            setTimeout(() => {
+                ships[1].classList.add("jump-to-lightspeed");
+            }, 550);
+
+            // 4. Fade to black seamlessly (Delayed to 1200 to let the ships finish jumping!)
+            const fade = document.createElement('div');
+            fade.className = 'warp-fade';
+            document.body.appendChild(fade);
+            setTimeout(() => fade.classList.add('active'), 1200);
+
+            // 5. Load the Homepage! (Delayed to 1300ms)
+            setTimeout(() => {
+                // THE FIX: We pass the flag directly in the URL instead of sessionStorage!
+                window.location.href = "home.html?warp=true"; 
+            }, 1500);
+
         } else {
-            // If they type "demo", pretend they logged in and go to dashboard
-            window.location.href = "home.html"; 
+            triggerError("loginError", "> ERROR: INVALID CREDENTIALS");
         }
     });
 

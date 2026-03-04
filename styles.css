@@ -829,3 +829,81 @@ body { overflow: hidden; background-color: #000; }
 
 .blink-text { animation: blink 1.5s infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* =========================================
+   HYPERSPACE LOGIN SEQUENCE
+========================================= */
+/* 1. UI Drops out of the bottom of the screen */
+.ui-hyperspace-hide {
+    animation: uiSlideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+@keyframes uiSlideDown {
+    0% { transform: translate(-50%, -50%); opacity: 1; }
+    100% { transform: translate(-50%, 150%); opacity: 0; }
+}
+
+/* 2. Ships get sucked into the dead center of the screen */
+.jump-to-lightspeed {
+    transform-origin: center center; 
+    /* Uses a standard 'ease-in' so it starts slow and accelerates perfectly */
+    animation: lightspeedJump 0.3s ease-in forwards !important; 
+}
+
+@keyframes lightspeedJump {
+    0% { 
+        transform: scale(1); 
+        filter: blur(0); 
+        opacity: 1; 
+    }
+    60% {
+        /* ACCELERATION: Ship begins pushing forward smoothly (shrinking slightly) */
+        transform: scale(0.90);
+        filter: blur(1px); /* Slight motion blur begins */
+        opacity: 1;
+    }
+    100% {
+        /* THE BOOM: Violently snaps to the vanishing point */
+        transform: scale(0);
+        filter: blur(1px); /* Massive speed blur */
+        opacity: 0;
+    }
+}
+/* 3. Smooth fade to black right before loading the dashboard */
+.warp-fade {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #000; z-index: 9999;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease-in;
+}
+.warp-fade.active { opacity: 1; }
+
+/* =========================================
+   HOMEPAGE REVEAL FADE (Only after Login)
+========================================= */
+.boot-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 9999;
+    
+    /* FIX: Starts completely black and visible so it never flashes the page! */
+    opacity: 1; 
+    visibility: visible;
+    pointer-events: none;
+}
+
+/* Instantly removes the black screen when clicking normal tabs */
+.boot-overlay.hidden {
+    display: none !important;
+}
+
+/* The cinematic fade animation */
+.boot-overlay.fade-out {
+    animation: boot-fade-out 1.2s ease forwards;
+}
+
+@keyframes boot-fade-out {
+    0%   { opacity: 1; visibility: visible; }
+    40%  { opacity: 1; visibility: visible; } /* Hold black briefly */
+    100% { opacity: 0; visibility: hidden; }
+}
