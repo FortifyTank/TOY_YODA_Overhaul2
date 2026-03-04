@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // 5. Load the Homepage! (Delayed to 1300ms)
             setTimeout(() => {
                 // THE FIX: We pass the flag directly in the URL instead of sessionStorage!
-                window.location.href = "home.html?warp=true"; 
+                window.location.href = "/home?warp=true";
             }, 1500);
 
         } else {
