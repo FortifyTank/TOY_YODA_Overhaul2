@@ -121,22 +121,6 @@ body {
     text-shadow: 0 0 10px rgba(255,255,255,0.3);
     white-space: nowrap;
 }
-.css-logo-temp {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    font-size: 2.2rem;
-    font-weight: 700;
-    letter-spacing: 4px;
-    color: var(--term-text);
-}
-
-.css-logo-temp .logo-bar {
-    width: 120%;
-    height: 3px;
-    background-color: var(--term-muted);
-}
 
 .header-search input {
     background: rgba(255, 255, 255, 0.05); /* Slightly visible frosted box */
