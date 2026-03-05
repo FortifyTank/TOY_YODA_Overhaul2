@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- STATE MANAGEMENT ---
     let allProducts = []; 
     let currentSort = 'LATEST'; 
+    let currentPage = 1;
+    const itemsPerPage = 16;
 
     // --- DOM ELEMENTS ---
     const container = document.getElementById('product-container');
@@ -10,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const priceSlider = document.getElementById("priceSlider");
     const priceDisplay = document.getElementById("priceDisplay");
-    
+    const topPagination = document.getElementById('topPagination');
+    const bottomPagination = document.getElementById('bottomPagination');
+
     const themeCheckboxes = document.querySelectorAll('.theme-checkbox');
     const stockCheckboxes = document.querySelectorAll('.stock-checkbox');
     const sortDropdown = document.getElementById('sortDropdown');
@@ -112,19 +116,35 @@ document.addEventListener('DOMContentLoaded', () => {
             filtered.sort((a, b) => b.name.localeCompare(a.name));
         }
 
+        currentPage = 1; // Reset to first page whenever filters change
         renderProducts(filtered);
     }
 
-    function renderProducts(productsToDraw) {
+    function renderProducts(filteredList) {
         container.innerHTML = ''; 
-        resultCount.innerText = `[ SHOWING: ${productsToDraw.length} / ${allProducts.length} ]`;
+        
+        const totalItems = filteredList.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        
+        // 1. Array Slicing Math (Grabs only 16 items depending on the page)
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageItems = filteredList.slice(startIndex, endIndex);
 
-        if (productsToDraw.length === 0) {
+        // 2. Update the "Showing" text format
+        if (totalItems === 0) {
+            resultCount.innerText = `[ SHOWING: 0 / 0 ]`;
             container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--term-muted); font-size: 1.5rem; margin-top: 50px;">> NO MANIFESTS MATCH CURRENT PARAMETERS.</p>';
+            renderPagination(0, filteredList);
             return;
         }
 
-        productsToDraw.forEach(product => {
+        const showingStart = startIndex + 1;
+        const showingEnd = Math.min(endIndex, totalItems);
+        resultCount.innerText = `[ SHOWING: ${showingStart}-${showingEnd} OF ${totalItems} ]`;
+
+        // 3. Draw the sliced items
+        pageItems.forEach(product => {
             let leftBadgeHTML = '';
             const ribbonStyle = `position: absolute; bottom: 10px; left: 0; padding: 4px 12px 4px 8px; font-weight: bold; font-size: 0.75em; clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%); z-index: 10; opacity: 1; height: 20px; display: flex; align-items: center;`;
 
@@ -153,21 +173,97 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="product-info">
                             <span class="product-category">> ${product.category}</span>
                             <h3 class="product-name">${product.name}</h3>
-                            <div class="price-container" style="display: flex; align-items: flex-end; gap: 8px;">
+                            <div class="price-container">
                                 <span class="product-price" style="line-height: 1;">${currentPriceFormatted}</span>
                                 ${product.onSale ? `<span style="text-decoration: line-through; color: #e5a823; font-size: 0.7em; line-height: 1.2;">${oldPriceFormatted}</span>` : ''}
                             </div>
                         </div>
                     </a>
                     <div class="product-actions">
-                        <button class="tac-btn tac-btn--full" ${!product.inStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                            ${product.inStock ? '[ ADD TO CART ]' : '[ OUT OF STOCK ]'}
-                        </button>
-                    </div>
+                            <button class="tac-btn tac-btn--full" 
+                                ${!product.inStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}
+                                onclick='addToCart(${JSON.stringify(product)})'>
+                                ${product.inStock ? '[ ADD TO CART ]' : '[ OUT OF STOCK ]'}
+                            </button>
+                        </div>
                 </div>
             `;
             container.innerHTML += cardHTML;
         });
+        
+        // 4. Draw the page buttons
+        renderPagination(totalPages, filteredList);
+    }
+
+    function renderPagination(totalPages, filteredList) {
+        if (totalPages <= 1) {
+            topPagination.innerHTML = '';
+            bottomPagination.innerHTML = '';
+            return;
+        }
+
+        let buttonsHTML = `
+            <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} data-page="prev">[ < ]</button>
+        `;
+        
+        // --- SMART TRUNCATION LOGIC ---
+        let pages = [];
+        if (totalPages <= 5) {
+            // If 5 or fewer pages, just show all of them
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            // If we are near the beginning
+            if (currentPage <= 3) {
+                pages = [1, 2, 3, 4, '...', totalPages];
+            } 
+            // If we are near the end
+            else if (currentPage >= totalPages - 2) {
+                pages = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+            } 
+            // If we are somewhere in the middle
+            else {
+                pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+            }
+        }
+
+        // --- DRAW THE BUTTONS ---
+        pages.forEach(p => {
+            if (p === '...') {
+                // Draw unclickable ellipsis
+                buttonsHTML += `<span style="color: var(--term-muted); font-weight: bold; margin: 0 5px;">...</span>`;
+            } else {
+                // Draw normal page buttons
+                buttonsHTML += `<button class="page-btn ${currentPage === p ? 'active' : ''}" data-page="${p}">[ ${p} ]</button>`;
+            }
+        });
+        
+        buttonsHTML += `
+            <button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} data-page="next">[ > ]</button>
+        `;
+
+        topPagination.innerHTML = buttonsHTML;
+        bottomPagination.innerHTML = buttonsHTML;
+
+        // --- CLICK EVENTS ---
+        const attachClickEvents = (navContainer) => {
+            const btns = navContainer.querySelectorAll('.page-btn');
+            btns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const action = e.target.getAttribute('data-page');
+                    if (!action) return; // Ignores clicks if they somehow click the ellipsis
+                    
+                    if (action === 'prev' && currentPage > 1) currentPage--;
+                    else if (action === 'next' && currentPage < totalPages) currentPage++;
+                    else if (action !== 'prev' && action !== 'next') currentPage = parseInt(action);
+                    
+                    renderProducts(filteredList);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        };
+
+        attachClickEvents(topPagination);
+        attachClickEvents(bottomPagination);
     }
 
     // --- EVENT LISTENERS ---

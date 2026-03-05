@@ -24,12 +24,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // --- ROUTES (The Controller Logic will go here eventually) ---
 
-// Route for the Login Checkpoint (index.html)
+// 1. Root Route: Now serves the Dashboard (home.html) as the landing page
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'home.html'));
+});
+
+// 2. Login Route: Dedicated path for the Checkpoint (index.html)
+app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-// Route for the Dashboard (home.html)
+// 3. Keep the /home alias so your existing navigation links don't break
 app.get('/home', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'home.html'));
 });

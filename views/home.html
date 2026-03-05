@@ -13,7 +13,7 @@
     
         <header class="global-header">
             <div class="header-left">
-                <span class="clearance">[ ACCOUNT ]</span>
+                <a href="/login" class="clearance">[ LOG IN ]</a>
             </div>
             <div class="header-logo">
                 <img src="images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
@@ -129,8 +129,36 @@
             </section>
 
     </main>
+
+    <div id="cartOverlay" class="cart-overlay"></div>
+    
+    <div id="cartDrawer" class="cart-drawer cyber-panel">
+        <div class="cart-header">
+            <h3>// CARGO MANIFEST</h3>
+            <button id="closeCartBtn" class="close-btn">[ X ]</button>
+        </div>
+        
+        <div id="cartItemsContainer" class="cart-items">
+            </div>
+        
+        <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>TOTAL ESTIMATE:</span>
+                <span id="cartTotalDisplay" class="text-amber">₱0</span>
+            </div>
+            <button class="tac-btn tac-btn--full tac-btn--lg">[ PROCEED TO CHECKOUT ]</button>
+            <button id="clearCartBtn" class="tac-btn tac-btn--full tac-btn--ghost" style="margin-top: 10px;">[ JETTISON CARGO ]</button>
+        </div>
+    </div>
+
+    <div id="systemAlert" class="system-alert-box">
+        <div class="alert-icon">[!]</div>
+        <div class="alert-message" id="systemAlertMessage">> SYSTEM WARNING</div>
+        <button class="tac-btn" id="systemAlertOkBtn">[ ACKNOWLEDGE ]</button>
+    </div>
+
     <div id="bootOverlay" class="boot-overlay"></div>
     <script src="/js/dashboard.js"></script>
-
+    <script src="/js/cart.js"></script>
 </body>
 </html>

@@ -12,7 +12,7 @@
     <div class="top-command-bar">
         <header class="global-header">
             <div class="header-left">
-                <span class="clearance">[ ACCOUNT ]</span>
+                <a href="/login" class="clearance">[ LOG IN ]</a>
             </div>
             <div class="header-logo">
                 <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
@@ -97,19 +97,50 @@
                     <option value="NAME: Z-A">NAME: Z-A</option>
                     <option value="DEEP DISCOUNTS">DEEP DISCOUNTS</option>
                 </select>
+
+                <div id="topPagination" class="pagination-controls" style="margin: 0 auto;"></div>
                 
-                <div id="resultCount" style="margin-left: auto; color: var(--amber-accent); font-weight: bold; font-size: 1.1rem; letter-spacing: 1px;">
+                <div id="resultCount">
                     [ SHOWING: 0/0 ]
                 </div>
             </div>
 
             <div class="product-grid" id="product-container">
-
             </div>
+
+            <div id="bottomPagination" class="pagination-controls bottom-nav"></div>
         </section>
     </main>
+
+    <div id="cartOverlay" class="cart-overlay"></div>
+    
+    <div id="cartDrawer" class="cart-drawer cyber-panel">
+        <div class="cart-header">
+            <h3>// YOUR CART</h3>
+            <button id="closeCartBtn" class="close-btn">[ X ]</button>
+        </div>
+        
+        <div id="cartItemsContainer" class="cart-items"></div>
+        
+        <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>TOTAL ESTIMATE:</span>
+                <span id="cartTotalDisplay" class="text-amber">₱0</span>
+            </div>
+            <button class="tac-btn tac-btn--full tac-btn--lg">[ PROCEED TO CHECKOUT ]</button>
+            <button id="clearCartBtn" class="tac-btn tac-btn--full tac-btn--ghost" style="margin-top: 10px;">[ CLEAR CART ]</button>
+        </div>
+    </div>
+
+    <div id="systemAlert" class="system-alert-box">
+        <div class="alert-icon">[!]</div>
+        <div class="alert-message" id="systemAlertMessage">> SYSTEM WARNING</div>
+        <button class="tac-btn" id="systemAlertOkBtn">[ ACKNOWLEDGE ]</button>
+    </div>
+
     <div id="bootOverlay" class="boot-overlay"></div>
     <script src="/js/dashboard.js"></script>
     <script src="/js/catalog.js"></script>
+    <script src="/js/cart.js"></script>
 </body>
 </html>

@@ -30,6 +30,9 @@
     --amber-glow-subtle: 0 0 6px rgba(255, 232, 0, 0.25);
     
     --border-dim: rgba(255, 255, 255, 0.15); /* Clean white structural lines */
+
+    --term-green: #00ff66;     /* Secure/Success Green */
+    --green-glow: 0 0 15px rgba(0, 255, 102, 0.4);
 }
 
 * {
@@ -139,15 +142,25 @@ body {
 /* 3. The User & Cart Buttons (Hollow Tactical Outlines) */
 .header-user { display: flex; gap: 15px; font-size: 1.5rem; align-items: center; }
 
-/* Citizen Box - Cyan Outline */
+/* Citizen / Login Box */
 .clearance { 
     background-color: transparent; 
-    color: var(--term-cyan); 
+    color: var(--term-green); /* Changed to green */
     padding: 6px 14px; 
-    border: 1px solid var(--term-cyan); 
+    border: 1px solid var(--term-green); 
     font-weight: bold;
     font-size: 1.2rem;
     white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+/* Hover Effect: Solid Green, Dark Text, Faint Glow */
+.clearance:hover {
+    background-color: var(--term-green);
+    color: var(--bg-deep);
+    box-shadow: var(--green-glow); /* Uses the root variable now! */
 }
 
 .cart-status { 
@@ -160,13 +173,13 @@ body {
     white-space: nowrap;
     cursor: pointer; 
     /* Instant, snappy transition */
-    transition: all 0.1s ease; 
+    transition: all 0.2s ease; 
 }
-
-/* Flashes solid Amber when hovered */
+/* Flashes solid Amber and inverts text when hovered */
 .cart-status:hover {
     background-color: var(--amber-accent); 
-    color: var(--bg-deep); 
+    color: var(--bg-deep); /* Inverts the text to dark space-navy */
+    box-shadow: var(--amber-glow); /* Adds the tactical button glow */
 }
 
 /* --- NAVIGATION BAR --- */
@@ -1066,8 +1079,8 @@ body { overflow: hidden; background-color: #000; }
 /* --- RESPONSIVE PRODUCT GRID (Strict Max 4 Columns) --- */
 .product-grid {
     display: grid;
-    /* This calculates exactly 25% of the container minus the gaps, capping at 4 columns */
-    grid-template-columns: repeat(auto-fit, minmax(max(250px, calc(25% - 20px)), 1fr)); 
+    /* CHANGED auto-fit TO auto-fill */
+    grid-template-columns: repeat(auto-fill, minmax(max(250px, calc(25% - 20px)), 1fr)); 
     gap: 20px;
 }
 
@@ -1107,7 +1120,23 @@ body { overflow: hidden; background-color: #000; }
     pointer-events: none;
 }
 
-.product-info { flex-grow: 1; display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
+.product-info { 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 5px; 
+    margin-bottom: 15px; 
+}
+
+/* ADD THIS BLOCK: Forces the price to the bottom right */
+.price-container {
+    margin-top: auto; /* Pushes the container to the absolute bottom of the card */
+    display: flex;
+    justify-content: flex-end; /* Pushes the text to the right side */
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+}
 
 .product-category { font-size: 1rem; color: var(--term-cyan); }
 .product-name { font-size: 1.3rem; line-height: 1.1; }
@@ -1124,7 +1153,6 @@ body { overflow: hidden; background-color: #000; }
     margin-bottom: 10px;
     text-align: left;
     font-weight: bold;
-    text-shadow: var(--amber-glow-subtle);
 }
 
 .tactical-slider {
@@ -1143,6 +1171,15 @@ body { overflow: hidden; background-color: #000; }
     background: var(--amber-accent);
     cursor: pointer;
     border-radius: 2px;
+    
+    /* FIX: Set default to no glow (or subtle), add a transition */
+    box-shadow: none; 
+    transition: box-shadow 0.2s ease;
+}
+
+/* FIX: Only glow when hovering or actively dragging! */
+.tactical-slider::-webkit-slider-thumb:hover,
+.tactical-slider:active::-webkit-slider-thumb {
     box-shadow: var(--amber-glow);
 }
 
@@ -1208,16 +1245,199 @@ body { overflow: hidden; background-color: #000; }
     clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
 }
 
-/* Cyan for New Items */
-.badge-new {
-    background: var(--term-cyan);
-    color: var(--bg-deep);
-    box-shadow: 0 0 10px rgba(77, 196, 255, 0.4);
+/* --- PAGINATION CONTROLS --- */
+.pagination-controls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
 }
 
-/* Harsh Red for Sales/Clearance */
-.badge-sale {
+.bottom-nav {
+    justify-content: center;
+    margin-top: 40px; /* Gives breathing room below the grid */
+}
+
+.page-btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-dim);
+    color: var(--term-muted);
+    padding: 5px 12px;
+    font-size: 1.1rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+    border-color: var(--term-muted);
+    color: var(--term-text);
+    box-shadow: 0 0 10px rgba(139, 155, 180, 0.2);
+}
+
+/* The currently selected page */
+.page-btn.active {
+    background: var(--amber-accent);
+    color: #000;
+    border-color: var(--amber-accent);
+    box-shadow: var(--amber-glow-subtle);
+}
+
+/* Disabled state for Previous/Next buttons when at the ends */
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* --- RESULT COUNTER --- */
+#resultCount {
+    /* Deleted margin-left: auto! */
+    color: var(--amber-accent); 
+    font-weight: bold; 
+    font-size: 1.1rem; 
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   CART DRAWER (Slide-out panel)
+========================================= */
+.cart-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+    z-index: 900; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+}
+
+.cart-drawer {
+    position: fixed; top: 0; right: -450px; /* Hidden off-screen to the right */
+    width: 100%; max-width: 400px; height: 100vh;
+    background: var(--bg-crt); z-index: 1000;
+    border-left: 2px solid var(--amber-accent);
+    display: flex; flex-direction: column;
+    transition: right 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* The classes JavaScript will use to open the drawer */
+.cart-overlay.active { opacity: 1; visibility: visible; }
+.cart-drawer.active { right: 0; }
+
+.cart-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px; border-bottom: 1px solid var(--border-dim);
+}
+
+.cart-header h3 { color: var(--amber-accent); font-size: 1.5rem; }
+
+.close-btn {
+    background: transparent; border: none; color: var(--term-muted);
+    font-size: 1.2rem; cursor: pointer; font-family: 'Rajdhani', sans-serif;
+    font-weight: bold; transition: color 0.2s;
+}
+.close-btn:hover { color: #ff2a2a; }
+
+.cart-items {
+    flex-grow: 1; padding: 20px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 15px;
+}
+
+.cart-footer {
+    padding: 20px; border-top: 1px solid var(--border-dim); background: rgba(0,0,0,0.5);
+}
+
+.cart-total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; color: var(--term-text);
+}
+
+/* Individual Item Styles */
+.cart-item {
+    display: flex; gap: 15px; border: 1px solid var(--border-dim);
+    padding: 10px; background: rgba(0,0,0,0.3);
+}
+
+.cart-item-img {
+    width: 70px; height: 70px; object-fit: cover; border: 1px solid var(--border-dim);
+}
+
+.cart-item-details { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.cart-item-title { font-size: 1.1rem; color: var(--term-text); line-height: 1.1; }
+.cart-item-price { color: var(--amber-accent); font-weight: bold; }
+
+/* --- CART ITEM CONTROLS --- */
+.remove-item-btn {
+    background: transparent; border: none; 
+    color: var(--term-muted); cursor: pointer; 
+    font-size: 0.85rem; font-weight: bold; font-family: 'Rajdhani', sans-serif;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+.remove-item-btn:hover { color: #ff2a2a; }
+
+.qty-controls {
+    display: flex; align-items: center; gap: 12px;
+}
+.qty-btn {
+    background: transparent; border: 1px solid var(--term-muted);
+    color: var(--term-text); cursor: pointer; 
+    width: 24px; height: 24px; 
+    display: flex; justify-content: center; align-items: center;
+    font-weight: bold; transition: all 0.2s ease;
+}
+.qty-btn:hover {
+    border-color: var(--amber-accent); color: var(--amber-accent);
+}
+
+/* =========================================
+   TACTICAL SYSTEM ALERT (Dropdown Notification)
+========================================= */
+.system-alert-box {
+    position: fixed;
+    top: -100px; /* Hidden completely above the screen */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    background: #0d0202; /* Deep Red/Black */
+    border: 2px solid #ff2a2a;
+    box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.2), 0 10px 30px rgba(0, 0, 0, 0.8);
+    
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    z-index: 9999; /* Keeps it above absolutely everything */
+    
+    /* The snappy drop-down animation */
+    transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+
+/* JavaScript will add this class to drop it onto the screen */
+.system-alert-box.active {
+    top: 40px; 
+}
+
+.alert-icon {
+    color: #ff2a2a;
+    font-size: 2rem;
+    font-weight: bold;
+    animation: blink 1s infinite; /* Reuses your existing blink animation */
+}
+
+.alert-message {
+    color: #ff6666;
+    font-size: 1.3rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Custom Red Button for the Alert */
+.system-alert-box .tac-btn {
+    border-color: #ff2a2a;
+    color: #ff2a2a;
+    margin-left: 20px;
+    padding: 6px 15px;
+}
+
+.system-alert-box .tac-btn:hover {
     background: #ff2a2a;
-    color: #fff;
-    box-shadow: 0 0 10px rgba(255, 42, 42, 0.5);
+    color: #000;
+    box-shadow: 0 0 15px rgba(255, 42, 42, 0.6);
 }
