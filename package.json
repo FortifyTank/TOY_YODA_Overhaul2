@@ -1,0 +1,24 @@
+{
+  "name": "toy_yoda_overhaul",
+  "version": "1.0.0",
+  "description": "",
+  "main": "auth.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FortifyTank/TOY_YODA_Overhaul2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/FortifyTank/TOY_YODA_Overhaul2/issues"
+  },
+  "homepage": "https://github.com/FortifyTank/TOY_YODA_Overhaul2#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

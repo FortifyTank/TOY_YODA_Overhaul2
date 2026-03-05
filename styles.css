@@ -110,16 +110,13 @@ body {
     display: flex; align-items: center; gap: 15px; flex: 1; 
 }
 .header-right { justify-content: flex-end; }
-.header-logo { flex: 0 1 auto; text-align: center; }
 
-/* Reverted to clean text for now */
-.header-logo {
-    font-size: 2.5rem;
-    font-weight: 700;
-    letter-spacing: 4px;
-    color: var(--term-text);
-    text-shadow: 0 0 10px rgba(255,255,255,0.3);
-    white-space: nowrap;
+.header-logo { flex: 0 1 auto; text-align: center; }
+.nav-brand-img {
+    height: 50px; /* Adjust this slightly if you want it bigger/smaller */
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)); /* Gives the logo a faint glow */
 }
 
 .header-search input {
@@ -406,9 +403,60 @@ body {
     text-align: left;
 }
 
-/* 6. Action Button matched to "Initiate Full System Scan" */
-.action-btn {
-    align-self: center; /* FIX: Centers the button! */
+/* =========================================
+   UNIFIED BUTTON SYSTEM
+   .tac-btn           = base (amber, solid fill on hover)
+   .tac-btn--lg       = larger variant (hero / auth)
+   .tac-btn--ghost    = muted steel outline, white fill on hover
+   .tac-btn--full     = stretches to container width
+========================================= */
+.tac-btn {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--amber-accent);
+    color: var(--amber-accent);
+    padding: 8px 20px;
+    font-size: 1.1rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+.tac-btn:hover {
+    background: var(--amber-accent);
+    color: var(--bg-deep);
+    box-shadow: var(--amber-glow);
+}
+
+/* Large variant — auth submit & hero CTA */
+.tac-btn--lg {
+    padding: 12px 30px;
+    font-size: 1.5rem;
+    border-width: 2px;
+    margin-top: 15px;
+    align-self: center;
+}
+
+/* Ghost variant — muted steel border, inverts to white */
+.tac-btn--ghost {
+    border-color: var(--term-muted);
+    color: var(--term-muted);
+}
+.tac-btn--ghost:hover {
+    background: var(--term-text);
+    color: var(--bg-deep);
+    border-color: var(--term-text);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Full-width variant */
+.tac-btn--full { width: 100%; text-align: center; }
+
+/* Legacy aliases — keeps auth.js working without changes */
+.action-btn { 
+    display: inline-block;
     background: rgba(0,0,0,0.5); 
     border: 2px solid var(--amber-accent); 
     color: var(--amber-accent);
@@ -416,6 +464,8 @@ body {
     font-size: 1.4rem; cursor: pointer; margin-top: 15px; 
     transition: all 0.2s ease;
     font-weight: bold;
+    align-self: center;
+    font-family: 'Rajdhani', sans-serif;
 }
 .action-btn:hover { 
     background: var(--amber-accent); 
@@ -475,9 +525,17 @@ body {
 }
 .error-msg.hidden { display: none !important; }
 
-/* =========================================
-   5. DASHBOARD PAGE (home.html)
-========================================= */
+/* Section Titles (home.html dividers) */
+.section-title {
+    font-size: 1.2rem;
+    color: var(--term-muted);
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    border-left: 3px solid var(--amber-accent);
+    padding-left: 10px;
+}
+
+/* Dashboard Container */
 .dashboard-container { 
     max-width: 1200px; 
     margin: 0 auto; 
@@ -488,7 +546,7 @@ body {
 
 /* Hero Banner */
 .hero-banner {
-    border: 1px solid var(--term-green); padding: 60px 40px; 
+    border: 1px solid var(--term-muted); padding: 60px 40px; 
     text-align: center; margin-bottom: 40px; background-color: transparent; 
 }
 .system-alert { font-size: 2rem; margin-bottom: 15px; color: var(--amber-accent); text-shadow: var(--amber-glow); }
@@ -499,13 +557,14 @@ body {
     color: var(--amber-accent); 
     text-decoration: none; 
     border: 2px solid var(--amber-accent);
-    background: rgba(0,0,0,0.5); /* Helps it stand out from the background */
+    background: rgba(0,0,0,0.5);
     transition: 0.2s; cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
 }
-
 .action-btn-large:hover { 
     background: var(--amber-accent); 
-    color: var(--bg-deep); /* Fixes the black text issue by using the deep navy */
+    color: var(--bg-deep);
     box-shadow: var(--amber-glow); 
 }
 
@@ -553,19 +612,21 @@ body {
 }
 .card-details p { font-size: 1.4rem; }
 
+/* acquire-btn → use .tac-btn.tac-btn--full on new cards */
 .acquire-btn {
     background: transparent; 
-    border: 1px solid var(--term-muted); /* Starts as a muted steel blue */
+    border: 1px solid var(--term-muted);
     color: var(--term-muted); 
     padding: 10px; font-size: 1.5rem;
     cursor: pointer; transition: 0.2s;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
 }
-
 .acquire-btn:hover { 
     background: var(--amber-accent); 
     color: var(--bg-deep); 
     border-color: var(--amber-accent); 
-    box-shadow: var(--amber-glow-subtle); /* Now uses the subtle glow */
+    box-shadow: var(--amber-glow-subtle);
 }
 
 /* --- 6. OTHER SYSTEMS (Category Cards) --- */
@@ -640,8 +701,8 @@ body {
 
 .sector-name {
     font-size: 1.8rem;
-    color: var(--term-green);
-    background: rgba(0,0,0,0.8); /* Low opacity black background */
+    color: var(--term-text); /* FIX: Changed back to pure white */
+    background: rgba(0,0,0,0.8);
     padding: 5px 15px;
     border: 1px solid var(--border-dim);
     transition: 0.3s;
@@ -654,33 +715,28 @@ body {
     border-color: var(--amber-accent);
 }
 
-/* 4. INITIATE JUMP IS AMBER BY DEFAULT */
+/* travel-btn → use .tac-btn on new sector cards */
 .travel-btn {
-    background: rgba(0,0,0,0.8); /* Low opacity black background */
-    
-    border: 1px solid var(--amber-accent); /* Amber border */
-    color: var(--amber-accent); /* Amber text */
-    
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--amber-accent);
+    color: var(--amber-accent);
     padding: 8px 20px;
     font-size: 1.5rem;
     text-decoration: none;
     font-weight: bold;
-    
+    font-family: 'Rajdhani', sans-serif;
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.3s ease;
 }
-
 .system-card:hover .travel-btn {
     opacity: 1;
     transform: translateY(0);
 }
-
-/* BUTTON INVERTS TO SOLID AMBER WHEN HOVERED OVER */
 .travel-btn:hover {
     background: var(--amber-accent); 
     color: black;
-    box-shadow: var(--amber-glow); /* Adds that satisfying LED glow */
+    box-shadow: var(--amber-glow);
 }
 
 /* THE TACTICAL PLANET BACKGROUND */
@@ -910,8 +966,8 @@ body { overflow: hidden; background-color: #000; }
     box-shadow: inset 0 0 20px rgba(255, 176, 0, 0.05), var(--amber-glow-subtle);
 }
 
-/* Mutes the hover glow on the Add to Cart buttons */
-.catalog-layout .btn-cart:hover {
+/* Mutes the hover glow on the Add to Cart buttons inside catalog */
+.catalog-layout .tac-btn:hover {
     box-shadow: var(--amber-glow-subtle);
 }
 
@@ -1056,40 +1112,8 @@ body { overflow: hidden; background-color: #000; }
 .product-name { font-size: 1.3rem; line-height: 1.1; }
 .product-price { font-size: 1.5rem; color: var(--amber-accent); margin-top: auto; }
 
-/* Buttons */
+/* btn-details / btn-cart → use .tac-btn.tac-btn--ghost / .tac-btn on new cards */
 .product-actions { display: flex; gap: 10px; }
-
-.btn-details, .btn-cart {
-    flex: 1;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid var(--term-muted);
-    color: var(--term-muted);
-    
-    /* THE FIX: Smaller font and tighter padding so they never break the box bounds! */
-    padding: 8px 2px; 
-    font-size: 0.85rem; 
-    
-    cursor: pointer;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: bold;
-    transition: all 0.2s;
-    white-space: nowrap; 
-}
-
-/* THE NEW HOVER: Inverts to solid white background, dark text */
-.btn-details:hover { 
-    background: var(--term-text); 
-    color: var(--bg-deep); 
-    border-color: var(--term-text); 
-    box-shadow: 0 0 10px rgba(255,255,255,0.3);
-}
-
-.btn-cart { border-color: var(--amber-accent); color: var(--amber-accent); }
-.btn-cart:hover {
-    background: var(--amber-accent);
-    color: var(--bg-deep);
-    box-shadow: var(--amber-glow);
-}
 
 /* Custom Tactical Slider */
 .range-value {
@@ -1130,4 +1154,74 @@ body { overflow: hidden; background-color: #000; }
     margin-top: 8px;
     font-weight: bold;
     font-family: 'Rajdhani', sans-serif;
+}
+
+/* --- NEW INTERACTIVE PRODUCT CARDS --- */
+
+/* 1. Turn off the standard growing top line for product cards */
+.product-card::before {
+    display: none !important; 
+}
+
+/* 2. Make the link behave nicely */
+.product-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Pushes the cart button safely to the bottom */
+}
+
+/* 3. The Triangle Dropdown Banner */
+.view-details-banner {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%); /* Hidden completely above the image */
+    
+    background: var(--amber-accent);
+    color: var(--bg-deep);
+    padding: 8px 20px 15px 20px;
+    width: 60%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    
+    /* THE SHAPE: Cuts the bottom into a sharp V point! */
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+    
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 10;
+}
+
+/* 4. Drops the banner down when hovering ANYWHERE on the card */
+.product-card:hover .view-details-banner {
+    transform: translateX(-50%) translateY(0);
+}
+
+.tactical-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 4px 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    z-index: 5;
+    letter-spacing: 1px;
+    /* Cuts the top-left corner off for a sci-fi hardware look */
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Cyan for New Items */
+.badge-new {
+    background: var(--term-cyan);
+    color: var(--bg-deep);
+    box-shadow: 0 0 10px rgba(77, 196, 255, 0.4);
+}
+
+/* Harsh Red for Sales/Clearance */
+.badge-sale {
+    background: #ff2a2a;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(255, 42, 42, 0.5);
 }
