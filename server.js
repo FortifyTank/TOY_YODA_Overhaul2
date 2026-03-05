@@ -1,16 +1,17 @@
 const express = require('express');
 const path = require('path');
-const mongoose = require('mongoose'); // <--- 1. Import Mongoose
+const mongoose = require('mongoose');
+const Product = require('./models/Product');
 
 // Initialize the Express application
 const app = express();
 const PORT = 3000;
 
 // --- DATABASE CONNECTION ---
-// Your exact connection string (with 'toy_yoda' added as the database name)
-const dbURI = "mongodb+srv://playofgamer10_db_user:CHbeLY5tbk1CPx6q@mattcluster.5npf8nj.mongodb.net/toy_yoda?appName=MattCluster";
+// The "Unbreakable" Classic String (Bypasses SRV Blockers)
+const dbURI = "mongodb://playofgamer10_db_user:CHbeLY5tbk1CPx6q@ac-ir6m09r-shard-00-00.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-01.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-02.5npf8nj.mongodb.net:27017/?ssl=true&authSource=admin&retryWrites=true&w=majority";
 
-mongoose.connect(dbURI)
+mongoose.connect(dbURI, { dbName: "toy_yoda" })
     .then(() => {
         console.log(`> DATABASE: MONGODB SECURED AND CONNECTED`);
     })
