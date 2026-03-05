@@ -1063,12 +1063,11 @@ body { overflow: hidden; background-color: #000; }
     font-weight: bold;
     font-family: 'Rajdhani', sans-serif;
 }
-
-/* --- 4-COLUMN PRODUCT GRID --- */
+/* --- RESPONSIVE PRODUCT GRID (Strict Max 4 Columns) --- */
 .product-grid {
     display: grid;
-    /* Forces exactly 4 columns */
-    grid-template-columns: repeat(4, 1fr); 
+    /* This calculates exactly 25% of the container minus the gaps, capping at 4 columns */
+    grid-template-columns: repeat(auto-fit, minmax(max(250px, calc(25% - 20px)), 1fr)); 
     gap: 20px;
 }
 
