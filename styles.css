@@ -891,3 +891,243 @@ body { overflow: hidden; background-color: #000; }
     40%  { opacity: 1; visibility: visible; } /* Hold black briefly */
     100% { opacity: 0; visibility: hidden; }
 }
+
+/* =========================================
+   6. CATALOG PAGE (products.html)
+========================================= */
+.catalog-layout {
+    display: grid;
+    /* 250px Sidebar, the rest is for the grid */
+    grid-template-columns: 250px 1fr; 
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px 60px 20px;
+    align-items: start;
+}
+
+.catalog-layout .cyber-panel:hover {
+    box-shadow: inset 0 0 20px rgba(255, 176, 0, 0.05), var(--amber-glow-subtle);
+}
+
+/* Mutes the hover glow on the Add to Cart buttons */
+.catalog-layout .btn-cart:hover {
+    box-shadow: var(--amber-glow-subtle);
+}
+
+/* --- SIDEBAR FILTERS --- */
+.catalog-sidebar {
+    padding: 20px;
+    position: sticky;
+    top: 100px; /* Stays on screen when scrolling down */
+}
+
+.sidebar-title {
+    font-size: 1.6rem;
+    color: var(--amber-accent);
+    border-bottom: 2px solid var(--border-dim);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    margin-bottom: 25px;
+}
+
+.filter-group h4 {
+    color: var(--term-muted);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+/* Custom Tactical Checkboxes */
+.tactical-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    color: var(--term-text);
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+}
+
+.tactical-checkbox:hover { color: var(--amber-accent); }
+
+.tactical-checkbox input {
+    display: none; /* Hide the default browser checkbox */
+}
+
+.tactical-checkbox .check-box {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--term-muted);
+    display: inline-block;
+    position: relative;
+    transition: all 0.2s;
+}
+
+/* When Checked: Fill with glowing amber square */
+.tactical-checkbox input:checked + .check-box {
+    border-color: var(--amber-accent);
+    background-color: rgba(255, 232, 0, 0.2);
+    box-shadow: var(--amber-glow-subtle);
+}
+
+.tactical-checkbox input:checked + .check-box::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px; right: 3px; bottom: 3px;
+    background-color: var(--amber-accent);
+}
+
+/* --- SORTING BAR --- */
+.sort-bar {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-dim);
+    padding-bottom: 10px;
+}
+
+.sort-label { color: var(--term-muted); font-size: 1.2rem; font-weight: bold; }
+
+.sort-tab {
+    background: transparent;
+    border: none;
+    color: var(--term-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    transition: all 0.2s;
+}
+
+.sort-tab:hover { color: var(--term-text); }
+.sort-tab.active { color: var(--amber-accent); text-shadow: var(--amber-glow-subtle); }
+
+/* --- 4-COLUMN PRODUCT GRID --- */
+.product-grid {
+    display: grid;
+    /* Forces exactly 4 columns */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 20px;
+}
+
+/* --- PRODUCT CARD --- */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+.product-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Keeps images perfectly square */
+    border: 1px solid var(--border-dim);
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.product-image {
+    width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+    color: var(--term-muted);
+    background-size: cover;
+    background-position: center;
+}
+
+/* Tactical scanline overlay on images */
+.scanline-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.2) 3px,
+        rgba(0, 0, 0, 0.2) 4px
+    );
+    pointer-events: none;
+}
+
+.product-info { flex-grow: 1; display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
+
+.product-category { font-size: 1rem; color: var(--term-cyan); }
+.product-name { font-size: 1.3rem; line-height: 1.1; }
+.product-price { font-size: 1.5rem; color: var(--amber-accent); margin-top: auto; }
+
+/* Buttons */
+.product-actions { display: flex; gap: 10px; }
+
+.btn-details, .btn-cart {
+    flex: 1;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--term-muted);
+    color: var(--term-muted);
+    
+    /* THE FIX: Smaller font and tighter padding so they never break the box bounds! */
+    padding: 8px 2px; 
+    font-size: 0.85rem; 
+    
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
+    transition: all 0.2s;
+    white-space: nowrap; 
+}
+
+/* THE NEW HOVER: Inverts to solid white background, dark text */
+.btn-details:hover { 
+    background: var(--term-text); 
+    color: var(--bg-deep); 
+    border-color: var(--term-text); 
+    box-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+.btn-cart { border-color: var(--amber-accent); color: var(--amber-accent); }
+.btn-cart:hover {
+    background: var(--amber-accent);
+    color: var(--bg-deep);
+    box-shadow: var(--amber-glow);
+}
+
+/* Custom Tactical Slider */
+.range-value {
+    display: block;
+    color: var(--amber-accent);
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    text-align: left;
+    font-weight: bold;
+    text-shadow: var(--amber-glow-subtle);
+}
+
+.tactical-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border-dim);
+    outline: none;
+}
+
+.tactical-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 24px;
+    background: var(--amber-accent);
+    cursor: pointer;
+    border-radius: 2px;
+    box-shadow: var(--amber-glow);
+}
+
+/* Visual indicators under the slider */
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    color: var(--term-muted);
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-weight: bold;
+    font-family: 'Rajdhani', sans-serif;
+}

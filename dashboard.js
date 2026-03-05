@@ -19,6 +19,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // --- 3. TACTICAL PRICE SLIDER ---
+    const priceSlider = document.getElementById("priceSlider");
+    const priceDisplay = document.getElementById("priceDisplay");
+
+    if (priceSlider && priceDisplay) {
+        priceSlider.addEventListener("input", (e) => {
+            const formattedPrice = Number(e.target.value).toLocaleString();
+            // Added the "MAX PRICE" text to the dynamic update!
+            priceDisplay.innerText = `MAX PRICE: ₱${formattedPrice}`;
+        });
+    }
+
     // --- 2. FUTURE INVENTORY & PAYMENTS (Node.js + MongoDB + Paymongo) ---
     
     // 🟢 MONGODB FETCHING:
