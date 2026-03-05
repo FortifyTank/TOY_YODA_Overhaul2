@@ -15,6 +15,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const cameraRig = document.getElementById("cameraRig");
     const parallaxLayers = document.querySelectorAll(".parallax-layer");
 
+    // --- PASSWORD REVEAL LOGIC ---
+    const toggleRegPass = document.getElementById("toggleRegPass");
+    const regPassword = document.getElementById("regPassword");
+
+    const toggleLoginPass = document.getElementById("toggleLoginPass");
+    const loginPass = document.getElementById("loginPass");
+
+    // The two SVG strings
+    const iconHidden = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+    const iconVisible = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+
+    function setupPasswordToggle(btn, input) {
+        if (!btn || !input) return;
+        btn.addEventListener("click", () => {
+            const isPassword = input.getAttribute("type") === "password";
+            
+            // Swap the input type
+            input.setAttribute("type", isPassword ? "text" : "password");
+            
+            // Swap the SVG Icon
+            btn.innerHTML = isPassword ? iconVisible : iconHidden;
+            
+            // Toggle the bright white active state
+            btn.classList.toggle("active"); 
+        });
+    }
+
+    setupPasswordToggle(toggleRegPass, regPassword);
+    setupPasswordToggle(toggleLoginPass, loginPass);
+
     // --- 1. PARALLAX MOUSE TRACKING ---
     document.addEventListener("mousemove", (e) => {
         const x = (window.innerWidth / 2 - e.pageX) / 120;
@@ -109,54 +139,90 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 3000); 
     };
     // Form Submit Intercepts (Fake Validation)
-    loginForm.addEventListener("submit", (e) => {
+    // --- LOGIN LOGIC (Triggers Hyperspace) ---
+    loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const pass = document.getElementById("loginPass").value;
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPass").value;
 
-        // FAKE LOGIC: If password is "demo", trigger the hyperspace sequence!
-        if(pass === "demo") {
-            const terminal = document.querySelector(".terminal-container");
-            const ships = document.querySelectorAll(".intro-ship"); // [0] is right ship, [1] is left ship
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
-            // 1. The UI slides down and disappears
-            terminal.classList.add("ui-hyperspace-hide");
+            const data = await response.json();
 
-            // 2. Right ship goes to hyperspace (0.4s delay)
-            setTimeout(() => {
-                ships[0].classList.add("jump-to-lightspeed");
-            }, 400);
+            if (response.ok) {
+                // SUCCESS! Trigger the hyperspace sequence
+                const terminal = document.querySelector(".terminal-container");
+                const ships = document.querySelectorAll(".intro-ship");
 
-            // 3. Left ship goes to hyperspace right after (0.55s delay)
-            setTimeout(() => {
-                ships[1].classList.add("jump-to-lightspeed");
-            }, 550);
+                terminal.classList.add("ui-hyperspace-hide");
+                setTimeout(() => ships[0].classList.add("jump-to-lightspeed"), 400);
+                setTimeout(() => ships[1].classList.add("jump-to-lightspeed"), 550);
 
-            // 4. Fade to black seamlessly (Delayed to 1200 to let the ships finish jumping!)
-            const fade = document.createElement('div');
-            fade.className = 'warp-fade';
-            document.body.appendChild(fade);
-            setTimeout(() => fade.classList.add('active'), 1200);
+                const fade = document.createElement('div');
+                fade.className = 'warp-fade';
+                document.body.appendChild(fade);
+                setTimeout(() => fade.classList.add('active'), 1200);
 
-            // 5. Load the Homepage! (Delayed to 1300ms)
-            setTimeout(() => {
-                // THE FIX: We pass the flag directly in the URL instead of sessionStorage!
-                window.location.href = '/home?warp=true';
-            }, 1500);
-
-        } else {
-            triggerError("loginError", "> ERROR: INVALID CREDENTIALS");
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 1500);
+            } else {
+                triggerError("loginError", data.error);
+            }
+        } catch (err) {
+            triggerError("loginError", "> ERROR: CONNECTION TIMEOUT");
         }
     });
 
-    registerForm.addEventListener("submit", (e) => {
+    // --- REGISTER LOGIC (Triggers Green Success & Pans Camera) ---
+    registerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const name = document.getElementById("regName").value;
+        
+        const username = document.getElementById("regName").value;
+        const email = registerForm.querySelector('input[type="email"]').value;
+        const password = registerForm.querySelector('input[type="password"]').value;
 
-        // FAKE LOGIC: If they try to register as CT-5555, say it exists
-        if(name.toUpperCase() === "CT-5555") {
-            triggerError("registerError", "> ERROR: DOSSIER ALREADY EXISTS");
-        } else {
-            triggerError("registerError", "> ERROR: SECTOR REGISTRY OFFLINE");
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // 1. Show the success message in Green
+                const errorEl = document.getElementById("registerError");
+                errorEl.innerText = data.message;
+                errorEl.style.color = "var(--term-green)"; // Override red with green
+                errorEl.style.textShadow = "0 0 8px rgba(0, 255, 102, 0.6)";
+                errorEl.classList.remove("hidden");
+
+                // 2. Wait 2 seconds, clear the message, and slide back to the Login screen
+                setTimeout(() => {
+                    errorEl.classList.add("hidden");
+                    errorEl.style.color = ""; 
+                    errorEl.style.textShadow = "";
+                    
+                    // NEW: Wipe the form completely clean!
+                    registerForm.reset(); 
+                    regPassword.setAttribute("type", "password"); // Hide the password again
+                    toggleRegPass.classList.remove("active");
+                    
+                    showLoginBtn.click(); 
+                }, 2000);
+
+            } else {
+                triggerError("registerError", data.error);
+            }
+        } catch (err) {
+            triggerError("registerError", "> ERROR: CONNECTION TIMEOUT");
         }
     });
 });

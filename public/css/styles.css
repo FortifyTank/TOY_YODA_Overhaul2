@@ -33,6 +33,11 @@
 
     --term-green: #00ff66;     /* Secure/Success Green */
     --green-glow: 0 0 15px rgba(0, 255, 102, 0.4);
+
+    --term-red: #ff2a2a;
+    --red-glow: 0 0 15px rgba(255, 42, 42, 0.4);
+    --bg-overlay: rgba(255, 255, 255, 0.05); /* For input boxes */
+    --bg-panel-dark: rgba(0, 0, 0, 0.4); /* For dropdown forms */
 }
 
 * {
@@ -57,6 +62,8 @@ body {
     background-attachment: fixed; /* Keeps the background still while scrolling */
     
     color: var(--term-text);
+
+    overflow-x: hidden;
 }
 
 /* Base theme applied to the body of internal pages (Dashboard/Store) */
@@ -142,10 +149,11 @@ body {
 /* 3. The User & Cart Buttons (Hollow Tactical Outlines) */
 .header-user { display: flex; gap: 15px; font-size: 1.5rem; align-items: center; }
 
-/* Citizen / Login Box */
+/* --- 1. BASE STYLES FOR THE BUTTONS --- */
+/* (Keep your existing colors, borders, and padding) */
 .clearance { 
     background-color: transparent; 
-    color: var(--term-green); /* Changed to green */
+    color: var(--term-green); 
     padding: 6px 14px; 
     border: 1px solid var(--term-green); 
     font-weight: bold;
@@ -153,7 +161,35 @@ body {
     white-space: nowrap;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s ease;
+}
+
+.cart-status { 
+    background-color: transparent;
+    color: var(--amber-accent); 
+    padding: 6px 14px; 
+    border: 1px solid var(--amber-accent);
+    font-weight: bold;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    cursor: pointer; 
+}
+
+/* --- 2. HUD ELEMENT DROP-DOWN ANIMATION --- */
+/* Starts both buttons invisible and pushed 20px up into the ceiling */
+.clearance, .cart-status {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+    
+    /* Animates the drop smoothly (0.4s), but keeps hover color changes fast (0.2s) */
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+/* JavaScript adds this class to drop them into place after calculations are done */
+.clearance.ready, .cart-status.ready {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 /* Hover Effect: Solid Green, Dark Text, Faint Glow */
@@ -380,15 +416,36 @@ body {
     width: 100%;
 }
 
+/* --- OVERRIDE BROWSER AUTOFILL STYLES --- */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    /* Casts a solid dark gray shadow inside the box to hide the white */
+    -webkit-box-shadow: 0 0 0 30px #222831 inset !important;
+    /* Forces the text back to pure white */
+    -webkit-text-fill-color: var(--term-text) !important;
+    /* Ensures the border doesn't disappear */
+    border: 1px solid var(--border-dim) !important;
+}
+
+/* Optional: Turns the border yellow when the auto-filled box is focused */
+input:-webkit-autofill:focus {
+    border-color: var(--amber-accent) !important;
+}
+
 /* 3. Force the inputs to reach the very end of the box */
 .auth-box input {
-    width: 100%; /* ADD THIS: Forces the box to stretch to the right edge */
-    box-sizing: border-box; /* ADD THIS: Prevents the padding from breaking the width */
+    width: 100%; 
+    box-sizing: border-box; 
     background-color: rgba(255, 255, 255, 0.05); 
     border: 1px solid var(--border-dim);
     color: var(--term-text); 
     padding: 10px; font-size: 1.2rem; outline: none;
     transition: all 0.3s ease;
+    
+    /* ADD THIS: Allows normal lowercase typing for emails and passwords! */
+    text-transform: none; 
 }
 
 .auth-box input:focus { 
@@ -1440,4 +1497,223 @@ body { overflow: hidden; background-color: #000; }
     background: #ff2a2a;
     color: #000;
     box-shadow: 0 0 15px rgba(255, 42, 42, 0.6);
+}
+
+/* --- HIDE DEFAULT BROWSER EYE --- */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-webkit-reveal {
+    display: none;
+}
+
+/* --- PASSWORD REVEAL EYE --- */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 40px; /* Makes room so text doesn't hide behind the eye */
+}
+
+.eye-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--term-muted); /* Starts steel gray */
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    display: flex;
+    transition: color 0.2s ease;
+    user-select: none; /* ADD THIS: Prevents the browser from highlighting the icon */
+    -webkit-user-select: none;
+}
+
+.eye-btn:hover, .eye-btn.active {
+    color: #ffffff; /* Turns pure white when hovered or active! */
+}
+
+/* --- STATE: LOGGED IN (Cyan overrides the Green) --- */
+.clearance.logged-in {
+    color: var(--term-cyan);
+    border-color: var(--term-cyan);
+}
+
+.clearance.logged-in:hover {
+    background-color: var(--term-cyan);
+    color: var(--bg-deep); /* Forces the text dark */
+    box-shadow: var(--cyan-glow);
+}
+
+/* =========================================
+   PROFILE SLIDING UI
+========================================= */
+.profile-stage {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 60vh;
+    margin-top: 40px;
+    width: 100%; 
+    max-width: 100%; /* Overrides any previous max-width restrictions */
+    /* DELETED: overflow-x: hidden; */
+}
+
+/* The Main ID Card */
+.id-card {
+    width: 100%;
+    max-width: 750px; /* INCREASED from 600px */
+    position: relative;
+    z-index: 10;
+    padding: 40px; 
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); 
+}
+
+/* The Layout Inside the Card */
+.card-header { margin-bottom: 20px; }
+.access-level { color: var(--term-muted); font-size: 1.1rem; font-family: 'Rajdhani', sans-serif; font-weight: bold; }
+.card-body { display: flex; flex-direction: column; gap: 15px; }
+.data-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+.data-label { color: var(--term-muted); width: 100px; }
+.data-value { flex-grow: 1; color: var(--term-text); }
+.card-divider { border: none; border-top: 1px dashed var(--border-dim); margin: 25px 0; }
+.card-footer-actions { display: flex; justify-content: space-between; }
+
+.text-btn { 
+    background: none; 
+    border: none; 
+    color: var(--term-cyan); 
+    cursor: pointer; 
+    font-family: 'Rajdhani', sans-serif; /* Changed from VT323 */
+    font-weight: 700;
+    font-size: 1.1rem; 
+    letter-spacing: 1px;
+    transition: all 0.2s ease; 
+}
+
+.text-btn:hover { 
+    color: #fff; 
+    text-shadow: 0 0 8px rgba(255,255,255,0.6); /* Adds a tactical glow on hover */
+}
+
+/* The Side Panels */
+.side-panel {
+    position: absolute;
+    width: 400px; /* INCREASED from 350px */
+    padding: 30px; 
+    /* ... rest of the properties stay the same ... */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hidden State: Collapsed to 0px height */
+.inline-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    
+    /* The Animation Magic */
+    max-height: 0; 
+    opacity: 0;
+    margin-top: 0;
+    padding: 0 15px; 
+    border: 1px dashed transparent;
+    overflow: hidden; /* Hides the inputs while collapsed */
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Active State: Expanded to full height */
+.inline-form.active {
+    max-height: 250px; /* Expands to fit the form */
+    opacity: 1;
+    margin-top: 15px;
+    padding: 15px;
+    border-color: var(--border-dim);
+}
+
+.inline-input {
+    width: 100%; 
+    padding: 10px; 
+    background: rgba(255,255,255,0.05); 
+    border: 1px solid var(--border-dim); 
+    color: var(--term-text); 
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    outline: none;
+    
+    /* ADD THIS: Allows lowercase typing for emails, phones, and passwords */
+    text-transform: none; 
+}
+
+.inline-input:focus { border-color: var(--amber-accent); }
+
+.address-box { border: 1px solid var(--border-dim); padding: 15px; background: rgba(0,0,0,0.3); margin-top: 10px; color: var(--term-text); }
+
+/* Snugs the side panels much closer to the center */
+.left-panel { left: calc(50% - 580px); } 
+.right-panel { right: calc(50% - 580px); }
+
+/* Slides the main card just enough to clear the side panels with a 25px gap */
+.stage-shift-right .id-card { transform: translateX(220px); }
+.stage-shift-right .left-panel { opacity: 1; visibility: visible; transform: translateY(0); }
+
+.stage-shift-left .id-card { transform: translateX(-220px); }
+.stage-shift-left .right-panel { opacity: 1; visibility: visible; transform: translateY(0); }
+
+/* --- UTILITY CLASSES --- */
+.text-amber { color: var(--amber-accent) !important; }
+.text-cyan { color: var(--term-cyan) !important; }
+.text-green { color: var(--term-green) !important; }
+.text-red { color: var(--term-red) !important; }
+
+.flex-between { display: flex; width: 100%; justify-content: space-between; align-items: center; }
+.flex-1 { flex: 1; }
+.text-right { text-align: right; }
+.mt-15 { margin-top: 15px; }
+.mt-30 { margin-top: 30px; }
+.mb-5 { margin-bottom: 5px; }
+.mb-12 { margin-bottom: 12px; }
+
+
+
+
+
+
+/* =========================================
+   AUTO-ADJUST (ZOOM & SMALLER SCREENS)
+========================================= */
+@media (max-width: 1400px) {
+    /* 1. Stop the ID card from moving, just dim it */
+    .stage-shift-right .id-card,
+    .stage-shift-left .id-card {
+        transform: translateX(0); 
+        opacity: 0.2; 
+        pointer-events: none; /* Disables the background buttons */
+    }
+
+    /* 2. Force the side panels to the absolute center */
+    .side-panel {
+        left: 50% !important;
+        right: auto !important;
+        transform: translate(-50%, 30px); /* Centers X, pushed slightly down */
+        z-index: 100; /* Puts it above the ID card */
+        width: 90%;
+        max-width: 450px;
+    }
+
+    /* 3. Drop it directly in the middle when active */
+    .stage-shift-right .left-panel,
+    .stage-shift-left .right-panel {
+        transform: translate(-50%, 0); 
+    }
 }

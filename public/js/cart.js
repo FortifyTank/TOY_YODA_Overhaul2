@@ -37,17 +37,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateCartUI() {
+    // ADDED: animate = false prevents it from flashing on page load
+    function updateCartUI(animate = false) {
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
         
         cartStatusElements.forEach(el => {
             el.innerText = `[ CART: ${totalItems} ]`;
-            el.style.backgroundColor = 'var(--amber-accent)';
-            el.style.color = 'var(--bg-deep)';
-            setTimeout(() => {
-                el.style.backgroundColor = '';
-                el.style.color = '';
-            }, 200);
+            
+            // Only flash the colors if animate is true
+            if (animate) {
+                el.style.backgroundColor = 'var(--amber-accent)';
+                el.style.color = 'var(--bg-deep)';
+                setTimeout(() => {
+                    el.style.backgroundColor = '';
+                    el.style.color = '';
+                }, 200);
+            } else {
+                // If it's the initial page load, just reveal the button by adding .ready
+                setTimeout(() => {
+                    el.classList.add('ready');
+                }, 50); 
+            }
         });
 
         renderCartDrawer();
@@ -118,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
-            updateCartUI();
+            updateCartUI(true);
         }
     };
 
@@ -126,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.removeFromCart = function(sku) {
         cart = cart.filter(i => i.sku !== sku);
         localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
-        updateCartUI();
+        updateCartUI(true);
     };
 
     window.addToCart = function(product) {
@@ -154,13 +164,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
-        updateCartUI();
+        updateCartUI(true);
     };
 
     function clearCart() {
         cart = [];
         localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
-        updateCartUI();
+        updateCartUI(true);
     }
 
     function openCart() {

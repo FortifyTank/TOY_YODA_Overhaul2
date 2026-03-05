@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toy Yoda | Dossier</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="crt-theme">
+    
+    <div class="top-command-bar">
+        <header class="global-header">
+            <div class="header-left">
+                <a href="/login" class="clearance">[ LOG IN ]</a>
+            </div>
+            <div class="header-logo">
+                <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
+            </div>
+            <div class="header-right">
+                <span class="cart-status">[ CART: 0 ]</span> 
+            </div>
+        </header>
+        <nav class="global-nav">
+            <div class="nav-status-light"></div> 
+            <a href="/home" class="nav-link">> OVERVIEW</a>
+            <a href="/products" class="nav-link">> CATALOG</a>
+            <a href="#" class="nav-link">> CONTACT_US</a>
+            <a href="#" class="nav-link active">> PROFILE</a>
+        </nav>
+    </div>
+
+    <main class="dashboard-container profile-stage">
+        
+        <div id="logisticsPanel" class="side-panel cyber-panel left-panel">
+            <h3 class="text-amber">// SHIPPING LOGISTICS</h3>
+            <p style="color: var(--term-muted); font-size: 0.9rem; margin-top: 10px;">> CURRENT SAVED SECTOR:</p>
+            <div class="address-box">
+                <p>No address equipped.</p>
+            </div>
+            <button class="tac-btn tac-btn--full" style="margin-top: 15px;">[ + ADD NEW ADDRESS ]</button>
+            <button class="tac-btn tac-btn--ghost tac-btn--full close-panel-btn" style="margin-top: 10px;">[ CANCEL ]</button>
+        </div>
+
+        <section id="mainIdCard" class="cyber-panel id-card">
+            <div class="card-header">
+                <h2 id="profileUsername" class="text-cyan">[ ACCOUNT: LOADING... ]</h2>
+                <p class="access-level">ACCESS LEVEL: <span id="profileRole" class="text-green">CUSTOMER</span></p>
+            </div>
+            
+            <div class="card-body">
+                <div class="data-row">
+                    <span class="data-label">EMAIL:</span>
+                    <span class="data-value" id="profileEmail">loading@system.com</span>
+                </div>
+                
+                <div class="data-row" style="flex-wrap: wrap;">
+                    <div class="flex-between">
+                        <span class="data-label">PHONE:</span>
+                        <span class="data-value text-muted" id="profilePhone">UNREGISTERED</span>
+                        <button class="text-btn" id="togglePhoneBtn">[ CHANGE ]</button>
+                    </div>
+                    <div id="phoneForm" class="inline-form">
+                        <input type="text" id="newPhoneInput" placeholder="ENTER NEW COMM NUMBER" class="inline-input">
+                        <button class="tac-btn tac-btn--ghost mt-15" id="savePhoneBtn" style="align-self: flex-end;">[ SAVE NUMBER ]</button>
+                    </div>
+                </div>
+
+                <div class="data-row" style="flex-wrap: wrap;">
+                    <div class="flex-between">
+                        <span class="data-label">PASSWORD:</span>
+                        <span class="data-value text-muted">********</span>
+                        <button class="text-btn" id="togglePassBtn">[ CHANGE ]</button>
+                    </div>
+                    <div id="passwordForm" class="inline-form">
+                        <div class="password-wrapper">
+                            <input type="password" id="oldPassInput" placeholder="OLD PASSWORD" class="inline-input">
+                            <button type="button" class="eye-btn" id="toggleOldPass">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                            </button>
+                        </div>
+                        <div class="password-wrapper mb-5 mt-15">
+                            <input type="password" id="newPassInput" placeholder="NEW PASSWORD" class="inline-input">
+                            <button type="button" class="eye-btn" id="toggleNewPass">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                            </button>
+                        </div>
+                        <button class="tac-btn tac-btn--ghost mt-15" id="savePassBtn" style="align-self: flex-end;">[ UPDATE PASSWORD ]</button>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="card-divider">
+
+            <div class="card-footer-actions">
+                <div class="action-group flex-1">
+                    <p class="text-muted mb-5">// SHIPPING INFO</p>
+                    <p class="mb-12" style="color: var(--term-text); font-size: 1rem;">CURRENT ADDRESS: <span id="currentAddressDisplay" class="text-amber">NONE</span></p>
+                    <button id="openLogisticsBtn" class="tac-btn tac-btn--ghost">[ UPDATE SHIPPING ]</button>
+                </div>
+                
+                <div class="action-group flex-1 text-right">
+                    <p class="text-muted mb-5">// PURCHASE HISTORY</p>
+                    <button id="openHistoryBtn" class="tac-btn tac-btn--ghost mt-30">[ VIEW RECORDS ]</button>
+                </div>
+            </div>
+            
+            <div class="text-right mt-30">
+                <button id="logoutBtn" class="tac-btn text-red" style="border-color: var(--term-red);">[ DISCONNECT LINK ]</button>
+            </div>
+        </section>
+
+        <div id="historyPanel" class="side-panel cyber-panel right-panel">
+            <h3 class="text-amber">// PURCHASE RECORDS</h3>
+            <p style="color: var(--term-muted); margin-top: 10px;">> NO ACTIVE ORDERS.</p>
+            <button class="tac-btn tac-btn--ghost tac-btn--full close-panel-btn" style="margin-top: auto;">[ CLOSE RECORDS ]</button>
+        </div>
+
+    </main>
+
+    <div id="bootOverlay" class="boot-overlay"></div>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/cart.js"></script>
+    <script src="/js/profile.js"></script>
+</body>
+</html>
