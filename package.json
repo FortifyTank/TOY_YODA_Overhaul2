@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/FortifyTank/TOY_YODA_Overhaul2#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^9.2.4"
   }
 }
