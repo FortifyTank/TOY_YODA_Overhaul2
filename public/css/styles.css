@@ -439,6 +439,13 @@ body {
     align-self: center;
 }
 
+.tac-btn--lg--lg
+{
+    padding: 15px 30px; 
+    font-size: 1.8rem; 
+    text-decoration: none; 
+}
+
 /* Ghost variant — muted steel border, inverts to white */
 .tac-btn--ghost {
     border-color: var(--term-muted);
@@ -453,25 +460,6 @@ body {
 
 /* Full-width variant */
 .tac-btn--full { width: 100%; text-align: center; }
-
-/* Legacy aliases — keeps auth.js working without changes */
-.action-btn { 
-    display: inline-block;
-    background: rgba(0,0,0,0.5); 
-    border: 2px solid var(--amber-accent); 
-    color: var(--amber-accent);
-    padding: 10px 25px; 
-    font-size: 1.4rem; cursor: pointer; margin-top: 15px; 
-    transition: all 0.2s ease;
-    font-weight: bold;
-    align-self: center;
-    font-family: 'Rajdhani', sans-serif;
-}
-.action-btn:hover { 
-    background: var(--amber-accent); 
-    color: var(--bg-deep); 
-    box-shadow: var(--amber-glow); 
-}
 
 /* 7. Toggle Link matched to "Cargo Manifest" Nav Links */
 .toggle-link { 
@@ -509,8 +497,8 @@ body {
 .auth-box.error-state input:focus { background-color: rgba(255, 42, 42, 0.15); box-shadow: 0 0 10px rgba(255, 42, 42, 0.4); }
 
 /* Turns the button red */
-.auth-box.error-state .action-btn { border-color: #ff2a2a; color: #ff2a2a; }
-.auth-box.error-state .action-btn:hover { background: #ff2a2a; color: #000; box-shadow: 0 0 15px rgba(255, 42, 42, 0.8); }
+.auth-box.error-state .tac-btn { border-color: #ff2a2a; color: #ff2a2a; }
+.auth-box.error-state .tac-btn:hover { background: #ff2a2a; color: #000; box-shadow: 0 0 15px rgba(255, 42, 42, 0.8); }
 
 /* The Error Message Text */
 .error-msg {
@@ -552,25 +540,9 @@ body {
 .system-alert { font-size: 2rem; margin-bottom: 15px; color: var(--amber-accent); text-shadow: var(--amber-glow); }
 .hero-banner p { font-size: 1.5rem; margin-bottom: 25px; }
 
-.action-btn-large {
-    display: inline-block; padding: 15px 30px; font-size: 1.8rem;
-    color: var(--amber-accent); 
-    text-decoration: none; 
-    border: 2px solid var(--amber-accent);
-    background: rgba(0,0,0,0.5);
-    transition: 0.2s; cursor: pointer;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: bold;
-}
-.action-btn-large:hover { 
-    background: var(--amber-accent); 
-    color: var(--bg-deep);
-    box-shadow: var(--amber-glow); 
-}
-
 .hero-bg {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background-image: url('images/spaceship-bg.jpg'); 
+    background-image: url('/images/spaceship-bg.jpg'); 
     background-size: cover; background-position: center;
     filter: grayscale(100%); opacity: 0.15; z-index: 0;
 }
@@ -585,7 +557,7 @@ body {
     opacity: 0; transition: opacity 0.4s ease-in-out; z-index: 1;
 }
 
-.hero-banner:has(.action-btn-large:hover) .hero-grid { opacity: 1; }
+.hero-banner:has(.tac-btn--lg--lg:hover) .hero-grid { opacity: 1; }
 .hero-content { position: relative; z-index: 10; }
 
 /* Bounty Grid */
@@ -746,7 +718,7 @@ body {
     top: 0; left: 0; width: 100vw; height: 100vh;
     
     /* Link your new planet image here */
-    background-image: url('images/planet-bg.png'); 
+    background-image: url('/images/planet-bg.png'); 
     background-size: cover;
     background-position: center bottom;
     
@@ -1049,18 +1021,48 @@ body { overflow: hidden; background-color: #000; }
 
 .sort-label { color: var(--term-muted); font-size: 1.2rem; font-weight: bold; }
 
-.sort-tab {
-    background: transparent;
-    border: none;
+/* --- TACTICAL DROPDOWN (Replaces Sort Tabs) --- */
+.tactical-dropdown {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-dim);
     color: var(--term-muted);
+    padding: 8px 15px;
     font-size: 1.1rem;
-    cursor: pointer;
+    font-weight: bold;
     font-family: 'Rajdhani', sans-serif;
-    transition: all 0.2s;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    /* Removes the default ugly browser arrow */
+    appearance: none; 
+    -webkit-appearance: none;
+    
+    /* Adds our own custom steel-colored tactical arrow */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238b9bb4%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px auto;
+    padding-right: 35px; /* Makes room for the arrow */
 }
 
-.sort-tab:hover { color: var(--term-text); }
-.sort-tab.active { color: var(--amber-accent); text-shadow: var(--amber-glow-subtle); }
+/* Glows Amber when clicked or hovered */
+.tactical-dropdown:focus, .tactical-dropdown:hover {
+    border-color: var(--amber-accent);
+    color: var(--amber-accent);
+    box-shadow: 0 0 10px rgba(255, 176, 0, 0.2);
+    /* Turns the SVG arrow Amber */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffe800%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+/* The actual list items inside the dropdown */
+/* The actual list items inside the dropdown */
+.tactical-dropdown option {
+    background-color: #000000; /* Pure pitch black */
+    color: var(--term-muted); /* Helldiver yellow text */
+    font-weight: bold;
+    font-family: 'Rajdhani', sans-serif;
+}
 
 /* --- 4-COLUMN PRODUCT GRID --- */
 .product-grid {
@@ -1200,15 +1202,10 @@ body { overflow: hidden; background-color: #000; }
 }
 
 .tactical-badge {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
     padding: 4px 10px;
     font-size: 0.9rem;
     font-weight: bold;
-    z-index: 5;
     letter-spacing: 1px;
-    /* Cuts the top-left corner off for a sci-fi hardware look */
     clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
 }
 

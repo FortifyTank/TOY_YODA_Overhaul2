@@ -39,6 +39,22 @@ app.get('/products', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'products.html'));
 });
 
+// --- DATA API ROUTES ---
+
+// Get all products from the database
+app.get('/api/products', async (req, res) => {
+    try {
+        // Product.find({}) tells Mongoose to fetch every single item in the collection
+        const products = await Product.find({}); 
+        
+        // Send the data back to the browser as a JSON object
+        res.json(products); 
+    } catch (err) {
+        console.error("Error fetching products:", err);
+        res.status(500).json({ error: "Failed to load database" });
+    }
+});
+
 // --- IGNITE SERVER ---
 app.listen(PORT, () => {
     console.log(`\n> =======================================`);

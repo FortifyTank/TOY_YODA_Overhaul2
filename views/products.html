@@ -15,11 +15,11 @@
                 <span class="clearance">[ ACCOUNT ]</span>
             </div>
             <div class="header-logo">
-                <img src="images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
+                <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
             </div>
             <div class="header-right">
                 <div class="header-search">
-                    <input type="text" placeholder="SEARCH CATALOG...">
+                    <input type="text" id="searchInput" placeholder="SEARCH CATALOG...">
                 </div>
                 <span class="cart-status">[ CART: 0 ]</span> 
             </div>
@@ -40,11 +40,11 @@
             
             <div class="filter-group">
                 <div class="range-slider-container">
-                    <span class="range-value" id="priceDisplay">MAX PRICE: ₱10,000</span>
-                    <input type="range" min="0" max="10000" step="500" value="10000" class="tactical-slider" id="priceSlider">
+                    <span class="range-value" id="priceDisplay">MAX PRICE: ANY</span>
+                    <input type="range" min="0" max="15500" step="500" value="15500" class="tactical-slider" id="priceSlider">
                     <div class="slider-labels">
                         <span>₱0</span>
-                        <span>₱10,000</span>
+                        <span>ANY</span>
                     </div>
                 </div>
             </div>
@@ -52,19 +52,19 @@
             <div class="filter-group">
                 <h4>// THEME</h4>
                 <label class="tactical-checkbox">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" class="theme-checkbox" value="STAR WARS">
                     <span class="check-box"></span> STAR WARS
                 </label>
                 <label class="tactical-checkbox">
-                    <input type="checkbox">
+                    <input type="checkbox" class="theme-checkbox" value="TRANSFORMERS">
                     <span class="check-box"></span> TRANSFORMERS
                 </label>
                 <label class="tactical-checkbox">
-                    <input type="checkbox">
+                    <input type="checkbox" class="theme-checkbox" value="METAL GEAR">
                     <span class="check-box"></span> METAL GEAR
                 </label>
                 <label class="tactical-checkbox">
-                    <input type="checkbox">
+                    <input type="checkbox" class="theme-checkbox" value="POKÉMON">
                     <span class="check-box"></span> POKÉMON
                 </label>
             </div>
@@ -72,11 +72,11 @@
             <div class="filter-group">
                 <h4>// AVAILABILITY</h4>
                 <label class="tactical-checkbox">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" class="stock-checkbox" value="IN STOCK">
                     <span class="check-box"></span> IN STOCK
                 </label>
                 <label class="tactical-checkbox">
-                    <input type="checkbox">
+                    <input type="checkbox" class="stock-checkbox" value="OUT OF STOCK">
                     <span class="check-box"></span> OUT OF STOCK
                 </label>
             </div>
@@ -86,118 +86,30 @@
             
             <div class="sort-bar">
                 <span class="sort-label">> SORT BY:</span>
-                <button class="sort-tab active">[ LATEST ]</button>
-                <button class="sort-tab">[ PRICE: LOW TO HIGH ]</button>
-                <button class="sort-tab">[ PRICE: HIGH TO LOW ]</button>
-                <button class="sort-tab">[ NAME: A-Z ]</button>
-                <button class="sort-tab">[ NAME: Z-A ]</button>
+                
+                <select id="sortDropdown" class="tactical-dropdown">
+                    <option value="LATEST" selected>LATEST</option>
+                    <option value="RELEVANCE">RELEVANCE</option>
+                    <option value="OLDEST">OLDEST</option>
+                    <option value="PRICE: LOW TO HIGH">PRICE: LOW TO HIGH</option>
+                    <option value="PRICE: HIGH TO LOW">PRICE: HIGH TO LOW</option>
+                    <option value="NAME: A-Z">NAME: A-Z</option>
+                    <option value="NAME: Z-A">NAME: Z-A</option>
+                    <option value="DEEP DISCOUNTS">DEEP DISCOUNTS</option>
+                </select>
+                
+                <div id="resultCount" style="margin-left: auto; color: var(--amber-accent); font-weight: bold; font-size: 1.1rem; letter-spacing: 1px;">
+                    [ SHOWING: 0/0 ]
+                </div>
             </div>
 
-            <div class="product-grid">
-                
-                <div class="product-card cyber-panel">
-                    
-                    <a href="#" class="product-link">
-                        <div class="product-image-wrapper">
-                            
-                            <div class="tactical-badge badge-new">NEW</div>
-                            
-                            <div class="product-image" style="background-color: #111;">IMG_NO_SIGNAL</div>
-                            <div class="scanline-overlay"></div>
-                            
-                            <div class="view-details-banner">
-                                <span>VIEW DETAILS</span>
-                            </div>
-                        </div>
-                        
-                        <div class="product-info">
-                            <span class="product-category">> STAR WARS</span>
-                            <h3 class="product-name">BLACK SERIES DARTH VADER</h3>
-                            <p class="product-price">₱1,500.00</p>
-                        </div>
-                    </a>
-
-                    <div class="product-actions">
-                        <button class="tac-btn tac-btn--full">[ ADD TO CART ]</button>
-                    </div>
-                </div>
-
-                <div class="product-card cyber-panel">
-                    
-                    <a href="#" class="product-link">
-                        <div class="product-image-wrapper">
-                            <div class="product-image" style="background-color: #111;">IMG_NO_SIGNAL</div>
-                            <div class="scanline-overlay"></div>
-                            
-                            <div class="view-details-banner">
-                                <span>[ VIEW DETAILS ]</span>
-                            </div>
-                        </div>
-                        
-                        <div class="product-info">
-                            <span class="product-category">> STAR WARS</span>
-                            <h3 class="product-name">BLACK SERIES DARTH VADER</h3>
-                            <p class="product-price">₱1,500.00</p>
-                        </div>
-                    </a>
-
-                    <div class="product-actions">
-                        <button class="tac-btn tac-btn--full">[ ADD TO CART ]</button>
-                    </div>
-                </div>
-                
-                <div class="product-card cyber-panel">
-                    
-                    <a href="#" class="product-link">
-                        <div class="product-image-wrapper">
-                            <div class="product-image" style="background-color: #111;">IMG_NO_SIGNAL</div>
-                            <div class="scanline-overlay"></div>
-                            
-                            <div class="view-details-banner">
-                                <span>[ VIEW DETAILS ]</span>
-                            </div>
-                        </div>
-                        
-                        <div class="product-info">
-                            <span class="product-category">> STAR WARS</span>
-                            <h3 class="product-name">BLACK SERIES DARTH VADER</h3>
-                            <p class="product-price">₱1,500.00</p>
-                        </div>
-                    </a>
-
-                    <div class="product-actions">
-                        <button class="tac-btn tac-btn--full">[ ADD TO CART ]</button>
-                    </div>
-                </div>
-
-                <div class="product-card cyber-panel">
-                    
-                    <a href="#" class="product-link">
-                        <div class="product-image-wrapper">
-                            <div class="product-image" style="background-color: #111;">IMG_NO_SIGNAL</div>
-                            <div class="scanline-overlay"></div>
-                            
-                            <div class="view-details-banner">
-                                <span>[ VIEW DETAILS ]</span>
-                            </div>
-                        </div>
-                        
-                        <div class="product-info">
-                            <span class="product-category">> STAR WARS</span>
-                            <h3 class="product-name">BLACK SERIES DARTH VADER</h3>
-                            <p class="product-price">₱1,500.00</p>
-                        </div>
-                    </a>
-
-                    <div class="product-actions">
-                        <button class="tac-btn tac-btn--full">[ ADD TO CART ]</button>
-                    </div>
-                </div>
+            <div class="product-grid" id="product-container">
 
             </div>
         </section>
     </main>
     <div id="bootOverlay" class="boot-overlay"></div>
     <script src="/js/dashboard.js"></script>
+    <script src="/js/catalog.js"></script>
 </body>
 </html>
