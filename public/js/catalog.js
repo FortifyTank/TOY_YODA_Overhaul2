@@ -144,24 +144,29 @@ document.addEventListener('DOMContentLoaded', () => {
         resultCount.innerText = `[ SHOWING: ${showingStart}-${showingEnd} OF ${totalItems} ]`;
 
         // 3. Draw the sliced items
+        // 3. Draw the sliced items
         pageItems.forEach(product => {
+            
+            // CLEAN CODE: Logic handled entirely by CSS classes now!
             let leftBadgeHTML = '';
-            const ribbonStyle = `position: absolute; bottom: 10px; left: 0; padding: 4px 12px 4px 8px; font-weight: bold; font-size: 0.75em; clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%); z-index: 10; opacity: 1; height: 20px; display: flex; align-items: center;`;
-
             if (product.inventoryStatus === 'LOW STOCK') {
-                leftBadgeHTML = `<div style="${ribbonStyle} background: var(--term-orange); color: #000;">LOW STOCK</div>`;
+                leftBadgeHTML = `<div class="badge-ribbon badge-low-stock">LOW STOCK</div>`;
             } else if (product.inventoryStatus === 'SOLD OUT') {
-                leftBadgeHTML = `<div style="${ribbonStyle} background: #cc0000; color: #fff;">SOLD OUT</div>`;
+                leftBadgeHTML = `<div class="badge-ribbon badge-sold-out">SOLD OUT</div>`;
             }
 
-            let rightBadgesHTML = `<div style="position: absolute; bottom: 0; right: 0; top: 0; width: 40%; background: linear-gradient(to top left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 50%); pointer-events: none; z-index: 4;"></div><div style="position: absolute; bottom: 10px; right: 10px; display: flex; flex-direction: column-reverse; gap: 5px; align-items: flex-end; z-index: 5;">`;
-            if (product.onSale) rightBadgesHTML += `<div class="tactical-badge" style="position: relative; height: 20px; display: flex; align-items: center; background: #cc0000; color: #fff; opacity: 1;">${product.discountPercent}% OFF</div>`;
-            if (product.isNew) rightBadgesHTML += `<div class="tactical-badge" style="position: relative; height: 20px; display: flex; align-items: center; background: #00e5ff; color: #000; opacity: 1;">NEW</div>`;
+            let rightBadgesHTML = `
+                <div class="card-gradient-overlay"></div>
+                <div class="right-badges-container">
+            `;
+            if (product.onSale) rightBadgesHTML += `<div class="tactical-badge badge-sale">${product.discountPercent}% OFF</div>`;
+            if (product.isNew) rightBadgesHTML += `<div class="tactical-badge badge-new">NEW</div>`;
             rightBadgesHTML += '</div>';
 
             const currentPriceFormatted = `₱${product.price.toLocaleString()}`;
             const oldPriceFormatted = product.onSale ? `₱${product.old_price.toLocaleString()}` : '';
 
+            // CLEAN HTML: Stripped of all inline styles
             const cardHTML = `
                 <div class="product-card cyber-panel">
                     <a href="#" class="product-link">
@@ -174,14 +179,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="product-category">> ${product.category}</span>
                             <h3 class="product-name">${product.name}</h3>
                             <div class="price-container">
-                                <span class="product-price" style="line-height: 1;">${currentPriceFormatted}</span>
-                                ${product.onSale ? `<span style="text-decoration: line-through; color: var(--term-orange); font-size: 0.7em; line-height: 1.2;">${oldPriceFormatted}</span>` : ''}
+                                <span class="product-price">${currentPriceFormatted}</span>
+                                ${product.onSale ? `<span class="old-price-strike">${oldPriceFormatted}</span>` : ''}
                             </div>
                         </div>
                     </a>
                     <div class="product-actions">
                             <button class="tac-btn tac-btn--full" 
-                                ${!product.inStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}
+                                ${!product.inStock ? 'disabled' : ''}
                                 onclick='addToCart(${JSON.stringify(product)})'>
                                 ${product.inStock ? '[ ADD TO CART ]' : '[ OUT OF STOCK ]'}
                             </button>

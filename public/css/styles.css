@@ -482,6 +482,12 @@ input:-webkit-autofill:focus {
     box-shadow: var(--amber-glow);
 }
 
+.tac-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .tac-btn--md {
     padding: 10px 25px;
     font-size: 1.3rem;
@@ -1161,9 +1167,10 @@ body { overflow: hidden; background-color: #000; }
 
 /* ADD THIS BLOCK: Forces the price to the bottom right */
 .price-container {
-    margin-top: auto; /* Pushes the container to the absolute bottom of the card */
+    margin-top: auto; 
     display: flex;
-    justify-content: flex-end; /* Pushes the text to the right side */
+    /* CHANGED: This pushes the prices to the left! */
+    justify-content: flex-start; 
     align-items: flex-end;
     gap: 8px;
     width: 100%;
@@ -1274,6 +1281,34 @@ body { overflow: hidden; background-color: #000; }
     font-weight: bold;
     letter-spacing: 1px;
     clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* --- PRODUCT BADGES & OVERLAYS --- */
+.badge-ribbon {
+    position: absolute; bottom: 10px; left: 0; 
+    padding: 4px 12px 4px 8px; font-weight: bold; font-size: 0.75rem; 
+    clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%); 
+    z-index: 10; display: flex; align-items: center; height: 20px;
+}
+.badge-low-stock { background: var(--term-orange); color: #000; }
+.badge-sold-out { background: #cc0000; color: #fff; }
+
+.card-gradient-overlay {
+    position: absolute; bottom: 0; right: 0; top: 0; width: 40%; 
+    background: linear-gradient(to top left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 50%); 
+    pointer-events: none; z-index: 4;
+}
+.right-badges-container {
+    position: absolute; bottom: 10px; right: 10px; 
+    display: flex; flex-direction: column-reverse; gap: 5px; 
+    align-items: flex-end; z-index: 5;
+}
+.badge-sale { height: 20px; display: flex; align-items: center; background: #cc0000; color: #fff; }
+.badge-new { height: 20px; display: flex; align-items: center; background: #00e5ff; color: #000; }
+
+.old-price-strike {
+    text-decoration: line-through; color: var(--term-orange); 
+    font-size: 0.7em; line-height: 1.2;
 }
 
 /* --- PAGINATION CONTROLS --- */
@@ -1648,6 +1683,11 @@ input[type="password"]::-webkit-reveal {
 .mt-15 { margin-top: 15px; }
 .mt-30 { margin-top: 30px; }
 .mt-auto { margin-top: auto; } /* ADDED THIS */
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* ADD THIS: Reusable gap utilities */
+.gap-10 { gap: 10px; }
+.gap-15 { gap: 15px; }
 
 /* --- UNIFIED TACTICAL INPUTS --- */
 .tac-input {
