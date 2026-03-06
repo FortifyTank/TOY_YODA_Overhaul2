@@ -391,6 +391,79 @@ app.post('/checkout', async (req, res) => {
     }
 });
 
+// --- ADMIN ROUTES ---
+
+// 1. Serve the Admin Dashboard
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
+
+// 2. Fetch ALL Orders (Admin Clearance Required)
+app.get('/api/admin/orders', async (req, res) => {
+    try {
+        // SECURITY CHECK: Kick them out if they aren't an admin!
+        if (!req.session.userId || req.session.role !== 'admin') {
+            return res.status(403).json({ error: "> CLASSIFIED: ADMIN CLEARANCE REQUIRED." });
+        }
+
+        // Fetch EVERY order in the database, newest first
+        const allOrders = await Order.find({})
+            .sort({ createdAt: -1 })
+            .populate('user', 'username email') // Grabs the buyer's info
+            .populate('items.product', 'imageString'); // Grabs the toy images
+
+        res.json(allOrders);
+    } catch (err) {
+        console.error("Admin Order Fetch Error:", err);
+        res.status(500).json({ error: "> SYSTEM FAILURE RETRIEVING LOGS." });
+    }
+});
+
+// 3. Update Order Status
+app.post('/api/admin/orders/:id/status', async (req, res) => {
+    try {
+        if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
+        
+        const { status } = req.body;
+        await Order.findByIdAndUpdate(req.params.id, { status });
+        
+        res.json({ message: "> STATUS UPDATED TO: " + status });
+    } catch (err) {
+        res.status(500).json({ error: "System Error" });
+    }
+});
+
+// 4. Cancel Order & REVERT INVENTORY
+app.post('/api/admin/orders/:id/cancel', async (req, res) => {
+    try {
+        if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
+
+        const order = await Order.findById(req.params.id);
+        if (!order) return res.status(404).json({ error: "Order not found" });
+        if (order.status === 'CANCELLED') return res.status(400).json({ error: "Already cancelled." });
+
+        // Loop through the receipt and ADD the stock back to the warehouse!
+        for (let item of order.items) {
+            const product = await Product.findById(item.product);
+            if (product) {
+                product.avail_inventory += item.quantity; // The Mathematical Revert!
+                
+                // Fix the tags
+                product.inStock = true; 
+                product.inventoryStatus = product.avail_inventory <= 5 ? 'LOW STOCK' : 'IN STOCK';
+                await product.save();
+            }
+        }
+
+        order.status = 'CANCELLED';
+        await order.save();
+
+        res.json({ message: "> ORDER CANCELLED. INVENTORY RESTORED." });
+    } catch (err) {
+        res.status(500).json({ error: "System Error" });
+    }
+});
+
 // --- IGNITE SERVER ---
 app.listen(PORT, () => {
     console.log(`\n> =======================================`);

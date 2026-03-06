@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. STATE & CONSTANTS (SVGs)
     // ==========================================
     let editingAddressId = null;
+    let userOrdersCache = [];
 
     const iconEdit = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
     const iconTrash = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
@@ -36,6 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabArchived = document.getElementById('tabArchived');
     const ongoingContainer = document.getElementById('ongoingOrdersContainer');
     const archivedContainer = document.getElementById('archivedOrdersContainer');
+
+    // Receipt Modal Logic
+    const modalOverlay = document.getElementById('orderModalOverlay');
+    const modalContent = document.getElementById('modalContent');
 
     // ==========================================
     // 3. CORE DATA LOADERS (API FETCHES)
@@ -73,10 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/orders');
             if (!response.ok) throw new Error('Failed to fetch orders');
-            const orders = await response.json();
+            userOrdersCache = await response.json();
 
-            const ongoing = orders.filter(o => ['PENDING', 'PREPARING', 'ON DELIVERY'].includes(o.status));
-            const archived = orders.filter(o => ['DELIVERED', 'CANCELLED'].includes(o.status));
+            const ongoing = userOrdersCache.filter(o => ['PENDING', 'PREPARING', 'ON DELIVERY'].includes(o.status));
+            const archived = userOrdersCache.filter(o => ['DELIVERED', 'CANCELLED'].includes(o.status));
 
             const buildCard = (order) => {
                 const date = new Date(order.createdAt).toLocaleDateString('en-GB');
@@ -95,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="history-items">${itemsPreview}</div>
                         <div class="history-footer">
                             <span class="text-amber font-bold">₱${order.totalAmount.toLocaleString()}</span>
-                            <button class="text-btn text-sm">[ VIEW DETAILS ]</button>
+                            <button class="text-btn text-sm view-details-btn" data-id="${order._id}">[ VIEW DETAILS ]</button>
                         </div>
                     </div>
                 `;
@@ -294,6 +299,69 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('saveLogisticsBtn').innerText = '[ SAVE LOGISTICS ]';
             toggleAddressForm();
         });
+    }
+
+    // Event Delegation: Listens for clicks on any "VIEW DETAILS" button inside the side panels
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('view-details-btn')) {
+            const orderId = e.target.getAttribute('data-id');
+            const targetOrder = userOrdersCache.find(o => o._id === orderId);
+            
+            if (targetOrder) openReceiptModal(targetOrder);
+        }
+    });
+
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => modalOverlay.classList.remove('active'));
+
+    function openReceiptModal(order) {
+        // Set the header
+        document.getElementById('modalOrderTitle').innerText = `// ORDER: ${order.orderNumber}`;
+
+        // Build the Items List HTML
+        let itemsHTML = '';
+        order.items.forEach(item => {
+            itemsHTML += `
+                <div class="item-row">
+                    <img src="${item.product?.imageString || '/images/default-placeholder.png'}" class="modal-img">
+                    <div class="flex-1">
+                        <div class="text-regular">${item.name}</div>
+                        <div class="text-muted text-sm">QTY: ${item.quantity}  |  ₱${item.priceAtPurchase.toLocaleString()}</div>
+                    </div>
+                    <div class="text-amber font-bold">₱${(item.quantity * item.priceAtPurchase).toLocaleString()}</div>
+                </div>
+            `;
+        });
+
+        // Inject the full blueprint into the Modal Body
+        modalContent.innerHTML = `
+            <div class="receipt-grid">
+                <div class="receipt-box">
+                    <div class="receipt-box-title">> ORDER STATUS</div>
+                    <div class="status-badge status-${order.status} text-lg">[ ${order.status} ]</div>
+                    <div class="text-muted mt-10">PLACED: ${new Date(order.timeline.placedAt).toLocaleString()}</div>
+                </div>
+                <div class="receipt-box">
+                    <div class="receipt-box-title">> SHIPPING ADDRESS</div>
+                    <div class="text-green font-bold">${order.shippingAddress.label}</div>
+                    <div class="text-regular">${order.shippingAddress.addressLine}</div>
+                    <div class="text-regular">BRGY. ${order.shippingAddress.barangay}, ${order.shippingAddress.city}</div>
+                </div>
+            </div>
+
+            <div class="receipt-box">
+                <div class="receipt-box-title">> ITEMS</div>
+                ${itemsHTML}
+            </div>
+
+            <div class="receipt-box">
+                <div class="flex-between mb-5"><span class="text-muted">SUBTOTAL:</span> <span>₱${order.subtotal.toLocaleString()}</span></div>
+                <div class="flex-between mb-12 border-dashed-dim pb-10"><span class="text-muted">SHIPPING:</span> <span>${order.shippingFee === 0 ? 'FREE' : '₱' + order.shippingFee.toLocaleString()}</span></div>
+                <div class="flex-between text-lg text-amber font-bold"><span>TOTAL:</span> <span>₱${order.totalAmount.toLocaleString()}</span></div>
+            </div>
+        `;
+
+        // Trigger the drop-down animation
+        modalOverlay.classList.add('active');
     }
 
     // ==========================================

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toy Yoda | Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="crt-theme admin-theme">
+    
+    <div class="top-command-bar">
+        <header class="global-header flex-between">
+            <div class="header-left">
+                <span class="text-red font-bold text-lg tracking-widest">// RESTRICTED SECTOR</span>
+            </div>
+            <div class="header-logo">
+                <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
+            </div>
+            <div class="header-right">
+                <a href="/products" class="tac-btn tac-btn--ghost">
+                    [ RETURN TO STOREFRONT ]
+                </a>
+            </div>
+        </header>
+        <nav class="global-nav">
+            <div class="nav-status-light"></div> 
+            <span class="nav-link active">> COMMAND DASHBOARD</span>
+        </nav>
+    </div>
+
+    <main class="dashboard-container">
+        
+        <div class="cyber-panel p-30">
+            <div class="flex-between align-start mb-20 border-dashed-dim pb-10">
+                <div>
+                    <h2 class="text-amber text-lg">// ADMIN OVERRIDE ENGAGED</h2>
+                    <p class="text-cyan mt-5">ACCESS LEVEL: <span class="text-regular">OMNIPOTENT</span></p>
+                </div>
+                
+                <div class="tactical-tabs border-none p-0">
+                    <button class="tab-btn active" id="tabLogistics">[ DEPLOYMENT LOGS ]</button>
+                    <button class="tab-btn" id="tabArmory">[ ARMORY INVENTORY ]</button>
+                </div>
+            </div>
+
+            <div id="logisticsView" class="active">
+                <div class="flex-between mb-15">
+                    <h3 class="text-muted">> ACTIVE NETWORK TRAFFIC</h3>
+                    <button class="tac-btn tac-btn--ghost text-sm" id="refreshOrdersBtn">[ REFRESH DATA ]</button>
+                </div>
+                
+                <div id="adminOrdersContainer" class="order-list-container tac-scroll max-h-60vh">
+                    <p class="text-muted text-center mt-30">> SCANNING SECURE CHANNELS...</p>
+                </div>
+            </div>
+
+            <div id="armoryView" class="hidden-content">
+                <div class="flex-between mb-15">
+                    <h3 class="text-muted">> WAREHOUSE MANIFEST</h3>
+                    <button class="tac-btn tac-btn--ghost text-sm">[ + ADD NEW MANIFEST ]</button>
+                </div>
+                <p class="text-center text-muted mt-30">> ARMORY DATABANKS OFFLINE. AWAITING INITIALIZATION.</p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>

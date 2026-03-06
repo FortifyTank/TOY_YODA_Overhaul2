@@ -147,15 +147,25 @@ body:not(.crt-theme) {
 
 .mt-auto { margin-top: auto; } 
 .mx-auto { margin-left: auto; margin-right: auto; }
-.pr-10 { padding-right: 10px; }
 .gap-10 { gap: 10px; }
 .gap-15 { gap: 15px; }
+
+/* Padding & Sizing */
+.pr-10 { padding-right: 10px; }
+.pb-10 { padding-bottom: 10px; }
+.p-0 { padding: 0 !important; }
+.p-30 { padding: 30px; }
+.tracking-widest { letter-spacing: 2px; }
+.border-none { border: none !important; }
+.max-h-60vh { max-height: 60vh; }
 
 /* Display & Borders */
 .col-span-full { grid-column: 1 / -1; }
 .border-red { border-color: var(--term-red) !important; } 
+.border-dashed-dim { border-bottom: 1px dashed var(--border-dim); }
 .opacity-80 { opacity: 0.8; }
 .bg-black { background-color: #000000; }
+
 
 /* HUD Greebles */
 .greeble {
@@ -308,6 +318,9 @@ input:-webkit-autofill:focus { border-color: var(--amber-accent) !important; }
     padding: 6px 14px; border: 1px solid;
     font-weight: bold; font-size: 1.2rem; white-space: nowrap;
     cursor: pointer; text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     opacity: 0; transform: translateY(-20px); pointer-events: none;
     transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s, color 0.2s, box-shadow 0.2s;
 }
@@ -790,6 +803,38 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
 .history-items { font-size: 0.95rem; color: var(--term-text); }
 .history-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
 
+/* --- TACTICAL MODAL (RECEIPTS) --- */
+.tac-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+    z-index: 2000; display: flex; justify-content: center; align-items: center;
+    opacity: 0; visibility: hidden; transition: all 0.3s ease;
+}
+.tac-modal-overlay.active { opacity: 1; visibility: visible; }
+
+.tac-modal {
+    width: 90%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column;
+    transform: translateY(-50px); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0, 255, 102, 0.05);
+}
+.tac-modal-overlay.active .tac-modal { transform: translateY(0); }
+
+.modal-header { padding: 20px; border-bottom: 1px solid var(--border-dim); background: rgba(0,0,0,0.4); }
+.modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+
+/* Modal Inner Data Styling */
+.receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.receipt-box { border: 1px solid var(--border-dim); padding: 15px; background: rgba(0,0,0,0.3); }
+.receipt-box-title { color: var(--term-muted); font-size: 0.9rem; margin-bottom: 8px; }
+.item-row { display: flex; gap: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-dim); margin-bottom: 15px; }
+.item-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.modal-img { width: 60px; height: 60px; object-fit: cover; border: 1px solid var(--border-dim); }
+.close-modal-btn {
+    font-size: 1.8rem;
+    font-weight: bold;
+    padding: 0 10px;
+    line-height: 1;
+}
+
 /* =========================================
    11. PAGE: CHECKPOINT / CHECKOUT
 ========================================= */
@@ -906,4 +951,36 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
     .stage-shift-right .id-card, .stage-shift-left .id-card { transform: translateX(0); opacity: 0.2; pointer-events: none; }
     .side-panel { left: 50% !important; right: auto !important; transform: translate(-50%, 30px); z-index: 100; width: 90%; max-width: 450px; }
     .stage-shift-right .left-panel, .stage-shift-left .right-panel { transform: translate(-50%, 0); }
+}
+
+/* =========================================
+   13. ADMIN COMMAND CENTER OVERRIDES
+========================================= */
+/* Widen the command center for better data visibility */
+.admin-theme .dashboard-container { max-width: 1400px; }
+
+.admin-theme .global-header { border-bottom-color: var(--term-red); }
+.admin-theme .nav-status-light { background-color: var(--term-red); }
+.admin-theme .text-amber { color: var(--term-red) !important; text-shadow: 0 0 8px rgba(255, 42, 42, 0.4); }
+
+/* Recolor the Buttons to Red */
+.admin-theme .tac-btn { border-color: var(--term-red); color: var(--term-red); }
+.admin-theme .tac-btn:hover { background: var(--term-red); color: #000; box-shadow: var(--red-glow); }
+.admin-theme .tac-btn--ghost:hover { background: var(--term-red); color: #000; border-color: var(--term-red); box-shadow: var(--red-glow); }
+
+/* Recolor the Panels & Tabs */
+.admin-theme .tab-btn.active { color: var(--term-red); text-shadow: 0 0 8px rgba(255, 42, 42, 0.4); }
+.admin-theme .cyber-panel::before { background-color: var(--term-red); }
+.admin-theme .cyber-panel:hover { 
+    border-color: var(--term-red); 
+    box-shadow: inset 0 0 20px rgba(255, 42, 42, 0.05), var(--red-glow); 
+}
+
+/* Recolor Navigation Tabs */
+.admin-theme .nav-link:hover:not(.active) { color: var(--term-red); }
+.admin-theme .nav-link:hover:not(.active)::before { border-bottom-color: var(--term-red); }
+.admin-theme .nav-link.active { color: var(--term-red); }
+.admin-theme .nav-link.active::before {
+    background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6) 8px, rgba(255,42,42,0.08) 8px, rgba(255,42,42,0.08) 16px);
+    border: 3px solid var(--term-red);
 }

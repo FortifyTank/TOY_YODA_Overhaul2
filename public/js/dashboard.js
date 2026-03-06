@@ -39,9 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 accountButtons.forEach(btn => {
                     
                     if (window.location.pathname.includes('/profile')) {
-                        // INJECTS THE SVG DIRECTLY NEXT TO THE TEXT
+                        // INJECTS THE SVG DIRECTLY NEXT TO THE TEXT (Cleaned up!)
                         btn.innerHTML = `
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: text-bottom;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M9 14L4 9l5-5"/>
                                 <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/>
                             </svg>
