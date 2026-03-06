@@ -33,13 +33,33 @@
     <main class="dashboard-container profile-stage">
         
         <div id="logisticsPanel" class="side-panel cyber-panel left-panel">
-            <h3 class="text-amber">// SHIPPING LOGISTICS</h3>
-            <p style="color: var(--term-muted); font-size: 0.9rem; margin-top: 10px;">> CURRENT SAVED SECTOR:</p>
-            <div class="address-box">
-                <p>No address equipped.</p>
+            <h3 class="text-amber mb-12">// SHIPPING LOGISTICS</h3>
+            
+            <div id="addressListView">
+                <p class="text-muted mb-5">> SELECT SECTOR TO EQUIP:</p>
+                
+                <div class="address-list-container" id="addressListContainer">
+
+                </div>
+                <button class="tac-btn tac-btn--ghost tac-btn--full close-panel-btn mt-15">[ CLOSE PANEL ]</button>
             </div>
-            <button class="tac-btn tac-btn--full" style="margin-top: 15px;">[ + ADD NEW ADDRESS ]</button>
-            <button class="tac-btn tac-btn--ghost tac-btn--full close-panel-btn" style="margin-top: 10px;">[ CANCEL ]</button>
+
+            <form id="logisticsForm" class="logistics-form">
+                <p class="text-muted mb-5">> ENTER LOGISTICS DATA:</p>
+                <input type="text" id="shipLabel" class="tac-input" placeholder="LOCATION LABEL (e.g. HOME, HQ)">
+                <input type="text" id="shipAddressLine" class="tac-input" placeholder="ROOM / BLDG / STREET">
+                <input type="text" id="shipBarangay" class="tac-input" placeholder="BARANGAY">
+                
+                <div class="flex-between" style="gap: 10px;">
+                    <input type="text" id="shipCity" class="tac-input" placeholder="CITY">
+                    <input type="text" id="shipProvince" class="tac-input" placeholder="PROVINCE">
+                </div>
+                <input type="text" id="shipZip" class="tac-input" placeholder="ZIP CODE">
+                
+                <button type="submit" class="tac-btn tac-btn--full mt-15" id="saveLogisticsBtn">[ SAVE LOGISTICS ]</button>
+                <button type="button" class="tac-btn tac-btn--ghost tac-btn--full mt-15" id="cancelAddressFormBtn">[ CANCEL ]</button>
+            </form>
+
         </div>
 
         <section id="mainIdCard" class="cyber-panel id-card">
@@ -60,10 +80,10 @@
                         <span class="data-value text-muted" id="profilePhone">UNREGISTERED</span>
                         <button class="text-btn" id="togglePhoneBtn">[ CHANGE ]</button>
                     </div>
-                    <div id="phoneForm" class="inline-form">
-                        <input type="text" id="newPhoneInput" placeholder="ENTER NEW COMM NUMBER" class="inline-input">
-                        <button class="tac-btn tac-btn--ghost mt-15" id="savePhoneBtn" style="align-self: flex-end;">[ SAVE NUMBER ]</button>
-                    </div>
+                    <form id="phoneForm" class="inline-form">
+                        <input type="text" class="tac-input" id="newPhoneInput" placeholder="ENTER NEW COMM NUMBER">
+                        <button type="submit" class="tac-btn tac-btn--ghost mt-15" id="savePhoneBtn" style="align-self: flex-end;">[ SAVE NUMBER ]</button>
+                    </form>
                 </div>
 
                 <div class="data-row" style="flex-wrap: wrap;">
@@ -74,13 +94,13 @@
                     </div>
                     <div id="passwordForm" class="inline-form">
                         <div class="password-wrapper">
-                            <input type="password" id="oldPassInput" placeholder="OLD PASSWORD" class="inline-input">
+                            <input type="password" class="tac-input" id="oldPassInput" placeholder="OLD PASSWORD">
                             <button type="button" class="eye-btn" id="toggleOldPass">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                             </button>
                         </div>
                         <div class="password-wrapper mb-5 mt-15">
-                            <input type="password" id="newPassInput" placeholder="NEW PASSWORD" class="inline-input">
+                            <input type="password" class="tac-input" id="newPassInput" placeholder="NEW PASSWORD">
                             <button type="button" class="eye-btn" id="toggleNewPass">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                             </button>

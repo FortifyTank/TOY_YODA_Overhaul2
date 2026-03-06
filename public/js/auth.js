@@ -185,7 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const username = document.getElementById("regName").value;
         const email = registerForm.querySelector('input[type="email"]').value;
-        const password = registerForm.querySelector('input[type="password"]').value;
+        
+        // THE FIX: Now it will find the password box even if the eye icon changed it to "text"!
+        const password = document.getElementById("regPassword").value;
 
         try {
             const response = await fetch('/api/register', {

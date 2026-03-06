@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const ribbonStyle = `position: absolute; bottom: 10px; left: 0; padding: 4px 12px 4px 8px; font-weight: bold; font-size: 0.75em; clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%); z-index: 10; opacity: 1; height: 20px; display: flex; align-items: center;`;
 
             if (product.inventoryStatus === 'LOW STOCK') {
-                leftBadgeHTML = `<div style="${ribbonStyle} background: #e5a823; color: #000;">LOW STOCK</div>`;
+                leftBadgeHTML = `<div style="${ribbonStyle} background: var(--term-orange); color: #000;">LOW STOCK</div>`;
             } else if (product.inventoryStatus === 'SOLD OUT') {
                 leftBadgeHTML = `<div style="${ribbonStyle} background: #cc0000; color: #fff;">SOLD OUT</div>`;
             }
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <h3 class="product-name">${product.name}</h3>
                             <div class="price-container">
                                 <span class="product-price" style="line-height: 1;">${currentPriceFormatted}</span>
-                                ${product.onSale ? `<span style="text-decoration: line-through; color: #e5a823; font-size: 0.7em; line-height: 1.2;">${oldPriceFormatted}</span>` : ''}
+                                ${product.onSale ? `<span style="text-decoration: line-through; color: var(--term-orange); font-size: 0.7em; line-height: 1.2;">${oldPriceFormatted}</span>` : ''}
                             </div>
                         </div>
                     </a>
