@@ -28,16 +28,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function setupPasswordToggle(btn, input) {
         if (!btn || !input) return;
+        
+        // ADD THIS: Automatically injects the SVG on page load so HTML stays clean!
+        btn.innerHTML = iconHidden; 
+        
         btn.addEventListener("click", () => {
             const isPassword = input.getAttribute("type") === "password";
-            
-            // Swap the input type
             input.setAttribute("type", isPassword ? "text" : "password");
-            
-            // Swap the SVG Icon
             btn.innerHTML = isPassword ? iconVisible : iconHidden;
-            
-            // Toggle the bright white active state
             btn.classList.toggle("active"); 
         });
     }

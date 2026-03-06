@@ -50,6 +50,10 @@
     --red-glow: 0 0 15px rgba(255, 42, 42, 0.4);
     --bg-overlay: rgba(255, 255, 255, 0.05); /* For input boxes */
     --bg-panel-dark: rgba(0, 0, 0, 0.4); /* For dropdown forms */
+
+    /* ADD THESE: Unified placeholder colors */
+    --bg-placeholder: #111111;
+    --bg-placeholder-hover: #222222;
 }
 
 * {
@@ -330,6 +334,18 @@ body {
 }
 
 
+/* --- TACTICAL HUD GREEBLES --- */
+.greeble {
+    position: absolute; /* This tells it to break out of the normal layout and use coordinates */
+    color: var(--term-muted);
+    font-family: 'VT323', monospace; /* The hacker/terminal font */
+    font-size: 1rem;
+    letter-spacing: 1px;
+    z-index: 10;
+    pointer-events: none; /* Prevents them from blocking mouse clicks */
+}
+
+/* Your existing coordinate rules */
 .greeble.top-left { top: 10px; left: 15px; }
 .greeble.top-right { top: 10px; right: 15px; }
 .greeble.bottom-right { bottom: 10px; right: 15px; }
@@ -650,6 +666,13 @@ input:-webkit-autofill:focus {
     cursor: pointer;
 }
 
+/* --- SPECIFIC SECTOR BACKGROUNDS --- */
+.sector-sw .static-bg { background-image: url('/images/starwars-static.png'); }
+.sector-sw .animated-bg { background-image: url('/images/starwars-hover.png'); }
+
+.sector-placeholder .static-bg { background-color: var(--bg-placeholder); }
+.sector-placeholder .animated-bg { background-color: var(--bg-placeholder-hover); }
+
 /* The Background Images */
 .system-bg {
     position: absolute;
@@ -762,27 +785,32 @@ input:-webkit-autofill:focus {
 
 /* 1. Background */
 .intro-bg { 
+    background-image: url('/images/bg-space.png'); /* MOVED FROM HTML */
     transform: scale(1.3);
     animation: introZoom 3.5s cubic-bezier(0.25, 1, 0.3, 1) forwards; 
 }
 
 /* 2. THE RIM */
 .intro-rim { 
+    background-image: url('/images/planet-rim.png'); /* MOVED FROM HTML */
     transform: translate(15%, -100%) scale(4);
     animation: introRimSettle 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s forwards; 
 }
 
 /* 3. THE PLANET */
 .intro-planet { 
+    background-image: url('/images/planet-main.png'); /* MOVED FROM HTML */
     transform: translateY(40%) scale(0.9);
     animation: introPlanetRise 2.5s cubic-bezier(0.25, 1, 0.3, 1) 0.3s forwards; 
 }
 
-/* 4. THE SHIPS (Warp in much sooner!) */
+/* 4. THE SHIPS (Added specific classes for left/right images) */
 .intro-ship { 
     opacity: 0; transform: scale(5); filter: blur(20px);
     animation: introWarp 1s cubic-bezier(0.1, 0.9, 0.2, 1) 1.5s forwards; 
 }
+.ship-right { background-image: url('/images/ship-right.png'); }
+.ship-left { background-image: url('/images/ship-left.png'); }
 
 /* The Keyframes that bring everything to their normal positions */
 @keyframes introZoom { to { transform: scale(1); } }
@@ -1605,14 +1633,21 @@ input[type="password"]::-webkit-reveal {
 .text-cyan { color: var(--term-cyan) !important; }
 .text-green { color: var(--term-green) !important; }
 .text-red { color: var(--term-red) !important; }
+.text-muted { color: var(--term-muted) !important; } /* ADDED THIS */
+.text-regular { color: var(--term-text); font-size: 1rem; } /* ADDED THIS */
+
+.border-red { border-color: var(--term-red) !important; } /* ADDED THIS */
 
 .flex-between { display: flex; width: 100%; justify-content: space-between; align-items: center; }
+.flex-wrap { flex-wrap: wrap; } /* ADDED THIS */
 .flex-1 { flex: 1; }
+.self-end { align-self: flex-end; } /* ADDED THIS */
+
 .text-right { text-align: right; }
+.mt-10 { margin-top: 10px; } 
 .mt-15 { margin-top: 15px; }
 .mt-30 { margin-top: 30px; }
-.mb-5 { margin-bottom: 5px; }
-.mb-12 { margin-bottom: 12px; }
+.mt-auto { margin-top: auto; } /* ADDED THIS */
 
 /* --- UNIFIED TACTICAL INPUTS --- */
 .tac-input {

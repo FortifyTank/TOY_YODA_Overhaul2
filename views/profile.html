@@ -74,7 +74,7 @@
                     <span class="data-value" id="profileEmail">loading@system.com</span>
                 </div>
                 
-                <div class="data-row" style="flex-wrap: wrap;">
+                <div class="data-row flex-wrap">
                     <div class="flex-between">
                         <span class="data-label">PHONE:</span>
                         <span class="data-value text-muted" id="profilePhone">UNREGISTERED</span>
@@ -82,11 +82,11 @@
                     </div>
                     <form id="phoneForm" class="inline-form">
                         <input type="text" class="tac-input" id="newPhoneInput" placeholder="ENTER NEW COMM NUMBER">
-                        <button type="submit" class="tac-btn tac-btn--ghost mt-15" id="savePhoneBtn" style="align-self: flex-end;">[ SAVE NUMBER ]</button>
+                        <button type="submit" class="tac-btn tac-btn--ghost mt-15 self-end" id="savePhoneBtn">[ SAVE NUMBER ]</button>
                     </form>
                 </div>
 
-                <div class="data-row" style="flex-wrap: wrap;">
+                <div class="data-row flex-wrap">
                     <div class="flex-between">
                         <span class="data-label">PASSWORD:</span>
                         <span class="data-value text-muted">********</span>
@@ -95,17 +95,13 @@
                     <div id="passwordForm" class="inline-form">
                         <div class="password-wrapper">
                             <input type="password" class="tac-input" id="oldPassInput" placeholder="OLD PASSWORD">
-                            <button type="button" class="eye-btn" id="toggleOldPass">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                            </button>
+                            <button type="button" class="eye-btn" id="toggleOldPass"></button>
                         </div>
                         <div class="password-wrapper mb-5 mt-15">
                             <input type="password" class="tac-input" id="newPassInput" placeholder="NEW PASSWORD">
-                            <button type="button" class="eye-btn" id="toggleNewPass">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                            </button>
+                            <button type="button" class="eye-btn" id="toggleNewPass"></button>
                         </div>
-                        <button class="tac-btn tac-btn--ghost mt-15" id="savePassBtn" style="align-self: flex-end;">[ UPDATE PASSWORD ]</button>
+                        <button class="tac-btn tac-btn--ghost mt-15 self-end" id="savePassBtn">[ UPDATE PASSWORD ]</button>
                     </div>
                 </div>
             </div>
@@ -115,7 +111,7 @@
             <div class="card-footer-actions">
                 <div class="action-group flex-1">
                     <p class="text-muted mb-5">// SHIPPING INFO</p>
-                    <p class="mb-12" style="color: var(--term-text); font-size: 1rem;">CURRENT ADDRESS: <span id="currentAddressDisplay" class="text-amber">NONE</span></p>
+                    <p class="mb-12 text-regular">CURRENT ADDRESS: <span id="currentAddressDisplay" class="text-amber">NONE</span></p>
                     <button id="openLogisticsBtn" class="tac-btn tac-btn--ghost">[ UPDATE SHIPPING ]</button>
                 </div>
                 
@@ -126,14 +122,14 @@
             </div>
             
             <div class="text-right mt-30">
-                <button id="logoutBtn" class="tac-btn text-red" style="border-color: var(--term-red);">[ DISCONNECT LINK ]</button>
+                <button id="logoutBtn" class="tac-btn text-red border-red">[ DISCONNECT LINK ]</button>
             </div>
         </section>
 
         <div id="historyPanel" class="side-panel cyber-panel right-panel">
             <h3 class="text-amber">// PURCHASE RECORDS</h3>
-            <p style="color: var(--term-muted); margin-top: 10px;">> NO ACTIVE ORDERS.</p>
-            <button class="tac-btn tac-btn--ghost tac-btn--full close-panel-btn" style="margin-top: auto;">[ CLOSE RECORDS ]</button>
+            <p class="text-muted mt-10">> NO ACTIVE ORDERS.</p>
+            <button class="tac-btn tac-btn--ghost tac-btn--full close-panel-btn mt-auto">[ CLOSE RECORDS ]</button>
         </div>
 
     </main>
