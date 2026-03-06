@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Toy Yoda | Catalog</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles_new.css">
 </head>
 <body class="crt-theme">
     
@@ -51,22 +51,7 @@
 
             <div class="filter-group">
                 <h4>// THEME</h4>
-                <label class="tactical-checkbox">
-                    <input type="checkbox" class="theme-checkbox" value="STAR WARS">
-                    <span class="check-box"></span> STAR WARS
-                </label>
-                <label class="tactical-checkbox">
-                    <input type="checkbox" class="theme-checkbox" value="TRANSFORMERS">
-                    <span class="check-box"></span> TRANSFORMERS
-                </label>
-                <label class="tactical-checkbox">
-                    <input type="checkbox" class="theme-checkbox" value="METAL GEAR">
-                    <span class="check-box"></span> METAL GEAR
-                </label>
-                <label class="tactical-checkbox">
-                    <input type="checkbox" class="theme-checkbox" value="POKÉMON">
-                    <span class="check-box"></span> POKÉMON
-                </label>
+                <div id="dynamicThemeFilters"></div>
             </div>
 
             <div class="filter-group">
@@ -89,8 +74,8 @@
                 
                 <select id="sortDropdown" class="tactical-dropdown">
                     <option value="LATEST" selected>LATEST</option>
-                    <option value="RELEVANCE">RELEVANCE</option>
                     <option value="OLDEST">OLDEST</option>
+                    <option value="RELEVANCE">RELEVANCE</option>
                     <option value="PRICE: LOW TO HIGH">PRICE: LOW TO HIGH</option>
                     <option value="PRICE: HIGH TO LOW">PRICE: HIGH TO LOW</option>
                     <option value="NAME: A-Z">NAME: A-Z</option>

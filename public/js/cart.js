@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     
+    // ==========================================
+    // 1. STATE & DOM ELEMENTS
+    // ==========================================
     let cart = JSON.parse(localStorage.getItem('toy_yoda_cart')) || [];
+    let alertTimer;
     
     const cartStatusElements = document.querySelectorAll('.cart-status');
     const cartOverlay = document.getElementById('cartOverlay');
@@ -10,41 +14,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartTotalDisplay = document.getElementById('cartTotalDisplay');
     const clearCartBtn = document.getElementById('clearCartBtn');
 
-    // NEW ALERT ELEMENTS
     const systemAlert = document.getElementById('systemAlert');
     const systemAlertMessage = document.getElementById('systemAlertMessage');
     const systemAlertOkBtn = document.getElementById('systemAlertOkBtn');
 
-    // --- CUSTOM ALERT FUNCTION ---
-    let alertTimer; // ADD THIS
-
+    // ==========================================
+    // 2. UI & ALERT UTILITIES
+    // ==========================================
+    
+    // Displays user-friendly popup warnings
     function showSystemAlert(message) {
         if (!systemAlert) return;
         systemAlertMessage.innerText = message;
-        systemAlert.classList.add('active'); // Drops it down
+        systemAlert.classList.add('active'); 
 
-        // ADD THIS: Clear any existing timer, then set a new 7-second auto-close
         clearTimeout(alertTimer);
         alertTimer = setTimeout(() => {
             systemAlert.classList.remove('active');
-        }, 7000); // 7000 milliseconds = 7 seconds
+        }, 7000); 
     }
 
-    if (systemAlertOkBtn) {
-        systemAlertOkBtn.addEventListener('click', () => {
-            systemAlert.classList.remove('active'); 
-            clearTimeout(alertTimer); // Stop the timer if they manually closed it
-        });
-    }
-
-    // ADDED: animate = false prevents it from flashing on page load
+    // Flashes the cart button and triggers a drawer redraw
     function updateCartUI(animate = false) {
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
         
         cartStatusElements.forEach(el => {
             el.innerText = `[ CART: ${totalItems} ]`;
             
-            // Only flash the colors if animate is true
             if (animate) {
                 el.style.backgroundColor = 'var(--amber-accent)';
                 el.style.color = 'var(--bg-deep)';
@@ -53,25 +49,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.style.color = '';
                 }, 200);
             } else {
-                // If it's the initial page load, just reveal the button by adding .ready
-                setTimeout(() => {
-                    el.classList.add('ready');
-                }, 50); 
+                setTimeout(() => el.classList.add('ready'), 50); 
             }
         });
 
         renderCartDrawer();
     }
 
+    // Draws the HTML items inside the slide-out panel
     function renderCartDrawer() {
         if (!cartItemsContainer) return;
 
         cartItemsContainer.innerHTML = '';
         let totalPrice = 0;
 
+        // OPTIMIZATION: Removed inline styles, added .text-muted, .text-center, .mt-20
         if (cart.length === 0) {
-            // Cleaned up the empty text
-            cartItemsContainer.innerHTML = '<p style="color: var(--term-muted); text-align: center; margin-top: 20px;">> CART IS EMPTY.</p>';
+            cartItemsContainer.innerHTML = '<p class="text-muted text-center mt-20">> YOUR CART IS EMPTY.</p>';
             cartTotalDisplay.innerText = '₱0';
             return;
         }
@@ -80,21 +74,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemTotal = item.price * item.quantity;
             totalPrice += itemTotal;
 
-            // Updated HTML to include [REMOVE] and [+]/[-] buttons
+            // OPTIMIZATION: Zero inline styles. All handled by utility classes now!
             const itemHTML = `
                 <div class="cart-item">
                     <img src="${item.image}" alt="${item.name}" class="cart-item-img">
                     <div class="cart-item-details">
                         
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div class="cart-item-title" style="padding-right: 10px;">${item.name}</div>
+                        <div class="flex-between align-start">
+                            <div class="cart-item-title pr-10">${item.name}</div>
                             <button class="remove-item-btn" onclick="removeFromCart('${item.sku}')">[ REMOVE ]</button>
                         </div>
                         
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <div class="flex-between mt-10">
                             <div class="qty-controls">
                                 <button class="qty-btn" onclick="updateQuantity('${item.sku}', -1)">-</button>
-                                <span style="color: var(--term-text); font-weight: bold; font-size: 1.1rem;">${item.quantity}</span>
+                                <span class="qty-number">${item.quantity}</span>
                                 <button class="qty-btn" onclick="updateQuantity('${item.sku}', 1)">+</button>
                             </div>
                             <span class="cart-item-price">₱${itemTotal.toLocaleString()}</span>
@@ -109,47 +103,19 @@ document.addEventListener('DOMContentLoaded', () => {
         cartTotalDisplay.innerText = `₱${totalPrice.toLocaleString()}`;
     }
 
-    // --- ADDED: Modify Quantity Logic ---
-    window.updateQuantity = function(sku, change) {
-        const item = cart.find(i => i.sku === sku);
-        if (item) {
-            const newQuantity = item.quantity + change;
-
-            // CHECK: Prevent clicking '+' past the max stock
-            if (newQuantity > item.maxStock) {
-                showSystemAlert(`> INVENTORY LIMIT REACHED: ONLY ${item.maxStock} AVAILABLE.`);
-                return;
-            }
-
-            item.quantity = newQuantity;
-            
-            if (item.quantity <= 0) {
-                cart = cart.filter(i => i.sku !== sku);
-            }
-            
-            localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
-            updateCartUI(true);
-        }
-    };
-
-    // --- ADDED: Remove Item Logic ---
-    window.removeFromCart = function(sku) {
-        cart = cart.filter(i => i.sku !== sku);
-        localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
-        updateCartUI(true);
-    };
-
+    // ==========================================
+    // 3. CART DATA OPERATIONS (Global Window Functions)
+    // ==========================================
+    
     window.addToCart = function(product) {
-        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-
         const existingItem = cart.find(item => item.sku === product.sku);
         
         if (existingItem) {
-            // CHECK 2: Individual Stock Limit
             if (existingItem.quantity < product.avail_inventory) {
                 existingItem.quantity += 1;
             } else {
-                showSystemAlert(`> INVENTORY LIMIT REACHED: ONLY ${product.avail_inventory} AVAILABLE.`);
+                // UX UPDATE: Clearer, friendlier terminology
+                showSystemAlert(`> NOT ENOUGH STOCK: ONLY ${product.avail_inventory} AVAILABLE.`);
                 return; 
             }
         } else {
@@ -167,12 +133,44 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCartUI(true);
     };
 
+    window.updateQuantity = function(sku, change) {
+        const item = cart.find(i => i.sku === sku);
+        if (item) {
+            const newQuantity = item.quantity + change;
+
+            if (newQuantity > item.maxStock) {
+                // UX UPDATE: Clearer, friendlier terminology
+                showSystemAlert(`> NOT ENOUGH STOCK: ONLY ${item.maxStock} AVAILABLE.`);
+                return;
+            }
+
+            item.quantity = newQuantity;
+            
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.sku !== sku);
+            }
+            
+            localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
+            updateCartUI(true);
+        }
+    };
+
+    window.removeFromCart = function(sku) {
+        cart = cart.filter(i => i.sku !== sku);
+        localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
+        updateCartUI(true);
+    };
+
     function clearCart() {
         cart = [];
         localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
         updateCartUI(true);
     }
 
+    // ==========================================
+    // 4. DRAWER CONTROLS & EVENT LISTENERS
+    // ==========================================
+    
     function openCart() {
         if(cartDrawer && cartOverlay) {
             cartDrawer.classList.add('active');
@@ -187,10 +185,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Initialization
     cartStatusElements.forEach(btn => btn.addEventListener('click', openCart));
-    if(closeCartBtn) closeCartBtn.addEventListener('click', closeCart);
-    if(cartOverlay) cartOverlay.addEventListener('click', closeCart);
-    if(clearCartBtn) clearCartBtn.addEventListener('click', clearCart);
+    
+    if (closeCartBtn) closeCartBtn.addEventListener('click', closeCart);
+    if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
+    if (clearCartBtn) clearCartBtn.addEventListener('click', clearCart);
 
+    if (systemAlertOkBtn) {
+        systemAlertOkBtn.addEventListener('click', () => {
+            systemAlert.classList.remove('active'); 
+            clearTimeout(alertTimer); 
+        });
+    }
+
+    // Boot UI on load
     updateCartUI();
 });

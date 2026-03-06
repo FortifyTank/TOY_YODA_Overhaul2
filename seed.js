@@ -31,7 +31,10 @@ const seedProducts = [
     { sku: "TF-002", name: "STUDIO SERIES BUMBLEBEE", description: "Detailed movie-accurate figure.", price: 1200, old_price: 1500, avail_inventory: 20, category: "TRANSFORMERS", tags: ["autobot", "movie", "bumblebee"], imageString: "/images/products/TF-001.jpg" },
     { sku: "TF-003", name: "MASTERPIECE MEGATRON", description: "Decepticon leader.", price: 11000, old_price: 0, avail_inventory: 2, category: "TRANSFORMERS", tags: ["decepticon", "masterpiece", "megatron"], imageString: "/images/products/TF-001.jpg" },
     { sku: "TF-004", name: "WAR FOR CYBERTRON UNICRON", description: "Massive planet-eating figure.", price: 35000, old_price: 0, avail_inventory: 0, category: "TRANSFORMERS", tags: ["haslab", "unicron", "massive", "decepticon"], imageString: "/images/products/TF-001.jpg" },
-    { sku: "TF-005", name: "G1 REISSUE STARSCREAM", description: "Classic retro boxed figure.", price: 2500, old_price: 3000, avail_inventory: 5, category: "TRANSFORMERS", tags: ["decepticon", "retro", "g1", "starscream"], imageString: "/images/products/TF-001.jpg" }
+    { sku: "TF-005", name: "G1 REISSUE STARSCREAM", description: "Classic retro boxed figure.", price: 2500, old_price: 3000, avail_inventory: 5, category: "TRANSFORMERS", tags: ["decepticon", "retro", "g1", "starscream"], imageString: "/images/products/TF-001.jpg" },
+
+    // --- MARVEL ---
+    { sku: "MV-001", name: "CAPTAIN AMERICA", description: "SHIELD", price: 8000, old_price: 10000, avail_inventory: 5, category: "MARVEL", tags: ["hero", "shield", "marvel"], imageString: "/images/products/TF-001.jpg" }
 ];
 
 mongoose.connect(dbURI, { dbName: "toy_yoda" })

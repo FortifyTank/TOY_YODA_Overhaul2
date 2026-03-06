@@ -1,12 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- STATE MANAGEMENT ---
+    // ==========================================
+    // 1. STATE MANAGEMENT
+    // ==========================================
     let allProducts = []; 
     let currentSort = 'LATEST'; 
     let currentPage = 1;
     const itemsPerPage = 16;
 
-    // --- DOM ELEMENTS ---
+    // ==========================================
+    // 2. DOM ELEMENTS
+    // ==========================================
     const container = document.getElementById('product-container');
     const resultCount = document.getElementById('resultCount');
     const searchInput = document.getElementById('searchInput');
@@ -15,22 +19,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const topPagination = document.getElementById('topPagination');
     const bottomPagination = document.getElementById('bottomPagination');
 
-    const themeCheckboxes = document.querySelectorAll('.theme-checkbox');
     const stockCheckboxes = document.querySelectorAll('.stock-checkbox');
     const sortDropdown = document.getElementById('sortDropdown');
 
+    // ==========================================
+    // 3. INITIALIZATION
+    // ==========================================
     async function initCatalog() {
         try {
             const response = await fetch('/api/products');
             allProducts = await response.json();
+            generateThemeFilters(allProducts);
             applyFilters(); 
         } catch (error) {
             console.error("Error loading the catalog:", error);
-            container.innerHTML = '<p>> ERROR: DATABASE CONNECTION LOST.</p>';
+            container.innerHTML = '<p class="text-red">> ERROR: DATABASE CONNECTION LOST.</p>';
         }
     }
 
-    // --- RELEVANCE SCORING ALGORITHM ---
+    // ==========================================
+    // 4. CORE LOGIC (Scoring & Filtering)
+    // ==========================================
     function getRelevanceScore(product, searchTerm) {
         if (!searchTerm) return 0;
         
@@ -39,13 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = product.name.toLowerCase();
         const category = product.category.toLowerCase();
         
-        // Highest priority: Exact phrase is in the product name
         if (name.includes(term)) score += 50;
-        
-        // Medium priority: Matches the category
         if (category.includes(term)) score += 20;
-        
-        // Low priority: Matches a hidden tag
         if (product.tags && product.tags.some(tag => tag.toLowerCase().includes(term))) {
             score += 10;
         }
@@ -53,29 +57,55 @@ document.addEventListener('DOMContentLoaded', () => {
         return score;
     }
 
+    // Automatically generates checkboxes based on what exists in the database!
+    function generateThemeFilters(products) {
+        const filterContainer = document.getElementById('dynamicThemeFilters');
+        if (!filterContainer) return;
+
+        // 1. Extract a list of all categories, then use Set() to remove duplicates, and sort() alphabetically
+        const uniqueCategories = [...new Set(products.map(p => p.category))].sort();
+
+        // 2. Build the HTML for each unique category
+        let html = '';
+        uniqueCategories.forEach(category => {
+            html += `
+            <label class="tactical-checkbox">
+                <input type="checkbox" class="theme-checkbox" value="${category}">
+                <span class="check-box"></span> ${category}
+            </label>
+            `;
+        });
+
+        // 3. Inject it into the sidebar
+        filterContainer.innerHTML = html;
+
+        // 4. Attach the event listeners to the NEWLY created checkboxes
+        document.querySelectorAll('.theme-checkbox').forEach(cb => {
+            cb.addEventListener('change', applyFilters);
+        });
+    }
+
     function applyFilters() {
         let filtered = allProducts;
         const searchTerm = searchInput.value.toLowerCase();
 
-        // A. Search Bar Filter
+        // A. Search Bar
         if (searchTerm) {
             filtered = filtered.filter(p => getRelevanceScore(p, searchTerm) > 0);
         }
 
-        // B. Price Slider Filter (The Infinity Fix)
+        // B. Price Slider
         let maxPrice = Number(priceSlider.value);
-        if (maxPrice >= 15500) {
-            maxPrice = Infinity; // If it's at the absolute max, let everything pass
-        }
+        if (maxPrice >= 15500) maxPrice = Infinity;
         filtered = filtered.filter(p => p.price <= maxPrice);
 
-        // C. Theme Filter
-        const activeThemes = Array.from(themeCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+        // C. Theme
+        const activeThemes = Array.from(document.querySelectorAll('.theme-checkbox')).filter(cb => cb.checked).map(cb => cb.value);
         if (activeThemes.length > 0) {
             filtered = filtered.filter(p => activeThemes.includes(p.category));
         }
 
-        // D. Availability Filter
+        // D. Availability
         const activeStock = Array.from(stockCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
         if (activeStock.length > 0) {
             filtered = filtered.filter(p => {
@@ -89,19 +119,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // E. Sorting Engine
         if (currentSort === 'RELEVANCE') {
             if (searchTerm) {
-                // Sort by highest score first
                 filtered.sort((a, b) => getRelevanceScore(b, searchTerm) - getRelevanceScore(a, searchTerm));
             } else {
-                // If the search bar is empty, fallback to Latest
                 filtered.sort((a, b) => new Date(b.date_published) - new Date(a.date_published));
             }
         } else if (currentSort === 'DEEP DISCOUNTS') {
-            // Sort by highest discount percentage first
-            filtered.sort((a, b) => {
-                const discountA = a.discountPercent || 0;
-                const discountB = b.discountPercent || 0;
-                return discountB - discountA;
-            });
+            filtered.sort((a, b) => (b.discountPercent || 0) - (a.discountPercent || 0));
         } else if (currentSort === 'LATEST') {
             filtered.sort((a, b) => new Date(b.date_published) - new Date(a.date_published));
         } else if (currentSort === 'OLDEST') {
@@ -116,25 +139,27 @@ document.addEventListener('DOMContentLoaded', () => {
             filtered.sort((a, b) => b.name.localeCompare(a.name));
         }
 
-        currentPage = 1; // Reset to first page whenever filters change
+        currentPage = 1; 
         renderProducts(filtered);
     }
 
+    // ==========================================
+    // 5. UI RENDERING
+    // ==========================================
     function renderProducts(filteredList) {
         container.innerHTML = ''; 
         
         const totalItems = filteredList.length;
         const totalPages = Math.ceil(totalItems / itemsPerPage);
         
-        // 1. Array Slicing Math (Grabs only 16 items depending on the page)
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         const pageItems = filteredList.slice(startIndex, endIndex);
 
-        // 2. Update the "Showing" text format
+        // Empty State (OPTIMIZED: Using CSS Utilities)
         if (totalItems === 0) {
             resultCount.innerText = `[ SHOWING: 0 / 0 ]`;
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--term-muted); font-size: 1.5rem; margin-top: 50px;">> NO MANIFESTS MATCH CURRENT PARAMETERS.</p>';
+            container.innerHTML = '<p class="col-span-full text-center text-muted text-lg mt-30">> NO MANIFESTS MATCH CURRENT PARAMETERS.</p>';
             renderPagination(0, filteredList);
             return;
         }
@@ -143,11 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const showingEnd = Math.min(endIndex, totalItems);
         resultCount.innerText = `[ SHOWING: ${showingStart}-${showingEnd} OF ${totalItems} ]`;
 
-        // 3. Draw the sliced items
-        // 3. Draw the sliced items
         pageItems.forEach(product => {
-            
-            // CLEAN CODE: Logic handled entirely by CSS classes now!
             let leftBadgeHTML = '';
             if (product.inventoryStatus === 'LOW STOCK') {
                 leftBadgeHTML = `<div class="badge-ribbon badge-low-stock">LOW STOCK</div>`;
@@ -166,13 +187,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentPriceFormatted = `₱${product.price.toLocaleString()}`;
             const oldPriceFormatted = product.onSale ? `₱${product.old_price.toLocaleString()}` : '';
 
-            // CLEAN HTML: Stripped of all inline styles
+            // OPTIMIZED: No more inline styles on the wrapper or img!
             const cardHTML = `
                 <div class="product-card cyber-panel">
                     <a href="#" class="product-link">
-                        <div class="product-image-wrapper" style="background: #000;">
+                        <div class="product-image-wrapper">
                             ${leftBadgeHTML + rightBadgesHTML}
-                            <img src="${product.imageString}" alt="${product.name}" class="product-image" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
+                            <img src="${product.imageString}" alt="${product.name}" class="product-image">
                             <div class="view-details-banner"><span>[ VIEW DETAILS ]</span></div>
                         </div>
                         <div class="product-info">
@@ -185,18 +206,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </a>
                     <div class="product-actions">
-                            <button class="tac-btn tac-btn--full" 
-                                ${!product.inStock ? 'disabled' : ''}
-                                onclick='addToCart(${JSON.stringify(product)})'>
-                                ${product.inStock ? '[ ADD TO CART ]' : '[ OUT OF STOCK ]'}
-                            </button>
-                        </div>
+                        <button class="tac-btn tac-btn--full" 
+                            ${!product.inStock ? 'disabled' : ''}
+                            onclick='addToCart(${JSON.stringify(product)})'>
+                            ${product.inStock ? '[ ADD TO CART ]' : '[ OUT OF STOCK ]'}
+                        </button>
+                    </div>
                 </div>
             `;
             container.innerHTML += cardHTML;
         });
         
-        // 4. Draw the page buttons
         renderPagination(totalPages, filteredList);
     }
 
@@ -207,55 +227,41 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let buttonsHTML = `
-            <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} data-page="prev">[ < ]</button>
-        `;
+        let buttonsHTML = `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} data-page="prev">[ < ]</button>`;
         
-        // --- SMART TRUNCATION LOGIC ---
         let pages = [];
         if (totalPages <= 5) {
-            // If 5 or fewer pages, just show all of them
             for (let i = 1; i <= totalPages; i++) pages.push(i);
         } else {
-            // If we are near the beginning
             if (currentPage <= 3) {
                 pages = [1, 2, 3, 4, '...', totalPages];
-            } 
-            // If we are near the end
-            else if (currentPage >= totalPages - 2) {
+            } else if (currentPage >= totalPages - 2) {
                 pages = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-            } 
-            // If we are somewhere in the middle
-            else {
+            } else {
                 pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
             }
         }
 
-        // --- DRAW THE BUTTONS ---
         pages.forEach(p => {
             if (p === '...') {
-                // Draw unclickable ellipsis
-                buttonsHTML += `<span style="color: var(--term-muted); font-weight: bold; margin: 0 5px;">...</span>`;
+                // OPTIMIZED: Using the new CSS class
+                buttonsHTML += `<span class="pagination-ellipsis">...</span>`;
             } else {
-                // Draw normal page buttons
                 buttonsHTML += `<button class="page-btn ${currentPage === p ? 'active' : ''}" data-page="${p}">[ ${p} ]</button>`;
             }
         });
         
-        buttonsHTML += `
-            <button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} data-page="next">[ > ]</button>
-        `;
+        buttonsHTML += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} data-page="next">[ > ]</button>`;
 
         topPagination.innerHTML = buttonsHTML;
         bottomPagination.innerHTML = buttonsHTML;
 
-        // --- CLICK EVENTS ---
         const attachClickEvents = (navContainer) => {
             const btns = navContainer.querySelectorAll('.page-btn');
             btns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const action = e.target.getAttribute('data-page');
-                    if (!action) return; // Ignores clicks if they somehow click the ellipsis
+                    if (!action) return; 
                     
                     if (action === 'prev' && currentPage > 1) currentPage--;
                     else if (action === 'next' && currentPage < totalPages) currentPage++;
@@ -271,41 +277,37 @@ document.addEventListener('DOMContentLoaded', () => {
         attachClickEvents(bottomPagination);
     }
 
-    // --- EVENT LISTENERS ---
-    if(searchInput) searchInput.addEventListener('input', () => {
-        // Auto-switch dropdown to "Relevance" when they start typing
-        if (searchInput.value.length > 0 && currentSort !== 'RELEVANCE') {
-            sortDropdown.value = 'RELEVANCE'; // Updates the UI dropdown
-            currentSort = 'RELEVANCE';        // Updates the system state
-        }
-        applyFilters();
-    });
-
-    if (priceSlider && priceDisplay) {
-        priceSlider.addEventListener("input", (e) => {
-            const rawValue = Number(e.target.value);
-            if (rawValue >= 15500) {
-                priceDisplay.innerText = `MAX PRICE: ANY`;
-            } else {
-                priceDisplay.innerText = `MAX PRICE: ₱${rawValue.toLocaleString()}`;
+    // ==========================================
+    // 6. EVENT LISTENERS
+    // ==========================================
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.length > 0 && currentSort !== 'RELEVANCE') {
+                sortDropdown.value = 'RELEVANCE'; 
+                currentSort = 'RELEVANCE';        
             }
             applyFilters();
         });
     }
 
-    themeCheckboxes.forEach(cb => cb.addEventListener('change', applyFilters));
+    if (priceSlider && priceDisplay) {
+        priceSlider.addEventListener("input", (e) => {
+            const rawValue = Number(e.target.value);
+            priceDisplay.innerText = rawValue >= 15500 ? `MAX PRICE: ANY` : `MAX PRICE: ₱${rawValue.toLocaleString()}`;
+            applyFilters();
+        });
+    }
+
     stockCheckboxes.forEach(cb => cb.addEventListener('change', applyFilters));
 
-    // NEW DROPDOWN LISTENER
     if (sortDropdown) {
         sortDropdown.addEventListener('change', (e) => {
             currentSort = e.target.value;
             applyFilters();
-            
-            // THE FIX: Instantly drop the "focus" so it reverts back to gray!
             e.target.blur(); 
         });
     }
 
+    // Ignite
     initCatalog();
 });

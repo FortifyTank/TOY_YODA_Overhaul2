@@ -1,45 +1,62 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- GLOBAL SYSTEM BOOT FADE-IN ---
-    const bootOverlay = document.getElementById("bootOverlay");
+    // ==========================================
+    // 1. STATE & DOM ELEMENTS
+    // ==========================================
     const urlParams = new URLSearchParams(window.location.search);
+    const bootOverlay = document.getElementById("bootOverlay");
     
-    if (bootOverlay) {
+    // Grabs all login buttons across the entire site instantly
+    const accountButtons = document.querySelectorAll('.clearance');
+
+    // ==========================================
+    // 2. CORE LOGIC
+    // ==========================================
+    
+    // --- Global System Boot Fade-In ---
+    function handleBootAnimation() {
+        if (!bootOverlay) return;
+        
         if (urlParams.get("warp") === "true") {
+            // Trigger cinematic fade
             bootOverlay.classList.add("fade-out");
+            
+            // Instantly clean the URL so refreshing the page doesn't replay the fade
             window.history.replaceState({}, document.title, window.location.pathname);
         } else {
+            // Instantly hide the black screen
             bootOverlay.classList.add("hidden");
         }
     }
 
-    // --- GLOBAL AUTHENTICATION CHECK ---
+    // --- Global Authentication Check ---
     async function checkAuthStatus() {
         try {
             const response = await fetch('/api/auth/status');
             const data = await response.json();
 
-            // Find every "LOG IN" button on the page
-            const accountButtons = document.querySelectorAll('.clearance');
-
             if (data.loggedIn) {
                 accountButtons.forEach(btn => {
-                    btn.innerText = `[ ${data.username} ]`;
+                    btn.innerText = `[ ${data.username.toUpperCase()} ]`; // Forces uppercase for military feel
                     btn.classList.add('logged-in');
                     btn.href = '/profile'; 
-                    btn.classList.add('ready'); // Reveal the button!
+                    btn.classList.add('ready'); // Drops the button from the ceiling
                 });
             } else {
                 accountButtons.forEach(btn => {
-                    // It's already green by default, just reveal it!
-                    btn.classList.add('ready'); 
+                    btn.classList.add('ready'); // Drops the default green button
                 });
             }
         } catch (error) {
             console.error("Failed to verify auth status:", error);
+            // Fallback: Drop the default green buttons even if the server lags
+            accountButtons.forEach(btn => btn.classList.add('ready'));
         }
     }
 
-    // Run the check instantly on page load
+    // ==========================================
+    // 3. INITIALIZATION
+    // ==========================================
+    handleBootAnimation();
     checkAuthStatus();
 });

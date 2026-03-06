@@ -1128,21 +1128,28 @@ body { overflow: hidden; background-color: #000; }
     padding: 15px;
 }
 
+/* UPDATE THESE TWO RULES */
 .product-image-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1; /* Keeps images perfectly square */
+    aspect-ratio: 1 / 1; 
     border: 1px solid var(--border-dim);
     margin-bottom: 15px;
     overflow: hidden;
+    background-color: #000; /* Replaced inline style */
 }
 
-.product-image {
-    width: 100%; height: 100%;
-    display: flex; justify-content: center; align-items: center;
-    color: var(--term-muted);
-    background-size: cover;
-    background-position: center;
+img.product-image {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    opacity: 0.8; /* Replaced inline style */
+    transition: opacity 0.3s ease;
+}
+
+/* Bonus Polish: Images light up when hovering the card! */
+.product-card:hover img.product-image {
+    opacity: 1;
 }
 
 /* Tactical scanline overlay on images */
@@ -1669,25 +1676,50 @@ input[type="password"]::-webkit-reveal {
 .text-green { color: var(--term-green) !important; }
 .text-red { color: var(--term-red) !important; }
 .text-muted { color: var(--term-muted) !important; } /* ADDED THIS */
+
 .text-regular { color: var(--term-text); font-size: 1rem; } /* ADDED THIS */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-lg { font-size: 1.5rem; }
+
+.col-span-full { grid-column: 1 / -1; }
+
+.align-start { align-items: flex-start; }
+
+.pr-10 { padding-right: 10px; }
 
 .border-red { border-color: var(--term-red) !important; } /* ADDED THIS */
 
 .flex-between { display: flex; width: 100%; justify-content: space-between; align-items: center; }
 .flex-wrap { flex-wrap: wrap; } /* ADDED THIS */
 .flex-1 { flex: 1; }
+
 .self-end { align-self: flex-end; } /* ADDED THIS */
 
-.text-right { text-align: right; }
 .mt-10 { margin-top: 10px; } 
 .mt-15 { margin-top: 15px; }
+.mt-20 { margin-top: 20px; }
 .mt-30 { margin-top: 30px; }
 .mt-auto { margin-top: auto; } /* ADDED THIS */
 .mx-auto { margin-left: auto; margin-right: auto; }
 
-/* ADD THIS: Reusable gap utilities */
 .gap-10 { gap: 10px; }
 .gap-15 { gap: 15px; }
+
+.opacity-80 { opacity: 0.8; }
+.bg-black { background-color: #000000; }
+
+.qty-number {
+    color: var(--term-text);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.pagination-ellipsis {
+    color: var(--term-muted);
+    font-weight: bold;
+    margin: 0 5px;
+}
 
 /* --- UNIFIED TACTICAL INPUTS --- */
 .tac-input {
