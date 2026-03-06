@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Toy Yoda | Dossier</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/styles_new.css">
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body class="crt-theme">
     
@@ -26,17 +26,17 @@
             <a href="/home" class="nav-link">> OVERVIEW</a>
             <a href="/products" class="nav-link">> CATALOG</a>
             <a href="#" class="nav-link">> CONTACT_US</a>
-            <a href="#" class="nav-link active">> PROFILE</a>
+            <a href="#" class="nav-link">> FORUM</a>
         </nav>
     </div>
 
     <main class="dashboard-container profile-stage">
         
         <div id="logisticsPanel" class="side-panel cyber-panel left-panel">
-            <h3 class="text-amber mb-12">// SHIPPING LOGISTICS</h3>
+            <h3 class="text-amber mb-12">// SHIPPING DETAILS</h3>
             
             <div id="addressListView">
-                <p class="text-muted mb-5">> SELECT SECTOR TO EQUIP:</p>
+                <p class="text-muted mb-5">> SELECT ADDRESS TO EQUIP:</p>
                 
                 <div class="address-list-container" id="addressListContainer">
 
@@ -45,7 +45,7 @@
             </div>
 
             <form id="logisticsForm" class="logistics-form">
-                <p class="text-muted mb-5">> ENTER LOGISTICS DATA:</p>
+                <p class="text-muted mb-5">> ENTER SHIPPING DATA:</p>
                 <input type="text" id="shipLabel" class="tac-input" placeholder="LOCATION LABEL (e.g. HOME, HQ)">
                 <input type="text" id="shipAddressLine" class="tac-input" placeholder="ROOM / BLDG / STREET">
                 <input type="text" id="shipBarangay" class="tac-input" placeholder="BARANGAY">
@@ -133,6 +133,26 @@
         </div>
 
     </main>
+
+    <div id="cartOverlay" class="cart-overlay"></div>
+    
+    <div id="cartDrawer" class="cart-drawer cyber-panel">
+        <div class="cart-header">
+            <h3>// YOUR CART</h3>
+            <button id="closeCartBtn" class="close-btn">[ X ]</button>
+        </div>
+        
+        <div id="cartItemsContainer" class="cart-items"></div>
+        
+        <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>TOTAL ESTIMATE:</span>
+                <span id="cartTotalDisplay" class="text-amber">₱0</span>
+            </div>
+            <button id="proceedCheckoutBtn" class="tac-btn tac-btn--full tac-btn--lg">[ PROCEED TO CHECKOUT ]</button>
+            <button id="clearCartBtn" class="tac-btn tac-btn--full tac-btn--ghost mt-10">[ CLEAR CART ]</button>
+        </div>
+    </div>
 
     <div id="bootOverlay" class="boot-overlay"></div>
     <script src="/js/dashboard.js"></script>

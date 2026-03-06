@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toy Yoda | Secure Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Rajdhani:wght@400;500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="crt-theme">
+    
+    <div class="top-command-bar">
+        <header class="global-header flex-between">
+            <a href="/products" class="tac-btn tac-btn--danger">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 14L4 9l5-5"/>
+                    <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/>
+                </svg>
+                ABORT CHECKOUT
+            </a>
+            <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
+            <div class="w-150"></div> </header>
+    </div>
+
+    <main class="dashboard-container checkout-layout">
+        
+        <section class="cyber-panel checkout-panel">
+            <h2 class="text-amber mb-12 text-lg">SHIPPING DETAILS</h2>
+            
+            <p class="text-cyan checkout-account-tracker">
+                // ACCOUNT: <span id="checkoutUsernameDisplay">LOADING...</span>
+            </p>
+            <p class="text-muted mt-10">Where should we send your order?</p>
+            
+            <div id="checkoutAddressContainer" class="mt-20">
+                <p class="text-amber">LOADING ACCOUNT DATA...</p>
+            </div>
+
+            <div class="mt-30 text-right">
+                <a href="/profile#logistics" class="tac-btn tac-btn--ghost">[ UPDATE ADDRESS ]</a>
+            </div>
+        </section>
+
+        <section class="cyber-panel checkout-panel">
+            <h2 class="text-amber mb-12 text-lg">ORDER SUMMARY</h2>
+            
+            <div id="checkoutItemsContainer" class="mt-20 mb-20 checkout-items-scroll">
+                </div>
+
+            <div class="mt-30">
+                <div class="receipt-row">
+                    <span class="text-muted">SUBTOTAL:</span>
+                    <span id="summarySubtotal">₱0</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="text-muted">SHIPPING:</span>
+                    <span id="summaryShipping">₱0</span>
+                </div>
+                <div class="receipt-row receipt-total">
+                    <span>TOTAL:</span>
+                    <span id="summaryTotal">₱0</span>
+                </div>
+            </div>
+
+            <p class="text-muted text-center mt-15 text-sm">
+                *Shipping is 10% of subtotal. Free shipping on orders over ₱10,000!
+            </p>
+
+            <button id="placeOrderBtn" class="tac-btn tac-btn--lg tac-btn--full mt-20">[ PROCEED TO PAYMENT ]</button>
+        </section>
+
+    </main>
+
+    <div id="bootOverlay" class="boot-overlay"></div>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/checkout.js"></script>
+</body>
+</html>

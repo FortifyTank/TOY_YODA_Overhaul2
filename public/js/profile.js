@@ -133,6 +133,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    if (window.location.hash === '#logistics') {
+        stage.classList.add('stage-shift-right');
+    }
+
     // Stage Sliding (History / Logistics)
     document.getElementById('openLogisticsBtn')?.addEventListener('click', () => {
         stage.classList.replace('stage-shift-left', 'stage-shift-right') || stage.classList.add('stage-shift-right');
@@ -351,9 +355,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Disconnect Link (Logout)
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            await fetch('/api/logout', { method: 'POST' });
-            window.location.href = '/login';
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Stop instant click
+            
+            // 1. Create and inject the fade overlay
+            const fade = document.createElement('div');
+            fade.className = 'warp-fade';
+            document.body.appendChild(fade);
+            
+            // 2. Trigger the black fade transition
+            setTimeout(() => fade.classList.add('active'), 50);
+
+            // 3. Wait for it to turn pitch black (500ms), then kill session & redirect
+            setTimeout(async () => {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/login';
+            }, 500);
         });
     }
 

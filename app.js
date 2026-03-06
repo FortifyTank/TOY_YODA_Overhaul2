@@ -7,6 +7,7 @@ const session = require('express-session'); // NEW: Digital wristband for logged
 // Import your Database Models
 const Product = require('./models/Product');
 const User = require('./models/User');
+const Order = require('./models/Order');
 
 // Initialize the Express application
 const app = express();
@@ -60,6 +61,11 @@ app.get('/products', (req, res) => {
 // Route for the Profile
 app.get('/profile', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'profile.html'));
+});
+
+// Route for the Checkout Page
+app.get('/checkout', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
 });
 
 // --- DATA API ROUTES ---
@@ -270,6 +276,101 @@ app.post('/api/profile/password', async (req, res) => {
     } catch (err) {
         console.error("Password Update Error:", err);
         res.status(500).json({ error: "> SYSTEM FAILURE" });
+    }
+});
+
+app.post('/checkout', async (req, res) => {
+    try {
+        // 1. Extract payload from the frontend
+        const { cart, address } = req.body;
+        
+        // Ensure user is actually logged in 
+        const userId = req.session.userId; 
+        if (!userId) return res.status(401).json({ error: "Unauthorized: Please log in." });
+        if (!cart || cart.length === 0) return res.status(400).json({ error: "Cart is empty." });
+
+        // 2. Secure Server-Side Math
+        let subtotal = 0;
+        let validatedItems = [];
+
+        /// Loop through the frontend cart and cross-reference with the real database
+        for (let item of cart) {
+            const realProduct = await Product.findById(item.productId);
+            if (!realProduct) continue; // Skip if they tried to buy a deleted toy
+
+            // NEW SECURITY CHECK: Prevent buying more than what is in the database
+            if (realProduct.avail_inventory < item.quantity) {
+                return res.status(400).json({ error: `Insufficient stock for ${realProduct.name}.` });
+            }
+
+            const itemTotal = realProduct.price * item.quantity;
+            subtotal += itemTotal;
+
+            validatedItems.push({
+                product: realProduct._id,
+                name: realProduct.name,
+                quantity: item.quantity,
+                priceAtPurchase: realProduct.price // Locks in the price!
+            });
+
+            // ==========================================
+            // NEW: INVENTORY DEDUCTION ENGINE
+            // ==========================================
+            // 1. Subtract the purchased amount from the database
+            realProduct.avail_inventory -= item.quantity;
+
+            // 2. Auto-update the UI tags based on the new stock levels
+            if (realProduct.avail_inventory <= 0) {
+                realProduct.inStock = false;
+                realProduct.inventoryStatus = 'SOLD OUT';
+            } else if (realProduct.avail_inventory <= 5) {
+                realProduct.inventoryStatus = 'LOW STOCK'; // Adds the orange ribbon if stock is getting low
+            } else {
+                realProduct.inventoryStatus = 'IN STOCK';
+            }
+
+            // 3. Save the updated toy back to MongoDB
+            await realProduct.save();
+        }
+
+        // Calculate the official shipping fee
+        let shippingFee = subtotal <= 10000 ? subtotal * 0.10 : 0;
+        let totalAmount = subtotal + shippingFee;
+
+        // 3. Generate the Tactical Order Number (e.g., OR-030626-X7A9)
+        // Gets today's date as DDMMYY
+        const dateStr = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'}).replace(/\//g, '');
+        // Generates 4 random alphanumeric characters
+        const randomCode = Math.random().toString(36).substring(2, 6).toUpperCase(); 
+        const orderNumber = `OR-${dateStr}-${randomCode}`;
+
+        // 4. Construct the Final Order Document
+        const newOrder = new Order({
+            orderNumber,
+            user: userId,
+            items: validatedItems,
+            subtotal,
+            shippingFee,
+            totalAmount,
+            shippingAddress: address,
+            status: 'PENDING',
+            paymentStatus: 'UNPAID',
+            timeline: { placedAt: new Date() }
+        });
+
+        // 5. Save to MongoDB
+        await newOrder.save();
+
+        // Send the success signal back to the frontend!
+        res.status(200).json({ 
+            message: "Order successfully logged.", 
+            orderId: newOrder._id,
+            orderNumber: newOrder.orderNumber 
+        });
+
+    } catch (error) {
+        console.error("Checkout Error:", error);
+        res.status(500).json({ error: "Server malfunction during checkout process." });
     }
 });
 

@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartItemsContainer = document.getElementById('cartItemsContainer');
     const cartTotalDisplay = document.getElementById('cartTotalDisplay');
     const clearCartBtn = document.getElementById('clearCartBtn');
+    const proceedCheckoutBtn = document.getElementById('proceedCheckoutBtn');
 
     const systemAlert = document.getElementById('systemAlert');
     const systemAlertMessage = document.getElementById('systemAlertMessage');
@@ -120,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             cart.push({
+                _id: product._id, // <-- THE FIX: Now saving the Database ID!
                 sku: product.sku,
                 name: product.name,
                 price: product.price,
@@ -197,6 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
             systemAlert.classList.remove('active'); 
             clearTimeout(alertTimer); 
         });
+    }
+
+    if (proceedCheckoutBtn) {
+        proceedCheckoutBtn.addEventListener('click', () => window.location.href = '/checkout');
     }
 
     // Boot UI on load

@@ -1,0 +1,1911 @@
+/* =========================================
+   TABLE OF CONTENTS
+   1. Variables & Global Reset
+   2. Global UI & Effects (Scanlines, Animations)
+   3. Reusable Components (Header, Nav, Panels)
+   4. Checkpoint Page (index.html)
+   5. Dashboard Page (home.html)
+========================================= */
+
+/* Z-INDEX MAP:
+  - Backgrounds/Parallax: -1 to 0
+  - Base Content: 1 to 10
+  - Hover Banners / Dropdowns: 20 to 50
+  - Top Navigation Bar: 100
+  - Slide-out Panels (Cart, Profile): 900
+  - Overlays (Screen Dimming): 999
+  - System Alerts & Warps: 9999
+*/
+
+/* =========================================
+   1. VARIABLES & GLOBAL RESET
+========================================= */
+:root {
+    /* Deep Space Navy / Steel */
+    --bg-deep: #0a1118;        
+    --bg-crt: #0d1520;         
+    --bg-panel: rgba(13, 25, 40, 0.4); /* Much more transparent for the glass effect */
+    --bg-header: rgba(5, 10, 15, 0.85);
+    
+    /* Super Earth Typography */
+    --term-text: #ffffff;      /* Pure white for readability */
+    --term-muted: #8b9bb4;     /* Steel blue for secondary text */
+    
+    /* Accents */
+    --term-cyan: #4dc4ff;      /* Thruster Blue */
+    --cyan-glow: 0 0 15px rgba(77, 196, 255, 0.4);
+    
+    --amber-accent: #ffe800;   /* Helldiver Yellow / Gold */
+    --amber-glow: 0 0 15px rgba(255, 232, 0, 0.5);
+    --amber-glow-subtle: 0 0 6px rgba(255, 232, 0, 0.25);
+
+    --term-orange: #e5a823;
+    
+    --border-dim: rgba(255, 255, 255, 0.15); /* Clean white structural lines */
+
+    --term-green: #00ff66;     /* Secure/Success Green */
+    --green-glow: 0 0 15px rgba(0, 255, 102, 0.4);
+
+    --term-red: #ff2a2a;
+    --red-glow: 0 0 15px rgba(255, 42, 42, 0.4);
+    --bg-overlay: rgba(255, 255, 255, 0.05); /* For input boxes */
+    --bg-panel-dark: rgba(0, 0, 0, 0.4); /* For dropdown forms */
+
+    /* ADD THESE: Unified placeholder colors */
+    --bg-placeholder: #111111;
+    --bg-placeholder-hover: #222222;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* FORCE THE NEW MILITARY FONT */
+    font-family: 'Rajdhani', sans-serif; 
+    text-transform: uppercase; /* Military HUDs usually use all-caps */
+}
+
+/* =========================================
+   2. FIXING THE BACKGROUND & GLASS
+========================================= */
+body {
+    background-color: var(--bg-deep);
+    
+    /* ADD YOUR HELLDIVERS PLANET IMAGE HERE */
+    /* Make sure you have a cool space background in your images folder */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Keeps the background still while scrolling */
+    
+    color: var(--term-text);
+
+    overflow-x: hidden;
+}
+
+/* Base theme applied to the body of internal pages (Dashboard/Store) */
+.crt-theme {
+    background-color: var(--bg-crt);
+    overflow-y: auto; /* Allows scrolling on internal pages */
+    height: auto;
+    display: block;
+}
+
+
+/* =========================================
+   2. GLOBAL UI & EFFECTS
+========================================= */
+
+/* SHARED ANIMATIONS */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-10px); }
+    100% { transform: translateX(0); }
+}
+
+
+/* =========================================
+   3. REUSABLE COMPONENTS
+========================================= */
+/* --- 1. GLOBAL HEADER (Tactical LED Hardware) --- */
+.top-command-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    /* Move the background color and shadow to this wrapper */
+    background-color: var(--bg-header);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+    margin-bottom: 30px;
+}
+
+/* Remove sticky and margins from the old header so it fits inside the wrapper */
+.global-header {
+    display: flex; justify-content: space-between; align-items: center;
+    
+    /* FIX: Changed from 2px to 3px to match the tabs perfectly */
+    border-bottom: 3px solid var(--amber-accent); 
+    
+    padding: 15px 20px; 
+    position: relative; 
+    box-shadow: none;   
+    margin-bottom: 0;
+}
+
+.header-left, .header-right {
+    display: flex; align-items: center; gap: 15px; flex: 1; 
+}
+.header-right { justify-content: flex-end; }
+
+.header-logo { flex: 0 1 auto; text-align: center; }
+.nav-brand-img {
+    height: 50px; /* Adjust this slightly if you want it bigger/smaller */
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)); /* Gives the logo a faint glow */
+}
+
+/* 3. The User & Cart Buttons (Hollow Tactical Outlines) */
+.header-user { display: flex; gap: 15px; font-size: 1.5rem; align-items: center; }
+
+/* --- 1. BASE STYLES FOR THE BUTTONS --- */
+/* (Keep your existing colors, borders, and padding) */
+.clearance { 
+    background-color: transparent; 
+    color: var(--term-green); 
+    padding: 6px 14px; 
+    border: 1px solid var(--term-green); 
+    font-weight: bold;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.cart-status { 
+    background-color: transparent;
+    color: var(--amber-accent); 
+    padding: 6px 14px; 
+    border: 1px solid var(--amber-accent);
+    font-weight: bold;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    cursor: pointer; 
+}
+
+/* --- 2. HUD ELEMENT DROP-DOWN ANIMATION --- */
+/* Starts both buttons invisible and pushed 20px up into the ceiling */
+.clearance, .cart-status {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+    
+    /* Animates the drop smoothly (0.4s), but keeps hover color changes fast (0.2s) */
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+/* JavaScript adds this class to drop them into place after calculations are done */
+.clearance.ready, .cart-status.ready {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Hover Effect: Solid Green, Dark Text, Faint Glow */
+.clearance:hover {
+    background-color: var(--term-green);
+    color: var(--bg-deep);
+    box-shadow: var(--green-glow); /* Uses the root variable now! */
+}
+
+/* Flashes solid Amber and inverts text when hovered */
+.cart-status:hover {
+    background-color: var(--amber-accent); 
+    color: var(--bg-deep); /* Inverts the text to dark space-navy */
+    box-shadow: var(--amber-glow); /* Adds the tactical button glow */
+}
+
+/* --- NAVIGATION BAR --- */
+.global-nav {
+    display: flex; gap: 5px; 
+    padding: 0 20px 0 20px; 
+    align-items: flex-end; 
+    
+    /* FIX: Pulls the nav up exactly 3px to lock into the header border */
+    margin-top: -3px; 
+    
+    margin-bottom: 0; 
+}
+
+/* The Status Block to fill the empty corner */
+/* Replace your old .nav-status-light with this */
+.nav-status-light {
+    width: 80px; /* Made it much wider */
+    align-self: stretch; 
+    background-color: var(--amber-accent);
+    
+    transform: skewX(-25deg);
+    transform-origin: bottom left;
+    
+    /* Pulls the block far off the left side of the screen to hide the skew */
+    margin-left: -60px; 
+    margin-right: 15px; 
+    
+    border-top: none; 
+    border-radius: 0;
+    position: relative;
+    top: 1px; /* Fix sometimes 1 pixel overshoot on top*/
+}
+
+.nav-link {
+    position: relative;
+    color: var(--term-muted);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 30px 10px 20px; /* Extra padding on the right to make room for the slant */
+    letter-spacing: 1.5px;
+    display: inline-block;
+    z-index: 1;
+    transition: color 0.2s ease;
+}
+
+.nav-link::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -1; transform: skewX(-25deg); transform-origin: bottom left;
+    background: rgba(255, 255, 255, 0.03); 
+    border-top: 1px solid var(--border-dim);
+    border-right: 1px solid var(--border-dim);
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    
+    /* FIX: Added a visible gray bottom border to inactive tabs so they don't float */
+    border-bottom: 2px solid var(--border-dim); 
+    
+    border-radius: 4px 4px 0 0; transition: all 0.1s ease;
+}
+
+/* --- THE ACTIVE FOLDER (Hazard & Amber) --- */
+.nav-link.active {
+    color: var(--amber-accent);
+}
+
+.nav-link.active::before {
+    background: repeating-linear-gradient(
+        -45deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6) 8px,
+        rgba(255, 176, 0, 0.08) 8px, rgba(255, 176, 0, 0.08) 16px
+    );
+    
+    border-top: 3px solid var(--amber-accent); 
+    border-right: 3px solid var(--amber-accent); 
+    border-left: 3px solid var(--amber-accent);
+    border-bottom: 3px solid var(--amber-accent); 
+    
+    /* FIX: Set back to 0. The standard 3px math above fixes the gap naturally. */
+    top: 1px; 
+}
+
+/* --- HOVERING OVER INACTIVE FOLDERS --- */
+.nav-link:hover:not(.active) {
+    color: var(--amber-accent);
+}
+
+.nav-link:hover:not(.active)::before {
+    /* Instantly changes color instead of thickness */
+    border-bottom-color: var(--amber-accent); 
+}
+
+/* --- CYBER PANELS & GREEBLES --- */
+.cyber-panel {
+    background: var(--bg-panel);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    
+    border: 1px solid var(--border-dim); 
+    /* Keep a thin baseline border so it never shifts */
+    border-top: 1px solid var(--term-muted); 
+    
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5); 
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease; 
+}
+
+/* The invisible growing bar */
+.cyber-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 6px; /* How thick it gets */
+    background-color: var(--amber-accent);
+    
+    /* Start flattened to 0 height */
+    transform: scaleY(0); 
+    transform-origin: top; /* Grows downward from the top edge */
+    transition: transform 0.15s ease-out; /* Super fast and smooth */
+    z-index: 5;
+}
+
+.cyber-panel:hover {
+    border-color: var(--amber-accent); 
+    box-shadow: inset 0 0 20px rgba(255, 176, 0, 0.05), var(--amber-glow);
+}
+
+/* When hovering the panel, scale the invisible bar to full size */
+.cyber-panel:hover::before {
+    transform: scaleY(1);
+}
+
+
+/* --- TACTICAL HUD GREEBLES --- */
+.greeble {
+    position: absolute; /* This tells it to break out of the normal layout and use coordinates */
+    color: var(--term-muted);
+    font-family: 'VT323', monospace; /* The hacker/terminal font */
+    font-size: 1rem;
+    letter-spacing: 1px;
+    z-index: 10;
+    pointer-events: none; /* Prevents them from blocking mouse clicks */
+}
+
+/* Your existing coordinate rules */
+.greeble.top-left { top: 10px; left: 15px; }
+.greeble.top-right { top: 10px; right: 15px; }
+.greeble.bottom-right { bottom: 10px; right: 15px; }
+
+.main-title {
+    font-family: 'Audiowide', cursive; font-size: 4.5rem; letter-spacing: 5px; color: #ffffff; 
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    transform: scaleX(1.2); transform-origin: center; 
+    animation: titleStretch 1.2s ease-out forwards 2s; /* Faster stretch */
+}
+
+@keyframes titleStretch {
+    to { transform: scaleX(1); }
+}
+
+/* The !important forces the browser to collapse the invisible space! */
+.hidden-form { display: none !important; opacity: 0; }
+.active-form { display: flex !important; opacity: 1; }
+
+.auth-box {
+    margin-top: 30px; background-color: #1a1e24; 
+    border: 4px solid var(--amber-accent); 
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8), 0 10px 20px rgba(0,0,0,0.5); 
+    position: relative; width: 100%; 
+    /* Removed transition line here to allow for the scan animation */
+}
+
+.auth-box.hidden {
+    opacity: 0; visibility: hidden; pointer-events: none; position: absolute;
+}
+
+/* THE NEW DEPLOY ANIMATION */
+.auth-box.deploying {
+    animation: boxDeploy 0.6s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes boxDeploy {
+    0% {
+        opacity: 1;
+        /* Hides everything except a 0-width dot in the top center border */
+        clip-path: inset(0 50% calc(100% - 4px) 50%);
+    }
+    40% {
+        /* Shoots outwards into a full-width yellow line */
+        clip-path: inset(0 0 calc(100% - 4px) 0);
+    }
+    100% {
+        /* Drops the curtain down to reveal the rest of the box! (-50px stops it from clipping the shadow) */
+        clip-path: inset(-50px);
+    }
+}
+
+/* Force everything inside the form to the left */
+.auth-form { 
+    padding: 35px; 
+    display: flex; flex-direction: column; gap: 15px; 
+    transition: opacity 0.3s ease; 
+    text-align: left; 
+    align-items: stretch; 
+    min-height: 460px; /* ADD THIS: Locks the height. Adjust this number if needed! */
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Adds a little breathing room between the label and the text box */
+    width: 100%;
+}
+
+/* --- OVERRIDE BROWSER AUTOFILL STYLES --- */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    /* Casts a solid dark gray shadow inside the box to hide the white */
+    -webkit-box-shadow: 0 0 0 30px #222831 inset !important;
+    /* Forces the text back to pure white */
+    -webkit-text-fill-color: var(--term-text) !important;
+    /* Ensures the border doesn't disappear */
+    border: 1px solid var(--border-dim) !important;
+}
+
+/* Optional: Turns the border yellow when the auto-filled box is focused */
+input:-webkit-autofill:focus {
+    border-color: var(--amber-accent) !important;
+}
+
+/* Yellow Headers */
+.auth-box h2 { 
+    font-size: 1.6rem; 
+    margin-bottom: 15px; 
+    border-bottom: 1px solid var(--border-dim); 
+    padding-bottom: 5px; 
+    color: var(--amber-accent); 
+    text-align: left; /* Keeps title left-aligned */
+}
+
+/* Crisp, Bold labels (Matching the "CLASSIFIED" font) */
+.auth-box label { 
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; /* Forces it bold */
+    font-size: 1.2rem; 
+    letter-spacing: 1.5px; /* Adds that tactical tracking */
+    color: var(--term-muted); 
+    text-align: left;
+}
+
+/* =========================================
+   UNIFIED BUTTON SYSTEM
+   .tac-btn           = base (amber, solid fill on hover)
+   .tac-btn--md       = medium variant (nav, system content)
+   .tac-btn--lg       = larger variant (hero / auth)
+   .tac-btn--lg--lg   = extra large variant (hero banner main CTA)
+   .tac-btn--ghost    = muted steel outline, white fill on hover
+   .tac-btn--full     = stretches to container width
+========================================= */
+.tac-btn {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--amber-accent);
+    color: var(--amber-accent);
+    padding: 8px 20px;
+    font-size: 1.1rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+.tac-btn:hover {
+    background: var(--amber-accent);
+    color: var(--bg-deep);
+    box-shadow: var(--amber-glow);
+}
+
+.tac-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.tac-btn--md {
+    padding: 10px 25px;
+    font-size: 1.3rem;
+    border-width: 2px;
+    margin-top: 12px;
+    align-self: center;
+}
+
+/* Large variant — auth submit & hero CTA */
+.tac-btn--lg {
+    padding: 12px 30px;
+    font-size: 1.5rem;
+    border-width: 2px;
+    margin-top: 15px;
+    align-self: center;
+}
+
+.tac-btn--lg--lg
+{
+    padding: 15px 30px; 
+    font-size: 1.8rem; 
+    text-decoration: none; 
+}
+
+/* Ghost variant — muted steel border, inverts to white */
+.tac-btn--ghost {
+    border-color: var(--term-muted);
+    color: var(--term-muted);
+}
+.tac-btn--ghost:hover {
+    background: var(--term-text);
+    color: var(--bg-deep);
+    border-color: var(--term-text);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Full-width variant */
+.tac-btn--full { width: 100%; text-align: center; }
+
+/* 7. Toggle Link matched to "Cargo Manifest" Nav Links */
+.toggle-link { 
+    display: inline-block;
+    text-align: center; margin-top: 15px; cursor: pointer; font-size: 1.1rem; 
+    color: var(--term-muted);
+    border-bottom: 2px solid transparent;
+    padding-bottom: 2px;
+    transition: all 0.2s ease;
+}
+.toggle-link:hover { 
+    color: var(--amber-accent);
+    border-bottom-color: var(--amber-accent);
+    text-decoration: none;
+}
+
+/* Invalid Login State */
+/* =========================================
+   AUTOMATON ERROR STATE (Red & Black)
+========================================= */
+/* Turns the entire box into dark steel and glowing crimson */
+.auth-box.error-state {
+    background-color: #0d0202; /* Deep Automaton Black/Red */
+    border-color: #ff2a2a; /* Harsh Red */
+    box-shadow: inset 0 0 30px rgba(255, 0, 0, 0.3), 0 10px 20px rgba(255, 0, 0, 0.4);
+    
+    /* Triggers the UI to violently shake when an error occurs */
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Turns all headers, text, and inputs red */
+.auth-box.error-state h2 { color: #ff2a2a; border-bottom-color: #ff2a2a; }
+.auth-box.error-state label { color: #ff6666; }
+.auth-box.error-state input { border-color: #ff2a2a; background-color: rgba(255, 42, 42, 0.05); color: #ff2a2a; }
+.auth-box.error-state input:focus { background-color: rgba(255, 42, 42, 0.15); box-shadow: 0 0 10px rgba(255, 42, 42, 0.4); }
+
+/* Turns the button red */
+.auth-box.error-state .tac-btn { border-color: #ff2a2a; color: #ff2a2a; }
+.auth-box.error-state .tac-btn:hover { background: #ff2a2a; color: #000; box-shadow: 0 0 15px rgba(255, 42, 42, 0.8); }
+
+/* The Error Message Text */
+.error-msg {
+    color: #ff2a2a;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: -5px; /* Pulls it tight to the button */
+    text-shadow: 0 0 8px rgba(255, 42, 42, 0.6);
+    animation: blink 1s infinite; /* Uses your existing blink animation! */
+}
+.error-msg.hidden { display: none !important; }
+
+/* Section Titles (home.html dividers) */
+.section-title {
+    font-size: 1.2rem;
+    color: var(--term-muted);
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    border-left: 3px solid var(--amber-accent);
+    padding-left: 10px;
+}
+
+/* Dashboard Container */
+.dashboard-container { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    
+    /* ADDED padding here to protect your content */
+    padding: 0 20px 40px 20px; 
+}
+
+/* Hero Banner */
+.hero-banner {
+    border: 1px solid var(--term-muted); padding: 60px 40px; 
+    text-align: center; margin-bottom: 40px; background-color: transparent; 
+}
+.system-alert { font-size: 2rem; margin-bottom: 15px; color: var(--amber-accent); text-shadow: var(--amber-glow); }
+.hero-banner p { font-size: 1.5rem; margin-bottom: 25px; }
+
+.hero-bg {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('/images/spaceship-bg.jpg'); 
+    background-size: cover; background-position: center;
+    filter: grayscale(100%); opacity: 0.15; z-index: 0;
+}
+
+.hero-grid {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+    background-size: 40px 40px;
+    /* SWAPPED GREEN FOR TACTICAL CYAN (77, 196, 255) */
+    background-image: linear-gradient(to right, rgba(77, 196, 255, 0.2) 1px, transparent 1px), linear-gradient(to top, rgba(77, 196, 255, 0.2) 1px, transparent 1px);
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
+    mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%);
+    opacity: 0; transition: opacity 0.4s ease-in-out; z-index: 1;
+}
+
+.hero-banner:has(.tac-btn--lg--lg:hover) .hero-grid { opacity: 1; }
+.hero-content { position: relative; z-index: 10; }
+
+/* Bounty Grid */
+
+.bounty-grid {
+    display: grid; gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+}
+
+.bounty-card {
+    border: 1px solid var(--border-dim); padding: 15px; 
+    display: flex; flex-direction: column; gap: 15px; transition: all 0.2s;
+}
+
+.bounty-card:hover { 
+    border-color: var(--amber-accent); 
+    box-shadow: var(--amber-glow-subtle); /* Now uses the subtle glow */
+}
+
+.card-header { font-size: 1.2rem; border-bottom: 1px dotted var(--border-dim); padding-bottom: 5px; }
+.card-image-placeholder {
+    height: 200px; background: #111; display: flex; justify-content: center; align-items: center;
+    border: 1px solid var(--border-dim); font-size: 1.5rem; opacity: 0.5;
+}
+.card-details p { font-size: 1.4rem; }
+
+/* --- 6. OTHER SYSTEMS (Category Cards) --- */
+.system-grid {
+    display: grid; 
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    margin-bottom: 50px;
+}
+
+.system-card {
+    height: 420px; /* 1. EVEN TALLER CARDS! */
+    border: 1px solid var(--border-dim);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    
+    /* 2. Aligns everything to the bottom */
+    justify-content: flex-end; 
+    
+    padding: 20px;
+    cursor: pointer;
+}
+
+/* --- SPECIFIC SECTOR BACKGROUNDS --- */
+.sector-sw .static-bg { background-image: url('/images/starwars-static.png'); }
+.sector-sw .animated-bg { background-image: url('/images/starwars-hover.png'); }
+
+.sector-placeholder .static-bg { background-color: var(--bg-placeholder); }
+.sector-placeholder .animated-bg { background-color: var(--bg-placeholder-hover); }
+
+/* The Background Images */
+.system-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    
+    /* 1. Set the default scale to normal (1) */
+    transform: scale(1); 
+    
+    /* 2. Animate BOTH opacity and the zoom (transform) */
+    transition: opacity 0.4s ease, transform 0.5s ease-out; 
+    
+    z-index: 0;
+    filter: grayscale(80%) brightness(0.5); 
+}
+.system-card .animated-bg {
+    opacity: 0; 
+}
+
+/* CARDS GLOW GREEN ON HOVER */
+/* THE HOVER MAGIC */
+.system-card:hover {
+    border-color: var(--amber-accent); 
+    box-shadow: var(--amber-glow-subtle); /* Now uses the subtle glow */
+}
+
+/* --- SYSTEM CARD BUTTON ANIMATION --- */
+/* 1. Hides any tactical button inside a system card by default */
+.system-card .tac-btn {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease; /* Smooth slide */
+}
+
+/* 2. Reveals the button when the user hovers over the card */
+.system-card:hover .tac-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.system-card:hover .static-bg { opacity: 0; }
+.system-card:hover .animated-bg { 
+    opacity: 1; 
+    filter: grayscale(0%) brightness(0.8); 
+    
+    /* 3. ADD THIS: Zooms the GIF in slightly while playing! */
+    transform: scale(1.05); 
+}
+
+/* Content Alignment */
+.system-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    
+    /* 2. CENTER ALIGNED! */
+    align-items: center; 
+    gap: 10px;
+}
+
+.sector-name {
+    font-size: 1.8rem;
+    color: var(--term-text); /* FIX: Changed back to pure white */
+    background: rgba(0,0,0,0.8);
+    padding: 5px 15px;
+    border: 1px solid var(--border-dim);
+    transition: 0.3s;
+    text-align: center;
+}
+
+/* 3. SECTOR TURNS AMBER ON HOVER */
+.system-card:hover .sector-name {
+    color: var(--amber-accent); 
+    border-color: var(--amber-accent);
+}
+
+/* THE TACTICAL PLANET BACKGROUND */
+.crt-theme::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    
+    /* Link your new planet image here */
+    background-image: url('/images/planet-bg.png'); 
+    background-size: cover;
+    background-position: center bottom;
+    
+    /* THE FILTER MAGIC: Strips the color and makes it incredibly faint */
+    filter: grayscale(100%) contrast(120%);
+    opacity: 0.08; /* Barely visible! */
+    
+    z-index: -1; /* Pushes it behind all your boxes */
+    pointer-events: none;
+}
+
+/* =========================================
+   CINEMATIC INTRO ANIMATIONS
+========================================= */
+.intro-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #000; z-index: 999; pointer-events: none;
+    /* Fades out very fast so we see the massive rim immediately */
+    animation: fadeOverlay 0.8s ease-out 0.2s forwards;
+}
+@keyframes fadeOverlay { to { opacity: 0; visibility: hidden; } }
+
+.parallax-img { width: 100%; height: 100%; background-size: cover; background-position: center; background-repeat: no-repeat; }
+
+/* 1. Background */
+.intro-bg { 
+    background-image: url('/images/bg-space.png'); /* MOVED FROM HTML */
+    transform: scale(1.3);
+    animation: introZoom 3.5s cubic-bezier(0.25, 1, 0.3, 1) forwards; 
+}
+
+/* 2. THE RIM */
+.intro-rim { 
+    background-image: url('/images/planet-rim.png'); /* MOVED FROM HTML */
+    transform: translate(15%, -100%) scale(4);
+    animation: introRimSettle 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s forwards; 
+}
+
+/* 3. THE PLANET */
+.intro-planet { 
+    background-image: url('/images/planet-main.png'); /* MOVED FROM HTML */
+    transform: translateY(40%) scale(0.9);
+    animation: introPlanetRise 2.5s cubic-bezier(0.25, 1, 0.3, 1) 0.3s forwards; 
+}
+
+/* 4. THE SHIPS (Added specific classes for left/right images) */
+.intro-ship { 
+    opacity: 0; transform: scale(5); filter: blur(20px);
+    animation: introWarp 1s cubic-bezier(0.1, 0.9, 0.2, 1) 1.5s forwards; 
+}
+.ship-right { background-image: url('/images/ship-right.png'); }
+.ship-left { background-image: url('/images/ship-left.png'); }
+
+/* The Keyframes that bring everything to their normal positions */
+@keyframes introZoom { to { transform: scale(1); } }
+@keyframes introRimSettle { to { transform: translate(0, 0) scale(1); } }
+@keyframes introPlanetRise { to { transform: translateY(0) scale(1); } }
+@keyframes introWarp { to { opacity: 1; transform: scale(1); filter: blur(0); } }
+
+
+/* =========================================
+   PARALLAX CAMERA RIG (FRAMING)
+========================================= */
+body { overflow: hidden; background-color: #000; }
+
+.camera-rig {
+    position: fixed; 
+    
+    /* Pulled all the way back. Just 10% extra so the mouse parallax still works without showing black edges */
+    width: 130vw; 
+    height: 130vh; 
+    
+    /* Dead center. */
+    top: -25%; 
+    left: -25%;
+    
+    transition: transform 1.5s cubic-bezier(0.25, 1, 0.2, 1); 
+    z-index: -1;
+}
+
+/* STRONGER PAN RIGHT: Swings the camera hard to look at the left ship */
+.camera-rig.pan-to-ship {
+    transform: translate(25%, 5%) scale(1.5); 
+}
+
+.parallax-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    transition: transform 0.1s ease-out; 
+}
+
+/* =========================================
+   UI & PROMPT ALIGNMENT
+========================================= */
+.terminal-container {
+    position: absolute;
+    top: 50%; 
+    left: 50%; /* FIX: Moves it back to the exact middle of the screen */
+    transform: translate(-50%, -50%); /* FIX: Centers it perfectly on both the X and Y axis */
+    display: flex; flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    width: 100%; 
+    max-width: 600px; /* FIX: Increased from 500px to make the box wider and more spacious! */
+    z-index: 10;
+}
+
+.ui-wrapper {
+    display: flex; flex-direction: column; 
+    align-items: center; /* FIX: Centers the TOY YODA Title */
+}
+
+/* Title waits for ships to arrive before fading in */
+.ui-reveal {
+    opacity: 0;
+    animation: revealWrapper 1s ease forwards 2s; 
+}
+@keyframes revealWrapper { to { opacity: 1; } }
+
+.start-prompt {
+    margin-top: 30px; font-size: 2rem; color: var(--amber-accent);
+    letter-spacing: 4px; cursor: pointer;
+    text-shadow: 0 0 10px rgba(255, 232, 0, 0.5);
+    transition: opacity 0.3s;
+}
+
+.blink-text { animation: blink 1.5s infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* =========================================
+   HYPERSPACE LOGIN SEQUENCE
+========================================= */
+/* 1. UI Drops out of the bottom of the screen */
+.ui-hyperspace-hide {
+    animation: uiSlideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+@keyframes uiSlideDown {
+    0% { transform: translate(-50%, -50%); opacity: 1; }
+    100% { transform: translate(-50%, 150%); opacity: 0; }
+}
+
+/* 2. Ships get sucked into the dead center of the screen */
+.jump-to-lightspeed {
+    transform-origin: center center; 
+    /* Uses a standard 'ease-in' so it starts slow and accelerates perfectly */
+    animation: lightspeedJump 0.3s ease-in forwards !important; 
+}
+
+@keyframes lightspeedJump {
+    0% { 
+        transform: scale(1); 
+        filter: blur(0); 
+        opacity: 1; 
+    }
+    60% {
+        /* ACCELERATION: Ship begins pushing forward smoothly (shrinking slightly) */
+        transform: scale(0.90);
+        filter: blur(1px); /* Slight motion blur begins */
+        opacity: 1;
+    }
+    100% {
+        /* THE BOOM: Violently snaps to the vanishing point */
+        transform: scale(0);
+        filter: blur(1px); /* Massive speed blur */
+        opacity: 0;
+    }
+}
+/* 3. Smooth fade to black right before loading the dashboard */
+.warp-fade {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #000; z-index: 9999;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease-in;
+}
+.warp-fade.active { opacity: 1; }
+
+/* =========================================
+   HOMEPAGE REVEAL FADE (Only after Login)
+========================================= */
+.boot-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 9999;
+    
+    /* FIX: Starts completely black and visible so it never flashes the page! */
+    opacity: 1; 
+    visibility: visible;
+    pointer-events: none;
+}
+
+/* Instantly removes the black screen when clicking normal tabs */
+.boot-overlay.hidden {
+    display: none !important;
+}
+
+/* The cinematic fade animation */
+.boot-overlay.fade-out {
+    animation: boot-fade-out 1.2s ease forwards;
+}
+
+@keyframes boot-fade-out {
+    0%   { opacity: 1; visibility: visible; }
+    40%  { opacity: 1; visibility: visible; } /* Hold black briefly */
+    100% { opacity: 0; visibility: hidden; }
+}
+
+/* =========================================
+   6. CATALOG PAGE (products.html)
+========================================= */
+.catalog-layout {
+    display: grid;
+    /* 250px Sidebar, the rest is for the grid */
+    grid-template-columns: 250px 1fr; 
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px 60px 20px;
+    align-items: start;
+}
+
+.catalog-layout .cyber-panel:hover {
+    box-shadow: inset 0 0 20px rgba(255, 176, 0, 0.05), var(--amber-glow-subtle);
+}
+
+/* Mutes the hover glow on the Add to Cart buttons inside catalog */
+.catalog-layout .tac-btn:hover {
+    box-shadow: var(--amber-glow-subtle);
+}
+
+/* --- SIDEBAR FILTERS --- */
+.catalog-sidebar {
+    padding: 20px;
+    position: sticky;
+    top: 100px; /* Stays on screen when scrolling down */
+}
+
+.sidebar-title {
+    font-size: 1.6rem;
+    color: var(--amber-accent);
+    border-bottom: 2px solid var(--border-dim);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    margin-bottom: 25px;
+}
+
+.filter-group h4 {
+    color: var(--term-muted);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+/* Custom Tactical Checkboxes */
+.tactical-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    color: var(--term-text);
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+}
+
+.tactical-checkbox:hover { color: var(--amber-accent); }
+
+.tactical-checkbox input {
+    display: none; /* Hide the default browser checkbox */
+}
+
+.tactical-checkbox .check-box {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--term-muted);
+    display: inline-block;
+    position: relative;
+    transition: all 0.2s;
+}
+
+/* When Checked: Fill with glowing amber square */
+.tactical-checkbox input:checked + .check-box {
+    border-color: var(--amber-accent);
+    background-color: rgba(255, 232, 0, 0.2);
+    box-shadow: var(--amber-glow-subtle);
+}
+
+.tactical-checkbox input:checked + .check-box::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px; right: 3px; bottom: 3px;
+    background-color: var(--amber-accent);
+}
+
+/* --- SORTING BAR --- */
+.sort-bar {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-dim);
+    padding-bottom: 10px;
+}
+
+.sort-label { color: var(--term-muted); font-size: 1.2rem; font-weight: bold; }
+
+/* --- TACTICAL DROPDOWN (Replaces Sort Tabs) --- */
+.tactical-dropdown {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-dim);
+    color: var(--term-muted);
+    padding: 8px 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: 'Rajdhani', sans-serif;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    /* Removes the default ugly browser arrow */
+    appearance: none; 
+    -webkit-appearance: none;
+    
+    /* Adds our own custom steel-colored tactical arrow */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238b9bb4%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px auto;
+    padding-right: 35px; /* Makes room for the arrow */
+}
+
+/* Glows Amber when clicked or hovered */
+.tactical-dropdown:focus, .tactical-dropdown:hover {
+    border-color: var(--amber-accent);
+    color: var(--amber-accent);
+    box-shadow: 0 0 10px rgba(255, 176, 0, 0.2);
+    /* Turns the SVG arrow Amber */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffe800%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+/* The actual list items inside the dropdown */
+.tactical-dropdown option {
+    background-color: #000000; /* Pure pitch black */
+    color: var(--term-muted); /* Helldiver yellow text */
+    font-weight: bold;
+    font-family: 'Rajdhani', sans-serif;
+}
+/* --- RESPONSIVE PRODUCT GRID (Strict Max 4 Columns) --- */
+.product-grid {
+    display: grid;
+    /* CHANGED auto-fit TO auto-fill */
+    grid-template-columns: repeat(auto-fill, minmax(max(250px, calc(25% - 20px)), 1fr)); 
+    gap: 20px;
+}
+
+/* --- PRODUCT CARD --- */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+/* UPDATE THESE TWO RULES */
+.product-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1; 
+    border: 1px solid var(--border-dim);
+    margin-bottom: 15px;
+    overflow: hidden;
+    background-color: #000; /* Replaced inline style */
+}
+
+img.product-image {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    opacity: 0.8; /* Replaced inline style */
+    transition: opacity 0.3s ease;
+}
+
+/* Bonus Polish: Images light up when hovering the card! */
+.product-card:hover img.product-image {
+    opacity: 1;
+}
+
+/* Tactical scanline overlay on images */
+.scanline-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.2) 3px,
+        rgba(0, 0, 0, 0.2) 4px
+    );
+    pointer-events: none;
+}
+
+.product-info { 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 5px; 
+    margin-bottom: 15px; 
+}
+
+/* ADD THIS BLOCK: Forces the price to the bottom right */
+.price-container {
+    margin-top: auto; 
+    display: flex;
+    /* CHANGED: This pushes the prices to the left! */
+    justify-content: flex-start; 
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+}
+
+.product-category { font-size: 1rem; color: var(--term-cyan); }
+.product-name { font-size: 1.3rem; line-height: 1.1; }
+.product-price { font-size: 1.5rem; color: var(--amber-accent); margin-top: auto; }
+
+/* btn-details / btn-cart → use .tac-btn.tac-btn--ghost / .tac-btn on new cards */
+.product-actions { display: flex; gap: 10px; }
+
+/* Custom Tactical Slider */
+.range-value {
+    display: block;
+    color: var(--amber-accent);
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.tactical-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border-dim);
+    outline: none;
+}
+
+.tactical-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 24px;
+    background: var(--amber-accent);
+    cursor: pointer;
+    border-radius: 2px;
+    
+    /* FIX: Set default to no glow (or subtle), add a transition */
+    box-shadow: none; 
+    transition: box-shadow 0.2s ease;
+}
+
+/* FIX: Only glow when hovering or actively dragging! */
+.tactical-slider::-webkit-slider-thumb:hover,
+.tactical-slider:active::-webkit-slider-thumb {
+    box-shadow: var(--amber-glow);
+}
+
+/* Visual indicators under the slider */
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    color: var(--term-muted);
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-weight: bold;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+/* --- NEW INTERACTIVE PRODUCT CARDS --- */
+
+/* 1. Turn off the standard growing top line for product cards */
+.product-card::before {
+    display: none !important; 
+}
+
+/* 2. Make the link behave nicely */
+.product-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Pushes the cart button safely to the bottom */
+}
+
+/* 3. The Triangle Dropdown Banner */
+.view-details-banner {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%); /* Hidden completely above the image */
+    
+    background: var(--amber-accent);
+    color: var(--bg-deep);
+    padding: 8px 20px 15px 20px;
+    width: 60%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    
+    /* THE SHAPE: Cuts the bottom into a sharp V point! */
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+    
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 10;
+}
+
+/* 4. Drops the banner down when hovering ANYWHERE on the card */
+.product-card:hover .view-details-banner {
+    transform: translateX(-50%) translateY(0);
+}
+
+.tactical-badge {
+    padding: 4px 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* --- PRODUCT BADGES & OVERLAYS --- */
+.badge-ribbon {
+    position: absolute; bottom: 10px; left: 0; 
+    padding: 4px 12px 4px 8px; font-weight: bold; font-size: 0.75rem; 
+    clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%); 
+    z-index: 10; display: flex; align-items: center; height: 20px;
+}
+.badge-low-stock { background: var(--term-orange); color: #000; }
+.badge-sold-out { background: #cc0000; color: #fff; }
+
+.card-gradient-overlay {
+    position: absolute; bottom: 0; right: 0; top: 0; width: 40%; 
+    background: linear-gradient(to top left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 50%); 
+    pointer-events: none; z-index: 4;
+}
+.right-badges-container {
+    position: absolute; bottom: 10px; right: 10px; 
+    display: flex; flex-direction: column-reverse; gap: 5px; 
+    align-items: flex-end; z-index: 5;
+}
+.badge-sale { height: 20px; display: flex; align-items: center; background: #cc0000; color: #fff; }
+.badge-new { height: 20px; display: flex; align-items: center; background: #00e5ff; color: #000; }
+
+.old-price-strike {
+    text-decoration: line-through; color: var(--term-orange); 
+    font-size: 0.7em; line-height: 1.2;
+}
+
+/* --- PAGINATION CONTROLS --- */
+.pagination-controls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.bottom-nav {
+    justify-content: center;
+    margin-top: 40px; /* Gives breathing room below the grid */
+}
+
+.page-btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-dim);
+    color: var(--term-muted);
+    padding: 5px 12px;
+    font-size: 1.1rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+    border-color: var(--term-muted);
+    color: var(--term-text);
+    box-shadow: 0 0 10px rgba(139, 155, 180, 0.2);
+}
+
+/* The currently selected page */
+.page-btn.active {
+    background: var(--amber-accent);
+    color: #000;
+    border-color: var(--amber-accent);
+    box-shadow: var(--amber-glow-subtle);
+}
+
+/* Disabled state for Previous/Next buttons when at the ends */
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* --- RESULT COUNTER --- */
+#resultCount {
+    /* Deleted margin-left: auto! */
+    color: var(--amber-accent); 
+    font-weight: bold; 
+    font-size: 1.1rem; 
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   CART DRAWER (Slide-out panel)
+========================================= */
+.cart-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+    z-index: 900; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+}
+
+.cart-drawer {
+    position: fixed; top: 0; right: -450px; /* Hidden off-screen to the right */
+    width: 100%; max-width: 400px; height: 100vh;
+    background: var(--bg-crt); z-index: 1000;
+    border-left: 2px solid var(--amber-accent);
+    display: flex; flex-direction: column;
+    transition: right 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* The classes JavaScript will use to open the drawer */
+.cart-overlay.active { opacity: 1; visibility: visible; }
+.cart-drawer.active { right: 0; }
+
+.cart-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px; border-bottom: 1px solid var(--border-dim);
+}
+
+.cart-header h3 { color: var(--amber-accent); font-size: 1.5rem; }
+
+.close-btn {
+    background: transparent; border: none; color: var(--term-muted);
+    font-size: 1.2rem; cursor: pointer; font-family: 'Rajdhani', sans-serif;
+    font-weight: bold; transition: color 0.2s;
+}
+.close-btn:hover { color: #ff2a2a; }
+
+.cart-items {
+    flex-grow: 1; padding: 20px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 15px;
+}
+
+.cart-footer {
+    padding: 20px; border-top: 1px solid var(--border-dim); background: rgba(0,0,0,0.5);
+}
+
+.cart-total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; color: var(--term-text);
+}
+
+/* Individual Item Styles */
+.cart-item {
+    display: flex; gap: 15px; border: 1px solid var(--border-dim);
+    padding: 10px; background: rgba(0,0,0,0.3);
+}
+
+.cart-item-img {
+    width: 70px; height: 70px; object-fit: cover; border: 1px solid var(--border-dim);
+}
+
+.cart-item-details { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.cart-item-title { font-size: 1.1rem; color: var(--term-text); line-height: 1.1; }
+.cart-item-price { color: var(--amber-accent); font-weight: bold; }
+
+/* --- CART ITEM CONTROLS --- */
+.remove-item-btn {
+    background: transparent; border: none; 
+    color: var(--term-muted); cursor: pointer; 
+    font-size: 0.85rem; font-weight: bold; font-family: 'Rajdhani', sans-serif;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+.remove-item-btn:hover { color: #ff2a2a; }
+
+.qty-controls {
+    display: flex; align-items: center; gap: 12px;
+}
+.qty-btn {
+    background: transparent; border: 1px solid var(--term-muted);
+    color: var(--term-text); cursor: pointer; 
+    width: 24px; height: 24px; 
+    display: flex; justify-content: center; align-items: center;
+    font-weight: bold; transition: all 0.2s ease;
+}
+.qty-btn:hover {
+    border-color: var(--amber-accent); color: var(--amber-accent);
+}
+
+/* =========================================
+   TACTICAL SYSTEM ALERT (Dropdown Notification)
+========================================= */
+.system-alert-box {
+    position: fixed;
+    top: -100px; /* Hidden completely above the screen */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    background: #0d0202; /* Deep Red/Black */
+    border: 2px solid #ff2a2a;
+    box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.2), 0 10px 30px rgba(0, 0, 0, 0.8);
+    
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    z-index: 9999; /* Keeps it above absolutely everything */
+    
+    /* The snappy drop-down animation */
+    transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+
+/* JavaScript will add this class to drop it onto the screen */
+.system-alert-box.active {
+    top: 40px; 
+}
+
+.alert-icon {
+    color: #ff2a2a;
+    font-size: 2rem;
+    font-weight: bold;
+    animation: blink 1s infinite; /* Reuses your existing blink animation */
+}
+
+.alert-message {
+    color: #ff6666;
+    font-size: 1.3rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Custom Red Button for the Alert */
+.system-alert-box .tac-btn {
+    border-color: #ff2a2a;
+    color: #ff2a2a;
+    margin-left: 20px;
+    padding: 6px 15px;
+}
+
+.system-alert-box .tac-btn:hover {
+    background: #ff2a2a;
+    color: #000;
+    box-shadow: 0 0 15px rgba(255, 42, 42, 0.6);
+}
+
+/* --- HIDE DEFAULT BROWSER EYE --- */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-webkit-reveal {
+    display: none;
+}
+
+/* --- PASSWORD REVEAL EYE --- */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 40px; /* Makes room so text doesn't hide behind the eye */
+}
+
+.eye-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--term-muted); /* Starts steel gray */
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    display: flex;
+    transition: color 0.2s ease;
+    user-select: none; /* ADD THIS: Prevents the browser from highlighting the icon */
+    -webkit-user-select: none;
+}
+
+.eye-btn:hover, .eye-btn.active {
+    color: #ffffff; /* Turns pure white when hovered or active! */
+}
+
+/* --- STATE: LOGGED IN (Cyan overrides the Green) --- */
+.clearance.logged-in {
+    color: var(--term-cyan);
+    border-color: var(--term-cyan);
+}
+
+.clearance.logged-in:hover {
+    background-color: var(--term-cyan);
+    color: var(--bg-deep); /* Forces the text dark */
+    box-shadow: var(--cyan-glow);
+}
+
+/* =========================================
+   PROFILE SLIDING UI
+========================================= */
+.profile-stage {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 60vh;
+    margin-top: 40px;
+    width: 100%; 
+    max-width: 100%; /* Overrides any previous max-width restrictions */
+    /* DELETED: overflow-x: hidden; */
+}
+
+/* The Main ID Card */
+.id-card {
+    width: 100%;
+    max-width: 750px; /* INCREASED from 600px */
+    position: relative;
+    z-index: 10;
+    padding: 40px; 
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); 
+}
+
+/* The Layout Inside the Card */
+.card-header { margin-bottom: 20px; }
+.access-level { color: var(--term-muted); font-size: 1.1rem; font-family: 'Rajdhani', sans-serif; font-weight: bold; }
+.card-body { display: flex; flex-direction: column; gap: 15px; }
+.data-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+.data-label { color: var(--term-muted); width: 100px; }
+.data-value { flex-grow: 1; color: var(--term-text); }
+.card-divider { border: none; border-top: 1px dashed var(--border-dim); margin: 25px 0; }
+.card-footer-actions { display: flex; justify-content: space-between; }
+
+.text-btn { 
+    background: none; 
+    border: none; 
+    color: var(--term-cyan); 
+    cursor: pointer; 
+    font-family: 'Rajdhani', sans-serif; /* Changed from VT323 */
+    font-weight: 700;
+    font-size: 1.1rem; 
+    letter-spacing: 1px;
+    transition: all 0.2s ease; 
+}
+
+.text-btn:hover { 
+    color: #fff; 
+    text-shadow: 0 0 8px rgba(255,255,255,0.6); /* Adds a tactical glow on hover */
+}
+
+/* The Side Panels */
+.side-panel {
+    position: absolute;
+    width: 400px; /* INCREASED from 350px */
+    padding: 30px; 
+    /* ... rest of the properties stay the same ... */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hidden State: Collapsed to 0px height */
+.inline-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    
+    /* The Animation Magic */
+    max-height: 0; 
+    opacity: 0;
+    margin-top: 0;
+    padding: 0 15px; 
+    border: 1px dashed transparent;
+    overflow: hidden; /* Hides the inputs while collapsed */
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Active State: Expanded to full height */
+.inline-form.active {
+    max-height: 250px; /* Expands to fit the form */
+    opacity: 1;
+    margin-top: 15px;
+    padding: 15px;
+    border-color: var(--border-dim);
+}
+
+.address-box { border: 1px solid var(--border-dim); padding: 15px; background: rgba(0,0,0,0.3); margin-top: 10px; color: var(--term-text); }
+
+/* Snugs the side panels much closer to the center */
+.left-panel { left: calc(50% - 580px); } 
+.right-panel { right: calc(50% - 580px); }
+
+/* Slides the main card just enough to clear the side panels with a 25px gap */
+.stage-shift-right .id-card { transform: translateX(220px); }
+.stage-shift-right .left-panel { opacity: 1; visibility: visible; transform: translateY(0); }
+
+.stage-shift-left .id-card { transform: translateX(-220px); }
+.stage-shift-left .right-panel { opacity: 1; visibility: visible; transform: translateY(0); }
+
+/* --- UTILITY CLASSES --- */
+.text-amber { color: var(--amber-accent) !important; }
+.text-cyan { color: var(--term-cyan) !important; }
+.text-green { color: var(--term-green) !important; }
+.text-red { color: var(--term-red) !important; }
+.text-muted { color: var(--term-muted) !important; } /* ADDED THIS */
+
+.text-regular { color: var(--term-text); font-size: 1rem; } /* ADDED THIS */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-lg { font-size: 1.5rem; }
+
+.col-span-full { grid-column: 1 / -1; }
+
+.align-start { align-items: flex-start; }
+
+.pr-10 { padding-right: 10px; }
+
+.border-red { border-color: var(--term-red) !important; } /* ADDED THIS */
+
+.flex-between { display: flex; width: 100%; justify-content: space-between; align-items: center; }
+.flex-wrap { flex-wrap: wrap; } /* ADDED THIS */
+.flex-1 { flex: 1; }
+
+.self-end { align-self: flex-end; } /* ADDED THIS */
+
+.mt-10 { margin-top: 10px; } 
+.mt-15 { margin-top: 15px; }
+.mt-20 { margin-top: 20px; }
+.mt-30 { margin-top: 30px; }
+.mt-auto { margin-top: auto; } /* ADDED THIS */
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+.gap-10 { gap: 10px; }
+.gap-15 { gap: 15px; }
+
+.opacity-80 { opacity: 0.8; }
+.bg-black { background-color: #000000; }
+
+.qty-number {
+    color: var(--term-text);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.pagination-ellipsis {
+    color: var(--term-muted);
+    font-weight: bold;
+    margin: 0 5px;
+}
+
+/* --- UNIFIED TACTICAL INPUTS --- */
+.tac-input {
+    width: 100%; 
+    box-sizing: border-box; 
+    background-color: var(--bg-overlay); 
+    border: 1px solid var(--border-dim);
+    color: var(--term-text); 
+    padding: 10px 15px; 
+    font-size: 1.2rem; 
+    font-family: 'VT323', monospace; /* Keeps that hacker terminal feel */
+    outline: none;
+    text-transform: none; /* Allows lowercase */
+    transition: all 0.3s ease;
+}
+
+.tac-input:focus {
+    border-color: var(--amber-accent);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: var(--amber-glow-subtle);
+}
+
+/* =========================================
+   AUTO-ADJUST (ZOOM & SMALLER SCREENS)
+========================================= */
+@media (max-width: 1400px) {
+    /* 1. Stop the ID card from moving, just dim it */
+    .stage-shift-right .id-card,
+    .stage-shift-left .id-card {
+        transform: translateX(0); 
+        opacity: 0.2; 
+        pointer-events: none; /* Disables the background buttons */
+    }
+
+    /* 2. Force the side panels to the absolute center */
+    .side-panel {
+        left: 50% !important;
+        right: auto !important;
+        transform: translate(-50%, 30px); /* Centers X, pushed slightly down */
+        z-index: 100; /* Puts it above the ID card */
+        width: 90%;
+        max-width: 450px;
+    }
+
+    /* 3. Drop it directly in the middle when active */
+    .stage-shift-right .left-panel,
+    .stage-shift-left .right-panel {
+        transform: translate(-50%, 0); 
+    }
+}
+
+/* --- ADDRESS INVENTORY CARDS --- */
+.address-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    width: 100%;
+    
+    /* NEW: Forces a scrollbar if they have more than 3 addresses */
+    max-height: 350px; 
+    overflow-y: auto;
+    padding-right: 10px; /* Gives the scrollbar some breathing room */
+}
+
+/* Custom Tactical Scrollbar for the Address List */
+.address-list-container::-webkit-scrollbar { width: 6px; }
+.address-list-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-left: 1px solid var(--border-dim); }
+.address-list-container::-webkit-scrollbar-thumb { background: var(--term-muted); }
+.address-list-container::-webkit-scrollbar-thumb:hover { background: var(--term-text); }
+
+.address-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid var(--border-dim);
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* CHANGED: Now glows pure white instead of yellow */
+.address-card:hover {
+    border-color: var(--term-text);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.address-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    pointer-events: none; /* Lets the click pass through to the card */
+}
+
+.address-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--term-text);
+}
+
+.address-detail {
+    font-size: 0.9rem;
+    color: var(--term-muted);
+}
+
+/* --- THE EQUIPPED STATE --- */
+.address-card.equipped {
+    border-color: var(--term-green);
+    background: rgba(0, 255, 102, 0.05); /* Faint tactical green tint */
+    box-shadow: inset 0 0 10px rgba(0, 255, 102, 0.1);
+}
+.address-card.equipped .address-title, 
+.address-card.equipped .address-detail {
+    color: var(--term-green);
+}
+
+/* --- CARD ACTION BUTTONS (Gear & Trash) --- */
+.card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--term-muted);
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+/* CHANGED: Uses the new Hazard Orange! */
+.icon-btn:hover { color: var(--term-orange); transform: scale(1.1); }
+
+/* The trash can still turns red */
+.icon-btn.delete-btn:hover { color: var(--term-red); }
+
+/* --- ADD NEW ADDRESS BOX --- */
+.add-address-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70px;
+    border: 1px dashed var(--border-dim);
+    background: transparent;
+    cursor: pointer;
+    color: var(--term-muted);
+    transition: all 0.3s ease;
+}
+
+.add-icon-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--term-muted);
+    border-radius: 50%;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, color 0.3s;
+}
+
+/* The Hover Animation you requested! */
+.add-address-box:hover {
+    border-color: var(--term-text);
+    color: var(--term-text);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+.add-address-box:hover .add-icon-circle {
+    transform: scale(1.2);
+    border-color: var(--term-text);
+}
+
+/* --- MULTI-INPUT LOGISTICS FORM --- */
+.logistics-form {
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+/* JS will add this class to reveal it */
+.logistics-form.active {
+    display: flex;
+}
