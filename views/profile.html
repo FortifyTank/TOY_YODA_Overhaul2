@@ -12,13 +12,13 @@
     <div class="top-command-bar">
         <header class="global-header">
             <div class="header-left">
-                <a href="/login" class="clearance">[ LOG IN ]</a>
+                <a href="/login" class="clearance header-btn">[ LOG IN ]</a>
             </div>
             <div class="header-logo">
                 <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
             </div>
             <div class="header-right">
-                <span class="cart-status">[ CART: 0 ]</span> 
+                <span class="cart-status header-btn">[ CART: 0 ]</span> 
             </div>
         </header>
         <nav class="global-nav">
@@ -38,7 +38,7 @@
             <div id="addressListView">
                 <p class="text-muted mb-5">> SELECT ADDRESS TO EQUIP:</p>
                 
-                <div class="address-list-container" id="addressListContainer">
+                <div class="address-list-container tac-scroll" id="addressListContainer">
 
                 </div>
                 <button class="tac-btn tac-btn--ghost tac-btn--full close-panel-btn mt-15">[ CLOSE PANEL ]</button>
@@ -128,8 +128,21 @@
 
         <div id="historyPanel" class="side-panel cyber-panel right-panel">
             <h3 class="text-amber">// PURCHASE RECORDS</h3>
-            <p class="text-muted mt-10">> NO ACTIVE ORDERS.</p>
-            <button class="tac-btn tac-btn--ghost tac-btn--full close-panel-btn mt-auto">[ CLOSE RECORDS ]</button>
+            
+            <div class="tactical-tabs mt-15">
+                <button class="tab-btn active" id="tabOngoing">[ ONGOING ]</button>
+                <button class="tab-btn" id="tabArchived">[ ARCHIVED ]</button>
+            </div>
+
+            <div id="ongoingOrdersContainer" class="order-list-container tac-scroll active mt-15">
+                <p class="text-muted">> SCANNING DEPLOYMENTS...</p>
+            </div>
+            
+            <div id="archivedOrdersContainer" class="order-list-container tac-scroll hidden-content mt-15">
+                <p class="text-muted">> SCANNING ARCHIVES...</p>
+            </div>
+
+            <button class="tac-btn tac-btn--ghost tac-btn--full close-panel-btn shrink-0 mt-auto">[ CLOSE RECORDS ]</button>
         </div>
 
     </main>
@@ -139,7 +152,7 @@
     <div id="cartDrawer" class="cart-drawer cyber-panel">
         <div class="cart-header">
             <h3>// YOUR CART</h3>
-            <button id="closeCartBtn" class="close-btn">[ X ]</button>
+            <button id="closeCartBtn" class="close-btn ghost-btn">[ X ]</button>
         </div>
         
         <div id="cartItemsContainer" class="cart-items"></div>

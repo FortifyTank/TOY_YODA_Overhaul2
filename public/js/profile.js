@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
-    // 1. STATE & CONSTANTS (SVG Math Extracted!)
+    // 1. STATE & CONSTANTS (SVGs)
     // ==========================================
     let editingAddressId = null;
 
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const phoneFormSubmit = document.getElementById('phoneForm');
     const passwordForm = document.getElementById('passwordForm');
 
-    // Buttons
+    // Action Buttons
     const cancelAddressFormBtn = document.getElementById('cancelAddressFormBtn');
     const togglePhoneBtn = document.getElementById('togglePhoneBtn');
     const togglePassBtn = document.getElementById('togglePassBtn');
@@ -31,9 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const savePassBtn = document.getElementById('savePassBtn');
     const logoutBtn = document.getElementById('logoutBtn');
 
+    // History Panel Elements
+    const tabOngoing = document.getElementById('tabOngoing');
+    const tabArchived = document.getElementById('tabArchived');
+    const ongoingContainer = document.getElementById('ongoingOrdersContainer');
+    const archivedContainer = document.getElementById('archivedOrdersContainer');
+
     // ==========================================
-    // 3. DOSSIER INITIALIZATION
+    // 3. CORE DATA LOADERS (API FETCHES)
     // ==========================================
+    
+    // Loads the User's Personal Dossier
     async function loadProfileData() {
         try {
             const response = await fetch('/api/profile');
@@ -50,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const addresses = data.addresses || [];
                 renderAddressCards(addresses);
-
             } else {
                 window.location.href = '/login';
             }
@@ -59,9 +66,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Loads the Order History and Filters the Tabs
+    async function loadOrderHistory() {
+        if (!ongoingContainer || !archivedContainer) return;
+
+        try {
+            const response = await fetch('/api/orders');
+            if (!response.ok) throw new Error('Failed to fetch orders');
+            const orders = await response.json();
+
+            const ongoing = orders.filter(o => ['PENDING', 'PREPARING', 'ON DELIVERY'].includes(o.status));
+            const archived = orders.filter(o => ['DELIVERED', 'CANCELLED'].includes(o.status));
+
+            const buildCard = (order) => {
+                const date = new Date(order.createdAt).toLocaleDateString('en-GB');
+                let itemsPreview = `${order.items[0].quantity}x ${order.items[0].name}`;
+                if (order.items.length > 1) itemsPreview += ` <span class="text-muted">(+${order.items.length - 1} MORE)</span>`;
+
+                return `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <div>
+                                <div class="text-cyan font-bold">${order.orderNumber}</div>
+                                <div class="text-muted text-sm mt-5">PLACED: ${date}</div>
+                            </div>
+                            <div class="status-badge status-${order.status}">[ ${order.status} ]</div>
+                        </div>
+                        <div class="history-items">${itemsPreview}</div>
+                        <div class="history-footer">
+                            <span class="text-amber font-bold">₱${order.totalAmount.toLocaleString()}</span>
+                            <button class="text-btn text-sm">[ VIEW DETAILS ]</button>
+                        </div>
+                    </div>
+                `;
+            };
+
+            ongoingContainer.innerHTML = ongoing.length ? ongoing.map(buildCard).join('') : '<p class="text-muted">> NO ACTIVE DEPLOYMENTS.</p>';
+            archivedContainer.innerHTML = archived.length ? archived.map(buildCard).join('') : '<p class="text-muted">> ARCHIVES EMPTY.</p>';
+
+        } catch (err) {
+            ongoingContainer.innerHTML = '<p class="text-red">> ERROR: LOG CONNECTION FAILED.</p>';
+            archivedContainer.innerHTML = '<p class="text-red">> ERROR: LOG CONNECTION FAILED.</p>';
+        }
+    }
+
     // ==========================================
-    // 4. DYNAMIC ADDRESS RENDERING
+    // 4. UI RENDERING ENGINES
     // ==========================================
+    
     function renderAddressCards(addresses) {
         const listContainer = document.getElementById('addressListContainer');
         const currentAddressDisplay = document.getElementById('currentAddressDisplay');
@@ -81,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const isEquipped = addr.isEquipped ? 'equipped' : 'unequipped';
             const statusTag = addr.isEquipped ? '[ EQUIPPED ] ' : '';
             
-            // CLEAN CODE: SVGs are now cleanly injected from the constants above!
             const cardHTML = `
                 <div class="address-card ${isEquipped}" data-id="${addr._id}">
                     <div class="address-info">
@@ -97,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
             listContainer.innerHTML += cardHTML;
         });
 
-        // Add New Button
         listContainer.innerHTML += `
             <div class="add-address-box" id="openAddressFormBtn">
                 <div class="add-icon-circle">${iconAdd}</div>
@@ -107,17 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         attachAddressEventListeners(addresses);
     }
 
-    // ==========================================
-    // 5. EVENT LISTENERS & UI LOGIC
-    // ==========================================
-    
-    // Form Visibility Toggles
-    function toggleAddressForm() {
-        const isListHidden = addressListView.style.display === 'none';
-        addressListView.style.display = isListHidden ? 'block' : 'none';
-        isListHidden ? logisticsForm.classList.remove('active') : logisticsForm.classList.add('active');
-    }
-
+    // Utility: Password Eye Reveal
     function setupProfilePasswordToggle(btnId, inputId) {
         const btn = document.getElementById(btnId);
         const input = document.getElementById(inputId);
@@ -133,11 +173,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Utility: Swap Address List / Form View
+    function toggleAddressForm() {
+        const isListHidden = addressListView.style.display === 'none';
+        addressListView.style.display = isListHidden ? 'block' : 'none';
+        isListHidden ? logisticsForm.classList.remove('active') : logisticsForm.classList.add('active');
+    }
+
+    // ==========================================
+    // 5. EVENT LISTENERS
+    // ==========================================
+
+    // Auto-Open Logistics from Checkout URL Hash
     if (window.location.hash === '#logistics') {
         stage.classList.add('stage-shift-right');
     }
 
-    // Stage Sliding (History / Logistics)
+    // History Panel Tabs (UPDATED to use clean CSS class swapping)
+    if (tabOngoing && tabArchived) {
+        tabOngoing.addEventListener('click', () => {
+            tabOngoing.classList.add('active'); tabArchived.classList.remove('active');
+            ongoingContainer.classList.remove('hidden-content'); archivedContainer.classList.add('hidden-content');
+        });
+        tabArchived.addEventListener('click', () => {
+            tabArchived.classList.add('active'); tabOngoing.classList.remove('active');
+            archivedContainer.classList.remove('hidden-content'); ongoingContainer.classList.add('hidden-content');
+        });
+    }
+
+    // Stage Sliding Animations
     document.getElementById('openLogisticsBtn')?.addEventListener('click', () => {
         stage.classList.replace('stage-shift-left', 'stage-shift-right') || stage.classList.add('stage-shift-right');
     });
@@ -150,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => { stage.classList.remove('stage-shift-right', 'stage-shift-left'); });
     });
 
-    // Sub-menu toggles (Phone vs Password)
+    // Sub-menu Toggles (Phone vs Password)
     if (togglePhoneBtn && phoneFormSubmit) {
         togglePhoneBtn.addEventListener('click', () => {
             phoneFormSubmit.classList.toggle('active');
@@ -169,8 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Dynamic Address Listeners
+    // Address Card Interactions
     function attachAddressEventListeners(addresses) {
+        // Equip Address
         document.querySelectorAll('.address-card').forEach(card => {
             card.addEventListener('click', async (e) => {
                 if (e.target.closest('.icon-btn')) return; 
@@ -186,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Delete Address
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const addrId = btn.getAttribute('data-id');
@@ -200,6 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Edit Address
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const addrId = btn.getAttribute('data-id');
@@ -220,6 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Open Add Address Form
         document.getElementById('openAddressFormBtn').addEventListener('click', () => {
             editingAddressId = null; 
             document.getElementById('logisticsForm').reset();
@@ -229,10 +297,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 6. FORM SUBMISSIONS & LOGOUT
+    // 6. FORM SUBMISSIONS & DISCONNECT
     // ==========================================
     
-    // Address Save
+    // Address Submission
     if (logisticsForm) {
         logisticsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -279,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Phone Save
+    // Phone Submission
     if (phoneFormSubmit && savePhoneBtn) {
         phoneFormSubmit.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -353,20 +421,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Disconnect Link (Logout)
+    // Disconnect (Logout) Link
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Stop instant click
+            e.preventDefault(); 
             
-            // 1. Create and inject the fade overlay
             const fade = document.createElement('div');
             fade.className = 'warp-fade';
             document.body.appendChild(fade);
             
-            // 2. Trigger the black fade transition
             setTimeout(() => fade.classList.add('active'), 50);
 
-            // 3. Wait for it to turn pitch black (500ms), then kill session & redirect
             setTimeout(async () => {
                 await fetch('/api/logout', { method: 'POST' });
                 window.location.href = '/login';
@@ -375,11 +440,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 7. IGNITE
+    // 7. INITIALIZATION (BOOT SEQUENCE)
     // ==========================================
     if (cancelAddressFormBtn) cancelAddressFormBtn.addEventListener('click', toggleAddressForm);
     setupProfilePasswordToggle('toggleOldPass', 'oldPassInput');
     setupProfilePasswordToggle('toggleNewPass', 'newPassInput');
     
+    // Trigger Data Loaders
     loadProfileData();
+    loadOrderHistory();
 });

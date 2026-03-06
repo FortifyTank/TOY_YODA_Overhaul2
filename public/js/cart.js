@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         <div class="flex-between align-start">
                             <div class="cart-item-title pr-10">${item.name}</div>
-                            <button class="remove-item-btn" onclick="removeFromCart('${item.sku}')">[ REMOVE ]</button>
+                            <button class="remove-item-btn ghost-btn" onclick="removeFromCart('${item.sku}')">[ REMOVE ]</button>
                         </div>
                         
                         <div class="flex-between mt-10">

@@ -68,6 +68,23 @@ app.get('/checkout', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
 });
 
+// Fetch the User's Order History
+app.get('/api/orders', async (req, res) => {
+    try {
+        if (!req.session.userId) return res.status(401).json({ error: "> UNAUTHORIZED" });
+
+        // Fetch all orders belonging to this user, sorted by newest first
+        const orders = await Order.find({ user: req.session.userId })
+            .sort({ createdAt: -1 })
+            .populate('items.product', 'imageString'); // Grabs the image from the Product database!
+
+        res.json(orders);
+    } catch (err) {
+        console.error("Error fetching orders:", err);
+        res.status(500).json({ error: "> FAILURE TO RETRIEVE LOGS" });
+    }
+});
+
 // --- DATA API ROUTES ---
 
 // Get all products from the database
