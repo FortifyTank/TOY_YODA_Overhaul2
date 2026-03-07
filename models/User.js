@@ -21,6 +21,8 @@ const userSchema = new mongoose.Schema({
         isEquipped: { type: Boolean, default: false } // Tracks the active loadout
     }],
     
+    isArchived: { type: Boolean, default: false },
+
     dateRegistered: { type: Date, default: Date.now }
 });
 

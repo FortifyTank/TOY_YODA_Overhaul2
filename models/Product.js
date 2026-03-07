@@ -39,9 +39,17 @@ const productSchema = new mongoose.Schema({
         required: true, 
         default: 0 
     },
+    // ADD THESE TWO FIELDS:
+    isArchived: {
+        type: Boolean,
+        default: false
+    },
+    last_modified: {
+        type: Date
+    },
     date_published: { 
         type: Date, 
-        default: Date.now // Automatically stamps today's date if left blank
+        default: Date.now 
     }
 }, {
     // CRITICAL: This forces Mongoose to include our computed virtuals when sending data to the frontend

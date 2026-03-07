@@ -18,9 +18,7 @@
                 <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
             </div>
             <div class="header-right">
-                <a href="/products" class="tac-btn tac-btn--ghost">
-                    [ RETURN TO STOREFRONT ]
-                </a>
+                <a href="/products" class="tac-btn tac-btn--ghost">[ RETURN TO STOREFRONT ]</a>
             </div>
         </header>
         <nav class="global-nav">
@@ -30,42 +28,139 @@
     </div>
 
     <main class="dashboard-container">
-        
         <div class="cyber-panel p-30">
             <div class="flex-between align-start mb-20 border-dashed-dim pb-10">
                 <div>
-                    <h2 class="text-amber text-lg">// ADMIN OVERRIDE ENGAGED</h2>
-                    <p class="text-cyan mt-5">ACCESS LEVEL: <span class="text-regular">OMNIPOTENT</span></p>
+                    <h2 class="text-amber text-lg">// ADMIN DASHBOARD</h2>
+                    <p class="text-cyan mt-5">ACCESS LEVEL: <span class="text-regular">FULL AUTHORIZATION</span></p>
                 </div>
                 
                 <div class="tactical-tabs border-none p-0">
-                    <button class="tab-btn active" id="tabLogistics">[ DEPLOYMENT LOGS ]</button>
-                    <button class="tab-btn" id="tabArmory">[ ARMORY INVENTORY ]</button>
+                    <button class="tab-btn active" id="tabLogistics">[ MANAGE ORDERS ]</button>
+                    <button class="tab-btn" id="tabArmory">[ MANAGE PRODUCTS ]</button>
                 </div>
             </div>
 
             <div id="logisticsView" class="active">
-                <div class="flex-between mb-15">
-                    <h3 class="text-muted">> ACTIVE NETWORK TRAFFIC</h3>
-                    <button class="tac-btn tac-btn--ghost text-sm" id="refreshOrdersBtn">[ REFRESH DATA ]</button>
+                <div class="flex-between mb-20 pb-10 border-dashed-dim">
+                    <div class="tactical-tabs border-none p-0 gap-20">
+                        <button class="tab-btn active" id="subTabRequests">[ REQUESTS ]</button>
+                        <button class="tab-btn" id="subTabPrepared">[ PREPARED ]</button>
+                        <button class="tab-btn" id="subTabTransit">[ IN TRANSIT ]</button>
+                        <button class="tab-btn" id="subTabDelivered">[ DELIVERED ]</button>
+                        <button class="tab-btn" id="subTabCancelled">[ CANCELLED ]</button>
+                    </div>
+                    <button class="tac-btn tac-btn--ghost text-sm shrink-0 btn-lime-invert" id="refreshOrdersBtn">[ REFRESH DATA ]</button>
                 </div>
                 
-                <div id="adminOrdersContainer" class="order-list-container tac-scroll max-h-60vh">
-                    <p class="text-muted text-center mt-30">> SCANNING SECURE CHANNELS...</p>
-                </div>
+                <div id="requestsContainer" class="order-list-container tac-scroll max-h-60vh"></div>
+                <div id="preparedContainer" class="order-list-container tac-scroll max-h-60vh hidden-content"></div>
+                <div id="transitContainer" class="order-list-container tac-scroll max-h-60vh hidden-content"></div>
+                <div id="deliveredContainer" class="order-list-container tac-scroll max-h-60vh hidden-content"></div>
+                <div id="cancelledContainer" class="order-list-container tac-scroll max-h-60vh hidden-content"></div>
             </div>
 
             <div id="armoryView" class="hidden-content">
-                <div class="flex-between mb-15">
-                    <h3 class="text-muted">> WAREHOUSE MANIFEST</h3>
-                    <button class="tac-btn tac-btn--ghost text-sm">[ + ADD NEW MANIFEST ]</button>
+                <div class="flex-between mb-20 pb-10 border-dashed-dim align-start flex-wrap gap-15">
+                    <div class="flex-wrap gap-10 d-flex">
+                        <input type="text" id="armorySearch" class="tac-input w-150 input-sm" placeholder="SEARCH SKU / NAME...">
+                        <select id="armoryCategoryFilter" class="tactical-dropdown select-sm">
+                            <option value="ALL">ALL CATEGORIES</option>
+                        </select>
+                        <select id="armorySort" class="tactical-dropdown select-sm">
+                            <option value="newest">NEWEST ADDED</option>
+                            <option value="name_asc">A - Z</option>
+                            <option value="name_desc">Z - A</option>
+                            <option value="mod_desc">MOST RECENTLY MODIFIED</option>
+                            <option value="mod_asc">OLDEST MODIFIED</option>
+                            <option value="stock_asc">STOCK: LOW TO HIGH</option>
+                            <option value="stock_desc">STOCK: HIGH TO LOW</option>
+                        </select>
+                    </div>
+
+                    <div class="flex-wrap gap-10 d-flex">
+                        <button class="tac-btn tac-btn--ghost text-sm btn-lime-invert shrink-0" id="refreshArmoryBtn">[ REFRESH ]</button>
+                        <button class="tac-btn tac-btn--ghost text-sm btn-pink-invert shrink-0" id="toggleArchiveModeBtn">[ SHOW ARCHIVED ]</button>
+                        <button class="tac-btn tac-btn--ghost text-sm btn-orange-invert shrink-0" id="addNewToyBtn">[ + ADD NEW PRODUCT ]</button>
+                    </div>
                 </div>
-                <p class="text-center text-muted mt-30">> ARMORY DATABANKS OFFLINE. AWAITING INITIALIZATION.</p>
+                
+                <div id="armoryContainer" class="order-list-container tac-scroll max-h-60vh">
+                    <p class="text-muted text-center mt-30">> SCANNING DATABASE...</p>
+                </div>
             </div>
-
         </div>
-
     </main>
+
+    <div id="orderModalOverlay" class="tac-modal-overlay">
+        <div class="tac-modal cyber-panel">
+            <div class="modal-header flex-between">
+                <h3 class="text-amber" id="modalOrderTitle">// ORDER DETAILS</h3>
+                
+                <button class="ghost-btn close-modal-btn btn-orange-invert" id="closeModalBtn">[ X ]</button>
+            </div>
+            <div class="modal-body tac-scroll" id="modalContent">
+                <p class="text-muted">> DECRYPTING DATA...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="forgeOverlay" class="forge-overlay"></div>
+    <div id="forgeDrawer" class="forge-drawer cyber-panel">
+        <div class="forge-header flex-between">
+            <h3 class="text-orange text-lg" id="forgeTitle" style="color: var(--term-orange); text-shadow: 0 0 10px rgba(229,168,35,0.4);">// NEW PRODUCT</h3>
+            <button class="ghost-btn close-modal-btn btn-orange-invert" id="closeForgeBtn">[ X ]</button>
+        </div>
+        
+        <div class="forge-body tac-scroll">
+            <input type="hidden" id="forgeId">
+            <div class="forge-group">
+                <label class="forge-label">> PRODUCT NAME</label>
+                <input type="text" id="forgeName" class="tac-input forge-input" placeholder="e.g. MILLENNIUM FALCON">
+            </div>
+            <div class="forge-grid">
+                <div class="forge-group">
+                    <label class="forge-label">> SKU CODE</label>
+                    <input type="text" id="forgeSku" class="tac-input forge-input" placeholder="SW-001">
+                </div>
+                <div class="forge-group">
+                    <label class="forge-label">> CATEGORY</label>
+                    <input type="text" id="forgeCategory" class="tac-input forge-input" placeholder="STAR WARS">
+                </div>
+            </div>
+            <div class="forge-grid">
+                <div class="forge-group">
+                    <label class="forge-label">> PRICE (₱)</label>
+                    <input type="number" id="forgePrice" class="tac-input forge-input" placeholder="0">
+                </div>
+                <div class="forge-group">
+                    <label class="forge-label">> OLD PRICE (₱)</label>
+                    <input type="number" id="forgeOldPrice" class="tac-input forge-input" placeholder="0">
+                </div>
+            </div>
+            <div class="forge-group" id="forgeStockGroup">
+                <label class="forge-label">> INITIAL STOCK QUANTITY</label>
+                <input type="number" id="forgeStock" class="tac-input forge-input" placeholder="0" min="0">
+            </div>
+            <div class="forge-group">
+                <label class="forge-label">> UPLOAD PRODUCT IMAGE</label>
+                <input type="file" id="forgeImageFile" class="tac-input forge-input" accept="image/*" style="padding: 10px;">
+                <input type="hidden" id="forgeExistingImage">
+                <div class="text-sm text-cyan mt-5" id="currentImageDisplay"></div>
+            </div>
+            <div class="forge-group">
+                <label class="forge-label">> SEARCH TAGS (Comma Separated)</label>
+                <input type="text" id="forgeTags" class="tac-input forge-input" placeholder="lego, rebel, ship">
+            </div>
+            <div class="forge-group">
+                <label class="forge-label">> DESCRIPTION</label>
+                <textarea id="forgeDesc" class="tac-input forge-input" rows="4" placeholder="Enter product details..."></textarea>
+            </div>
+        </div>
+        <div class="forge-footer">
+            <button class="tac-btn tac-btn--full tac-btn--xl btn-hazard-orange" id="submitForgeBtn">[ CREATE PRODUCT ]</button>
+        </div>
+    </div>
 
     <script src="/js/admin.js"></script>
 </body>

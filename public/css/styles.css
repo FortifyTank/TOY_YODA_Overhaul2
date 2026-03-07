@@ -44,6 +44,8 @@
     
     --term-green: #00ff66;     
     --green-glow: 0 0 15px rgba(0, 255, 102, 0.4);
+    --term-lime: #bfff00;
+    --term-maroon: #cc0000;
 
     --term-red: #ff2a2a;
     --term-pink: #ff6666;
@@ -122,6 +124,7 @@ body:not(.crt-theme) {
 .text-right { text-align: right; }
 .text-lg { font-size: 1.5rem; }
 .text-sm { font-size: 0.9rem; }
+.qty-lg { font-size: 1.5rem; }
 
 /* Flexbox Layouts */
 .flex-between { display: flex; width: 100%; justify-content: space-between; align-items: center; }
@@ -130,6 +133,8 @@ body:not(.crt-theme) {
 .align-start { align-items: flex-start; }
 .self-end { align-self: flex-end; } 
 .w-150 { width: 150px; }
+.w-full { width: 100%; }
+.d-flex { display: flex; }
 
 /* Layout Utilities */
 .shrink-0 { flex-shrink: 0; }
@@ -149,6 +154,11 @@ body:not(.crt-theme) {
 .mx-auto { margin-left: auto; margin-right: auto; }
 .gap-10 { gap: 10px; }
 .gap-15 { gap: 15px; }
+.gap-20 { gap: 20px; }
+
+/* Other stuff idk how to sort */
+.input-sm { padding: 6px 10px; font-size: 1rem; }
+.select-sm { padding: 6px 30px 6px 10px; }
 
 /* Padding & Sizing */
 .pr-10 { padding-right: 10px; }
@@ -162,10 +172,10 @@ body:not(.crt-theme) {
 /* Display & Borders */
 .col-span-full { grid-column: 1 / -1; }
 .border-red { border-color: var(--term-red) !important; } 
+.border-cyan { border-color: var(--term-cyan) !important; }
 .border-dashed-dim { border-bottom: 1px dashed var(--border-dim); }
 .opacity-80 { opacity: 0.8; }
 .bg-black { background-color: #000000; }
-
 
 /* HUD Greebles */
 .greeble {
@@ -191,6 +201,7 @@ body:not(.crt-theme) {
 }
 .tac-btn:hover { background: var(--amber-accent); color: var(--bg-deep); box-shadow: var(--amber-glow); }
 .tac-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+.tac-btn:active { transform: scale(0.96) !important; transition: transform 0.05s ease; }
 
 /* Button Modifiers */
 .tac-btn--md { padding: 10px 25px; font-size: 1.3rem; border-width: 2px; margin-top: 12px; align-self: center; }
@@ -270,20 +281,58 @@ input:-webkit-autofill:focus { border-color: var(--amber-accent) !important; }
 }
 .eye-btn:hover, .eye-btn.active { color: #ffffff; }
 
-/* Cyber Panels (Glass Containers) */
+/* Base Panel Style (For Product Cards, Modals, Sidebars) */
 .cyber-panel {
     background: var(--bg-panel); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-dim); border-top: 1px solid var(--term-muted); 
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5); position: relative;
     overflow: hidden; transition: all 0.2s ease; 
 }
+
+/* invisible element on top of panel, a thick yellow line squished flat */
 .cyber-panel::before {
     content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; 
     background-color: var(--amber-accent); transform: scaleY(0); 
     transform-origin: top; transition: transform 0.15s ease-out; z-index: 5;
 }
-.cyber-panel:hover { border-color: var(--amber-accent); box-shadow: inset 0 0 20px rgba(255, 176, 0, 0.05), var(--amber-glow); }
-.cyber-panel:hover::before { transform: scaleY(1); }
+
+/* MODIFIER 1: Only the thick top line drops down from top*/
+.panel-hover-line:hover::before { 
+    transform: scaleY(1); 
+}
+
+/* MODIFIER 2: change border from dim white to yellow and add yellow glow */
+.panel-hover-glow:hover { 
+    border-color: var(--amber-accent); 
+    box-shadow: inset 0 0 20px rgba(255, 176, 0, 0.05), var(--amber-glow); 
+}
+
+/* MODIFIER 4: change background from dark blue to translucent yellow */
+.panel-hover-bg-yellow {
+    transition: all 0.3s ease;
+}
+.panel-hover-bg-yellow:hover {
+    background-color: rgba(255, 232, 0, 0.15) !important; /* Floods the box with translucent yellow */
+    border-color: var(--amber-accent) !important;
+    box-shadow: inset 0 0 30px rgba(255, 232, 0, 0.1), var(--amber-glow);
+}
+
+/* MODIFIER 5: Border Highlight Only (No Shadow/Glow) */
+.panel-hover-border { 
+    transition: border-color 0.3s ease; 
+}
+.panel-hover-border:hover { 
+    border-color: var(--amber-accent) !important; 
+}
+
+/* MODIFIER COMBINED: drops the line, glow theborders, lift the card off the page */
+.panel-interactive { transition: all 0.3s ease; }
+.panel-interactive:hover {
+    border-color: var(--amber-accent); 
+    box-shadow: inset 0 0 20px rgba(255, 176, 0, 0.05), var(--amber-glow); 
+    transform: translateY(-5px);
+}
+.panel-interactive:hover::before { transform: scaleY(1); }
 
 /* =========================================
    5. GLOBAL LAYOUT (Header & Nav)
@@ -795,8 +844,8 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
 
 /* Status Colors */
 .status-badge { font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; }
-.status-PENDING { color: var(--term-orange); }
-.status-PREPARING { color: var(--term-bright-cyan); }
+.status-PENDING { color: var(--term-bright-cyan); }
+.status-PREPARING { color: var(--term-orange); }
 .status-DELIVERED { color: var(--term-green); }
 .status-CANCELLED { color: var(--term-red); }
 
@@ -954,33 +1003,238 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
 }
 
 /* =========================================
-   13. ADMIN COMMAND CENTER OVERRIDES
+   13. ADMIN COMMAND CENTER (Ergonomic Overrides)
 ========================================= */
-/* Widen the command center for better data visibility */
+/* Widen the command center */
 .admin-theme .dashboard-container { max-width: 1400px; }
 
-.admin-theme .global-header { border-bottom-color: var(--term-red); }
-.admin-theme .nav-status-light { background-color: var(--term-red); }
-.admin-theme .text-amber { color: var(--term-red) !important; text-shadow: 0 0 8px rgba(255, 42, 42, 0.4); }
+/* Shift the theme from aggressive Red to cooler Cyan/Pink for eye comfort */
+.admin-theme .global-header { border-bottom-color: var(--term-pink); }
+.admin-theme .nav-status-light { background-color: var(--term-pink); }
+.admin-theme .text-amber { color: var(--term-cyan) !important; text-shadow: var(--cyan-glow); }
+.admin-theme .text-red { color: var(--term-pink) !important; }
 
-/* Recolor the Buttons to Red */
-.admin-theme .tac-btn { border-color: var(--term-red); color: var(--term-red); }
-.admin-theme .tac-btn:hover { background: var(--term-red); color: #000; box-shadow: var(--red-glow); }
-.admin-theme .tac-btn--ghost:hover { background: var(--term-red); color: #000; border-color: var(--term-red); box-shadow: var(--red-glow); }
+/* Recolor Panels to subtle borders instead of red */
+.admin-theme .cyber-panel::before { background-color: var(--term-cyan); }
 
-/* Recolor the Panels & Tabs */
-.admin-theme .tab-btn.active { color: var(--term-red); text-shadow: 0 0 8px rgba(255, 42, 42, 0.4); }
-.admin-theme .cyber-panel::before { background-color: var(--term-red); }
-.admin-theme .cyber-panel:hover { 
-    border-color: var(--term-red); 
-    box-shadow: inset 0 0 20px rgba(255, 42, 42, 0.05), var(--red-glow); 
+/* The New Wide Modal & 2-Column Grid */
+.admin-modal-wide { max-width: 1200px !important; width: 95% !important; }
+.packing-slip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* Responsive break for smaller laptops */
+@media (max-width: 900px) { .packing-slip-grid { grid-template-columns: 1fr; } }
+
+/* Restored Admin Manifest Items */
+.admin-item-row { display: flex; gap: 20px; align-items: center; border: 1px dashed var(--border-dim); padding: 15px; background: rgba(0,0,0,0.4); }
+.admin-modal-img { width: 90px; height: 90px; object-fit: cover; border: 2px solid var(--border-dim); background: #000; }
+.admin-qty-box { border: 1px solid var(--term-cyan); background: rgba(77, 196, 255, 0.1); padding: 10px 15px; text-align: center; min-width: 80px; }
+
+/* --- 1. ADMIN HEADER (PINK OVERRIDES) --- */
+.admin-theme .header-right .tac-btn--ghost { border-color: var(--term-pink); color: var(--term-pink); background: transparent; }
+.admin-theme .header-right .tac-btn--ghost:hover { background: var(--term-pink); color: #000; box-shadow: 0 0 15px rgba(255, 102, 102, 0.5); }
+
+/* Force the Command Dashboard Text to Pink */
+.admin-theme .nav-link.active { color: var(--term-pink) !important; }
+.admin-theme .nav-link.active::before { border-color: var(--term-pink); background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6) 8px, rgba(255,102,102,0.1) 8px, rgba(255,102,102,0.1) 16px); }
+
+/* --- 2. COLOR-CODED PIPELINE TABS --- */
+.admin-theme .tactical-tabs .tab-btn.active { background: transparent; }
+#subTabRequests.active { color: var(--term-cyan); border-bottom: 2px solid var(--term-cyan); text-shadow: var(--cyan-glow); }
+/* Upgraded to Orange */
+#subTabPrepared.active { color: var(--term-orange); border-bottom: 2px solid var(--term-orange); text-shadow: 0 0 10px rgba(229, 168, 35, 0.4); }
+#subTabTransit.active { color: var(--term-lime); border-bottom: 2px solid var(--term-lime); text-shadow: 0 0 10px rgba(191, 255, 0, 0.4); }
+#subTabDelivered.active { color: var(--term-green); border-bottom: 2px solid var(--term-green); text-shadow: var(--green-glow); }
+#subTabCancelled.active { color: var(--term-maroon); border-bottom: 2px solid var(--term-maroon); text-shadow: 0 0 10px rgba(204, 0, 0, 0.5); }
+
+/* --- 3. WAREHOUSE CARD LAYOUT (FORCED HORIZONTAL) --- */
+/* Added !important to override the standard history-card column layout */
+.admin-order-card { display: flex !important; flex-direction: row !important; justify-content: space-between; align-items: stretch; padding: 0 !important; }
+.admin-card-details { padding: 15px; flex-grow: 1; display: flex; justify-content: space-between; }
+.admin-card-action { border-left: 1px dashed var(--border-dim); display: flex; justify-content: center; align-items: center; padding: 15px; min-width: 250px; background: rgba(0,0,0,0.5); }
+
+/* --- 4. ADVANCE BUTTONS (HAZARD & SOLID) --- */
+.btn-hazard-orange {
+    border: 2px solid var(--term-orange); color: var(--term-orange);
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(229, 168, 35, 0.1) 10px, rgba(229, 168, 35, 0.1) 20px);
+}
+.btn-hazard-orange:hover { background: var(--term-orange); color: #000; box-shadow: 0 0 15px rgba(229, 168, 35, 0.4); }
+
+.btn-hazard-green {
+    border: 2px solid var(--term-green); color: var(--term-green);
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0, 255, 102, 0.1) 10px, rgba(0, 255, 102, 0.1) 20px);
+}
+.btn-hazard-green:hover { background: var(--term-green); color: #000; box-shadow: var(--green-glow); }
+
+/* New Solid Inverting Green Button */
+.btn-solid-green { border: 2px solid var(--term-green); color: var(--term-green); background: transparent; transition: all 0.2s ease; }
+.btn-solid-green:hover { background: var(--term-green) !important; color: #000 !important; border-color: #000 !important; box-shadow: var(--green-glow); }
+
+/* --- 5. NEW BUTTON INVERSIONS (Orange, Pink, Cyan) --- */
+.btn-lime-invert {
+    color: var(--term-lime) !important;
+    border-color: var(--term-lime) !important;
+    transition: all 0.15s ease;
+}
+.btn-lime-invert:hover {
+    background-color: var(--term-lime) !important;
+    color: #000 !important;
+    box-shadow: 0 0 15px rgba(191, 255, 0, 0.4);
 }
 
-/* Recolor Navigation Tabs */
-.admin-theme .nav-link:hover:not(.active) { color: var(--term-red); }
-.admin-theme .nav-link:hover:not(.active)::before { border-bottom-color: var(--term-red); }
-.admin-theme .nav-link.active { color: var(--term-red); }
-.admin-theme .nav-link.active::before {
-    background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6) 8px, rgba(255,42,42,0.08) 8px, rgba(255,42,42,0.08) 16px);
-    border: 3px solid var(--term-red);
+.btn-orange-invert { color: var(--term-orange) !important; border-color: var(--term-orange) !important; background: transparent; transition: all 0.2s ease; }
+.btn-orange-invert:hover { background: var(--term-orange) !important; color: #000 !important; box-shadow: 0 0 15px rgba(229, 168, 35, 0.4); }
+
+.btn-pink-invert { color: var(--term-pink) !important; border-color: var(--term-pink) !important; background: transparent; transition: all 0.2s ease; }
+.btn-pink-invert:hover { background: var(--term-pink) !important; color: #000 !important; box-shadow: 0 0 15px rgba(255, 102, 102, 0.4); }
+
+.btn-cyan-invert { color: var(--term-cyan) !important; border-color: var(--term-cyan) !important; background: transparent; transition: all 0.2s ease; }
+.btn-cyan-invert:hover { background: var(--term-cyan) !important; color: #000 !important; box-shadow: var(--cyan-glow); }
+
+/* --- 6. ARMORY CARD LAYOUT (IMAGE LEFT, ACTIONS RIGHT) --- */
+.admin-theme { --term-dark-green: #00cc55; } /* New Custom Dark Green */
+
+.armory-img-box { border-right: 1px dashed var(--border-dim); padding: 15px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); min-width: 140px; }
+.armory-data-grid { display: flex; flex-grow: 1; padding: 15px; justify-content: space-between; align-items: stretch; gap: 20px; }
+
+.armory-info-col { display: flex; flex-direction: column; justify-content: center; flex-grow: 1; }
+.armory-action-col { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; min-width: 320px; gap: 15px; }
+
+/* --- 7. INLINE STOCK SLIDING DRAWER --- */
+.armory-stock-wrapper { 
+    display: flex; align-items: stretch; justify-content: flex-end; 
+    position: relative; height: 55px; width: 100%; overflow: hidden; 
 }
+
+/* The Normal Box (Slides Left & Hides) */
+.stock-controls-normal { 
+    display: flex; align-items: stretch; gap: 5px; position: absolute; right: 0; height: 100%;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s; transform: translateX(0); opacity: 1; 
+}
+.stock-controls-normal.hidden { transform: translateX(-50px); opacity: 0; pointer-events: none; }
+
+/* The Input Box (Slides in from Right) */
+.inline-stock-form { 
+    display: flex; align-items: stretch; gap: 5px; position: absolute; right: 0; height: 100%; background: var(--bg-crt); z-index: 5;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s; transform: translateX(100%); opacity: 0; pointer-events: none; 
+}
+.inline-stock-form.active { transform: translateX(0); opacity: 1; pointer-events: auto; }
+
+/* Stock Inner Elements (Ensuring 100% Height Matches) */
+.admin-qty-box { display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--term-cyan); background: rgba(77, 196, 255, 0.05); padding: 0 15px; min-width: 80px; }
+.stock-adjust-btn { width: 45px; font-size: 1.8rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid; background: transparent; transition: all 0.2s; padding: 0; margin: 0; }
+
+/* Specific Button Colors */
+.btn-stock-sub { color: var(--term-pink); border-color: var(--term-pink); }
+.btn-stock-sub:hover { background: var(--term-pink); color: #000; box-shadow: 0 0 10px rgba(255, 102, 102, 0.4); }
+
+.btn-stock-add { color: var(--term-dark-green); border-color: var(--term-dark-green); }
+.btn-stock-add:hover { background: var(--term-dark-green); color: #000; box-shadow: 0 0 10px rgba(0, 204, 85, 0.4); }
+
+/* The Number Input */
+.inline-stock-input { width: 70px; text-align: center; font-size: 1.3rem; font-weight: bold; border: 1px solid var(--border-dim); background: rgba(0,0,0,0.5); color: var(--term-text); outline: none; font-family: 'VT323', monospace; }
+.inline-stock-input:focus { border-color: var(--amber-accent); box-shadow: inset 0 0 10px rgba(255, 232, 0, 0.1); }
+
+/* --- 8. ARMORY CARD CLEANUP (No Inline Styles) --- */
+.price-row { margin-top: auto; display: flex; gap: 10px; align-items: baseline; }
+.old-price-strike { text-decoration: line-through; font-size: 0.9rem; }
+.stock-controls-col { justify-content: center; align-items: flex-end; }
+.armory-action-box { flex-direction: column; min-width: 220px; }
+
+/* Dynamic Image & Card States */
+.armory-main-img { width: 100px; height: 100px; object-fit: cover; border: 2px solid var(--term-cyan); background: #000; }
+.archived-card { border-color: var(--term-muted) !important; opacity: 0.6; }
+.archived-card .armory-main-img { border-color: var(--term-muted); }
+
+/* Dynamic Stock Colors */
+.stock-box-safe { border-color: var(--term-cyan); }
+.stock-box-safe .stock-val { color: var(--term-cyan); }
+
+.stock-box-warn { border-color: var(--term-orange); }
+.stock-box-warn .stock-val { color: var(--term-orange); }
+
+.stock-box-empty { border-color: var(--term-red); }
+.stock-box-empty .stock-val { color: var(--term-red); }
+
+/* --- 9. ARCHIVE TOGGLE ANIMATION (CSS ENGINE) --- */
+.archive-toggle-wrapper {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* When the parent container gets this class, the wrapper slides open! */
+.show-archive-mode .archive-toggle-wrapper {
+    max-height: 50px;
+    opacity: 1;
+    margin-top: 10px;
+}
+
+/* --- 10. THE MANIFEST FORGE (SLIDING DRAWER) --- */
+.forge-overlay { 
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); 
+    z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s ease; 
+}
+.forge-overlay.active { opacity: 1; visibility: visible; }
+
+.forge-drawer { 
+    position: fixed; top: 0; right: -500px; width: 100%; max-width: 450px; height: 100vh; 
+    background: var(--bg-crt); z-index: 2001; border-left: 2px solid var(--term-orange); 
+    display: flex; flex-direction: column; transition: right 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); 
+    box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+}
+.forge-drawer.active { right: 0; }
+
+.forge-header { padding: 20px; border-bottom: 1px dashed var(--border-dim); background: rgba(0,0,0,0.4); }
+.forge-body { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+.forge-footer { padding: 20px; border-top: 1px dashed var(--border-dim); background: rgba(0,0,0,0.6); }
+
+/* Forge Form Styling */
+.forge-group { display: flex; flex-direction: column; gap: 5px; }
+.forge-label { color: var(--term-muted); font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; }
+.forge-input { width: 100%; }
+.forge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+/* --- 11. CUSTOM FILE UPLOADER BUTTON --- */
+/* Style the text next to the button ("No file chosen") */
+.forge-input[type="file"] {
+    padding: 5px;
+    color: var(--term-muted);
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+}
+
+/* Hack into the browser's default button and override it! */
+.forge-input[type="file"]::file-selector-button {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--term-cyan);
+    color: var(--term-cyan);
+    padding: 6px 15px;
+    margin-right: 15px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+/* Add the tactical hover glow */
+.forge-input[type="file"]::file-selector-button:hover {
+    background: var(--term-cyan);
+    color: #000;
+    box-shadow: var(--cyan-glow);
+}
+
+/* --- 12. ADMIN MODAL LAYOUT (Cleaned) --- */
+.modal-override-grid { 
+    display: flex; justify-content: space-between; align-items: flex-start; 
+    gap: 20px; margin-top: 10px; 
+}
+.modal-timeline-col { flex-grow: 1; }
+.modal-action-col { 
+    display: flex; flex-direction: column; gap: 10px; min-width: 180px; 
+    border-left: 1px dashed var(--border-dim); padding-left: 15px; 
+}
+

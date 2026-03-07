@@ -314,10 +314,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('closeModalBtn')?.addEventListener('click', () => modalOverlay.classList.remove('active'));
 
     function openReceiptModal(order) {
-        // Set the header
-        document.getElementById('modalOrderTitle').innerText = `// ORDER: ${order.orderNumber}`;
+        document.getElementById('modalOrderTitle').innerText = `// TACTICAL RECEIPT: ${order.orderNumber}`;
 
-        // Build the Items List HTML
+        // 1. THE IMAGE BUG FIX (Added the ?. fallback)
         let itemsHTML = '';
         order.items.forEach(item => {
             itemsHTML += `
@@ -332,35 +331,48 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
 
-        // Inject the full blueprint into the Modal Body
+        // 2. THE CUSTOMER TIMELINE ENGINE
+        const t = order.timeline;
+        const formatTime = (dateObj) => dateObj ? new Date(dateObj).toLocaleString('en-GB') : '---';
+        
+        let timelineHTML = `<div class="text-muted mt-10 text-sm">> PLACED: <span class="text-regular">${formatTime(t.placedAt)}</span></div>`;
+        if (t.preparingAt) timelineHTML += `<div class="text-muted text-sm">> PACKED: <span class="text-amber">${formatTime(t.preparingAt)}</span></div>`;
+        if (t.shippedAt) timelineHTML += `<div class="text-muted text-sm">> SHIPPED: <span class="text-cyan">${formatTime(t.shippedAt)}</span></div>`;
+        if (t.deliveredAt) timelineHTML += `<div class="text-muted text-sm">> DELIVERED: <span class="text-green">${formatTime(t.deliveredAt)}</span></div>`;
+        if (t.cancelledAt) timelineHTML += `<div class="text-muted text-sm">> CANCELLED: <span class="text-red">${formatTime(t.cancelledAt)}</span></div>`;
+
+        // 3. INJECT INTO THE RECEIPT
         modalContent.innerHTML = `
             <div class="receipt-grid">
                 <div class="receipt-box">
                     <div class="receipt-box-title">> ORDER STATUS</div>
                     <div class="status-badge status-${order.status} text-lg">[ ${order.status} ]</div>
-                    <div class="text-muted mt-10">PLACED: ${new Date(order.timeline.placedAt).toLocaleString()}</div>
+                    
+                    <div class="mt-15 border-dashed-dim pb-10">
+                        ${timelineHTML}
+                    </div>
                 </div>
+                
                 <div class="receipt-box">
-                    <div class="receipt-box-title">> SHIPPING ADDRESS</div>
-                    <div class="text-green font-bold">${order.shippingAddress.label}</div>
-                    <div class="text-regular">${order.shippingAddress.addressLine}</div>
-                    <div class="text-regular">BRGY. ${order.shippingAddress.barangay}, ${order.shippingAddress.city}</div>
+                    <div class="receipt-box-title">> DESTINATION</div>
+                    <div class="text-green font-bold text-lg">${order.shippingAddress.label}</div>
+                    <div class="text-regular">${order.shippingAddress.addressLine}, BRGY. ${order.shippingAddress.barangay}</div>
+                    <div class="text-regular">${order.shippingAddress.city}, ${order.shippingAddress.province} ${order.shippingAddress.zipCode}</div>
                 </div>
             </div>
 
-            <div class="receipt-box">
-                <div class="receipt-box-title">> ITEMS</div>
+            <div class="receipt-box mt-15">
+                <div class="receipt-box-title">> ITEMS SECURED</div>
                 ${itemsHTML}
             </div>
 
-            <div class="receipt-box">
+            <div class="receipt-box mt-15">
                 <div class="flex-between mb-5"><span class="text-muted">SUBTOTAL:</span> <span>₱${order.subtotal.toLocaleString()}</span></div>
                 <div class="flex-between mb-12 border-dashed-dim pb-10"><span class="text-muted">SHIPPING:</span> <span>${order.shippingFee === 0 ? 'FREE' : '₱' + order.shippingFee.toLocaleString()}</span></div>
                 <div class="flex-between text-lg text-amber font-bold"><span>TOTAL:</span> <span>₱${order.totalAmount.toLocaleString()}</span></div>
             </div>
         `;
-
-        // Trigger the drop-down animation
+        
         modalOverlay.classList.add('active');
     }
 

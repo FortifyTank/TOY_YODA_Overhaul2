@@ -5,6 +5,9 @@ const Product = require('./models/Product');
 const dbURI = "mongodb://playofgamer10_db_user:CHbeLY5tbk1CPx6q@ac-ir6m09r-shard-00-00.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-01.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-02.5npf8nj.mongodb.net:27017/?ssl=true&authSource=admin&retryWrites=true&w=majority";
 
 const seedProducts = [
+    // --- PRE-ARCHIVED TEST ITEM ---
+    { sku: "TEST-000", name: "DEFECTIVE PROTOTYPE", description: "Recalled due to laser malfunction.", price: 9999, old_price: 0, avail_inventory: 0, category: "CLASSIFIED", tags: ["recalled"], imageString: "/images/default-placeholder.png", isArchived: true },
+    
     // --- STAR WARS ---
     { sku: "SW-001", name: "BLACK SERIES DARTH VADER", description: "1/12 scale highly articulated figure.", price: 1500, old_price: 0, avail_inventory: 12, category: "STAR WARS", tags: ["sith", "empire", "action figure"], imageString: "/images/products/SW-001.png" },
     { sku: "SW-002", name: "UCS MILLENNIUM FALCON", description: "7,500+ piece building set.", price: 45000, old_price: 0, avail_inventory: 2, category: "STAR WARS", tags: ["lego", "ship", "rebel", "han solo"], imageString: "/images/products/SW-001.png" },
