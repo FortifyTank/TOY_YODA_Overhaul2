@@ -42,6 +42,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalOverlay = document.getElementById('orderModalOverlay');
     const modalContent = document.getElementById('modalContent');
 
+    let alertTimer;
+    
+    // Custom Profile Alert Engine
+    function showProfileAlert(message, type = 'error') {
+        const sysAlert = document.getElementById('systemAlert');
+        const sysMsg = document.getElementById('systemAlertMessage');
+        const sysIcon = document.querySelector('.alert-icon');
+        if (!sysAlert) return alert(message); // Fallback
+
+        sysMsg.innerText = message; 
+        
+        if (type === 'success') {
+            sysAlert.classList.add('alert-success');
+            sysIcon.innerText = '[✓]';
+        } else {
+            sysAlert.classList.remove('alert-success');
+            sysIcon.innerText = '[!]';
+        }
+
+        sysAlert.classList.add('active');
+        clearTimeout(alertTimer);
+        alertTimer = setTimeout(() => sysAlert.classList.remove('active'), 5000);
+    }
+
+    document.getElementById('systemAlertOkBtn')?.addEventListener('click', () => {
+        document.getElementById('systemAlert').classList.remove('active');
+    });
+
     // ==========================================
     // 3. CORE DATA LOADERS (API FETCHES)
     // ==========================================
@@ -54,14 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 const data = await response.json();
                 
-                document.getElementById('profileUsername').innerText = `[ CITIZEN: ${data.username} ]`;
+                document.getElementById('profileUsername').innerText = `[ USER: ${data.username} ]`;
                 document.getElementById('profileRole').innerText = data.role.toUpperCase();
-                document.getElementById('profileEmail').innerText = data.email.toUpperCase();
+                document.getElementById('profileEmail').innerText = data.email;
                 
                 const safePhone = data.phone || 'UNREGISTERED';
                 document.getElementById('profilePhone').innerText = safePhone.toUpperCase();
 
+                // THE FIX: Define addresses, cache them, then render them!
                 const addresses = data.addresses || [];
+                window.userAddressesCache = addresses; 
                 renderAddressCards(addresses);
             } else {
                 window.location.href = '/login';
@@ -385,14 +415,31 @@ document.addEventListener('DOMContentLoaded', () => {
         logisticsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const newLabel = (document.getElementById('shipLabel').value || 'HOME').trim().toUpperCase();
+
+            // STEP 3: THE UNIQUENESS CHECK
+            if (!editingAddressId && window.userAddressesCache) {
+                const isDuplicate = window.userAddressesCache.some(addr => addr.label.toUpperCase() === newLabel);
+                if (isDuplicate) {
+                    showProfileAlert("> ERROR: DEPLOYMENT LABEL ALREADY EXISTS. CHOOSE A UNIQUE NAME.");
+                    return; // Kills the function so it doesn't save!
+                }
+            }
+
             const addressData = {
-                label: document.getElementById('shipLabel').value || 'HOME',
-                addressLine: document.getElementById('shipAddressLine').value,
-                barangay: document.getElementById('shipBarangay').value,
-                city: document.getElementById('shipCity').value,
-                province: document.getElementById('shipProvince').value,
-                zipCode: document.getElementById('shipZip').value
+                label: newLabel,
+                addressLine: document.getElementById('shipAddressLine').value.trim(),
+                barangay: document.getElementById('shipBarangay').value.trim(),
+                city: document.getElementById('shipCity').value.trim(),
+                province: document.getElementById('shipProvince').value.trim(),
+                zipCode: document.getElementById('shipZip').value.trim()
             };
+
+            // THE NEW VALIDATION CHECK
+            if (!addressData.label || !addressData.addressLine || !addressData.barangay || !addressData.city || !addressData.province || !addressData.zipCode) {
+                showProfileAlert("> ERROR: ALL LOCATION PARAMETERS MUST BE COMPLETED.");
+                return; // Stops the form from saving!
+            }
 
             const payload = editingAddressId 
                 ? { editAddressId: editingAddressId, editAddressData: addressData } 
@@ -412,6 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (response.ok) {
                     saveBtn.innerText = '[ SAVED SECURELY ]';
                     saveBtn.style.color = 'var(--term-green)';
+                    window.userAddressesCache = data.user.addresses; // Update cache
                     renderAddressCards(data.user.addresses);
 
                     setTimeout(() => {
@@ -420,9 +468,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         logisticsForm.reset(); 
                         toggleAddressForm(); 
                     }, 1000);
+                } else {
+                    showProfileAlert("> ERROR: COULD NOT SECURE LOGISTICS DATA.");
+                    saveBtn.innerText = '[ SAVE LOGISTICS ]';
                 }
             } catch (err) {
-                saveBtn.innerText = '[ COMM FAILURE ]';
+                showProfileAlert("> FATAL ERROR: CONNECTION LOST.");
+                saveBtn.innerText = '[ SAVE LOGISTICS ]';
             }
         });
     }
@@ -466,10 +518,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Password Update
     if (savePassBtn) {
         savePassBtn.addEventListener('click', async () => {
-            const oldPassword = document.getElementById('oldPassInput').value;
-            const newPassword = document.getElementById('newPassInput').value;
+            const oldPassInput = document.getElementById('oldPassInput');
+            const newPassInput = document.getElementById('newPassInput');
             
-            if (!oldPassword || !newPassword) return;
+            if (!oldPassInput.value || !newPassInput.value) return;
 
             savePassBtn.innerText = '[ ENCRYPTING... ]';
 
@@ -477,26 +529,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch('/api/profile/password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ oldPassword, newPassword })
+                    body: JSON.stringify({ oldPassword: oldPassInput.value, newPassword: newPassInput.value })
                 });
 
                 if (response.ok) {
-                    savePassBtn.innerText = '[ SECURED ]';
-                    savePassBtn.style.color = 'var(--term-green)';
-                    setTimeout(() => {
-                        savePassBtn.innerText = '[ UPDATE PASSWORD ]';
-                        savePassBtn.style.color = '';
-                        document.getElementById('oldPassInput').value = '';
-                        document.getElementById('newPassInput').value = '';
-                        document.getElementById('togglePassBtn').click(); 
-                    }, 1500);
+                    showProfileAlert("> SECURITY: PASSWORD UPDATED SUCCESSFULLY.", "success");
+                    oldPassInput.value = '';
+                    newPassInput.value = '';
                 } else {
-                    savePassBtn.innerText = '[ ERROR: INVALID ]';
-                    savePassBtn.style.color = 'var(--term-red)';
-                    setTimeout(() => { savePassBtn.innerText = '[ UPDATE PASSWORD ]'; savePassBtn.style.color = ''; }, 2000);
+                    showProfileAlert("> ERROR: AUTHENTICATION FAILED. INCORRECT CURRENT PASSWORD.");
                 }
             } catch (err) {
-                savePassBtn.innerText = '[ FAILURE ]';
+                showProfileAlert("> FATAL ERROR: CONNECTION LOST.");
+            } finally {
+                // This ensures the button ALWAYS resets, even if it fails!
+                savePassBtn.innerText = '[ UPDATE PASSWORD ]';
             }
         });
     }

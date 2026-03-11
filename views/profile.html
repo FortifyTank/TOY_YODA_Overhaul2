@@ -64,7 +64,7 @@
 
         <section id="mainIdCard" class="cyber-panel id-card">
             <div class="card-header">
-                <h2 id="profileUsername" class="text-cyan">[ ACCOUNT: LOADING... ]</h2>
+                <h2 id="profileUsername" class="text-cyan text-normal-case">[ ACCOUNT: LOADING... ]</h2>
                 <p class="access-level">ACCESS LEVEL: <span id="profileRole" class="text-green">CUSTOMER</span></p>
             </div>
             
@@ -180,9 +180,16 @@
         </div>
     </div>
 
+    <div id="systemAlert" class="system-alert-box">
+        <div class="alert-icon">[!]</div>
+        <div class="alert-message" id="systemAlertMessage">> SYSTEM WARNING</div>
+        <button class="tac-btn" id="systemAlertOkBtn">[ ACKNOWLEDGE ]</button>
+    </div>
+
     <div id="bootOverlay" class="boot-overlay"></div>
     <script src="/js/dashboard.js"></script>
     <script src="/js/cart.js"></script>
     <script src="/js/profile.js"></script>
+    <script src="/js/alerts.js"></script>
 </body>
 </html>

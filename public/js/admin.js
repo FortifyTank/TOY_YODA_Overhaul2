@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let adminOrdersCache = [];
     let armoryCache = [];
     let isArchiveMode = false; 
+    let alertTimer;
 
     // --- TAB SWITCHERS ---
     mainTabs.forEach(tab => {
@@ -414,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     await fetch(`/api/admin/products/${productId}/archive`, { method: 'POST' });
                     fetchArmoryData(); 
-                } catch (err) { alert("> ERROR MODIFYING ARCHIVE STATE"); }
+                } catch (err) { showAdminAlert("> ERROR MODIFYING ARCHIVE STATE"); }
             });
         });
 
@@ -461,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const inputVal = document.getElementById(`stock-input-${id}`).value;
                 const qty = parseInt(inputVal);
                 
-                if (isNaN(qty) || qty <= 0) return alert("> INVALID QUANTITY.");
+                if (isNaN(qty) || qty <= 0) return showAdminAlert("> INVALID QUANTITY.");
                 
                 const adjustment = mode === 'add' ? qty : -Math.abs(qty); 
                 btn.innerText = '[ ... ]';
@@ -479,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const id = btn.getAttribute('data-id');
                     const product = armoryCache.find(p => p._id === id);
-                    if (!product) return alert("> ERROR: PRODUCT NOT FOUND IN CACHE");
+                    if (!product) return showAdminAlert("> ERROR: PRODUCT NOT FOUND IN CACHE");
 
                     document.getElementById('forgeTitle').innerText = '// EDIT PRODUCT';
                     document.getElementById('forgeId').value = product._id;
@@ -505,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     forgeOverlay.classList.add('active');
                     forgeDrawer.classList.add('active');
                 } catch(err) {
-                    alert("> UI ERROR: " + err.message);
+                    showAdminAlert("> UI ERROR: " + err.message);
                 }
             });
         });
@@ -552,7 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 forgeOverlay.classList.add('active');
                 forgeDrawer.classList.add('active');
             } catch(err) {
-                alert("> UI ERROR: " + err.message);
+                showAdminAlert("> UI ERROR: " + err.message);
             }
         });
     }
@@ -577,10 +578,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const oldPrice = Number(document.getElementById('forgeOldPrice').value);
 
             if (!name || !sku || !category || !price) {
-                return alert("> ERROR: MISSING CRITICAL DATA FIELDS.");
+                return showAdminAlert("> ERROR: MISSING CRITICAL DATA FIELDS.");
             }
             if (oldPrice > 0 && oldPrice <= price) {
-                return alert("> ERROR: OLD PRICE MUST BE GREATER THAN CURRENT PRICE.");
+                return showAdminAlert("> ERROR: OLD PRICE MUST BE GREATER THAN CURRENT PRICE.");
             }
 
             submitForgeBtn.innerText = '[ TRANSMITTING... ]';
@@ -627,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeForge();
                 fetchArmoryData(); 
             } catch (err) {
-                alert("> " + err.message.toUpperCase());
+                showAdminAlert("> " + err.message.toUpperCase());
             } finally {
                 submitForgeBtn.innerText = isEditing ? '[ SAVE CHANGES ]' : '[ CREATE PRODUCT ]';
                 submitForgeBtn.disabled = false;
@@ -702,7 +703,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Popup function
+    function showAdminAlert(message, type = 'error') {
+        const sysAlert = document.getElementById('systemAlert');
+        const sysMsg = document.getElementById('systemAlertMessage');
+        const sysIcon = document.querySelector('.alert-icon');
+        if (!sysAlert) return alert(message); // Fallback
+
+        sysMsg.innerText = message; 
+        
+        if (type === 'success') {
+            sysAlert.classList.add('alert-success');
+            sysIcon.innerText = '[✓]';
+        } else {
+            sysAlert.classList.remove('alert-success');
+            sysIcon.innerText = '[!]';
+        }
+
+        sysAlert.classList.add('active');
+        clearTimeout(alertTimer);
+        alertTimer = setTimeout(() => sysAlert.classList.remove('active'), 5000);
+    }
+
+    document.getElementById('systemAlertOkBtn')?.addEventListener('click', () => {
+        document.getElementById('systemAlert').classList.remove('active');
+    });
+
+    async function secureAdminBoot() {
+        try {
+            const res = await fetch('/api/profile'); // Or wherever you check auth
+            const user = await res.json();
+            
+            if (user.role !== 'admin') {
+                // Intruder detected. Kick them out immediately.
+                window.location.href = '/products';
+                return;
+            }
+            
+            // If they ARE an admin, load data and fade out the black screen
+            // If they ARE an admin, load data and trigger the fade
+            await loadAdminOrders();
+            await fetchArmoryData();
+            
+            // Reusing the hyperspace fade-out class!
+            const bootScreen = document.getElementById('bootOverlay');
+            bootScreen.classList.add('fade-out'); 
+            
+            // Wait 1200ms (1.2s) for the CSS animation to fully finish before hiding it from the screen
+            setTimeout(() => bootScreen.classList.add('hidden'), 1200);
+        } catch (err) {
+            window.location.href = '/login';
+        }
+    }
+
     // BOOT SEQUENCE
+    secureAdminBoot();
     loadAdminOrders();
     fetchArmoryData();
 });

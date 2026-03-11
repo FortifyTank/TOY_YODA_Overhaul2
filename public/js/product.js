@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             cartBtn.innerText = '[ SOLD OUT ]';
             cartBtn.disabled = true;
             cartBtn.classList.replace('tac-btn', 'tac-btn--ghost'); 
+            cartBtn.style.pointerEvents = 'none'; // Kills the hover inversion
             btnAdd.disabled = true;
             btnSub.disabled = true;
             displayQty.innerText = "0";

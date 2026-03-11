@@ -37,49 +37,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.loggedIn) {
                 accountButtons.forEach(btn => {
-                    
-                    if (window.location.pathname.includes('/profile')) {
-                        // INJECTS THE SVG DIRECTLY NEXT TO THE TEXT (Cleaned up!)
-                        btn.innerHTML = `
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 14L4 9l5-5"/>
-                                <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/>
-                            </svg>
-                            RETURN TO CATALOG
-                        `;
-                        btn.classList.add('logged-in');
-                        btn.href = '/products'; 
-                    } else {
-                        btn.innerText = `[ ${data.username.toUpperCase()} ]`;
-                        btn.classList.add('logged-in');
-                        btn.href = '/profile'; 
-                    }
-                    
+                    // ALWAYS act as the Profile Button, no matter what page we are on!
+                    btn.innerText = `[ ${data.username} ]`;
+                    btn.classList.add('logged-in');
+                    btn.href = '/profile'; 
                     btn.classList.add('ready'); 
                 });
 
+                // DYNAMIC ADMIN BUTTON SPAWNER
                 if (data.role === 'admin') {
                     const headerLeft = document.querySelector('.header-left');
-                    // Check if it already exists so we don't spawn duplicates
                     if (headerLeft && !document.getElementById('adminNavBtn')) {
                         const adminBtn = document.createElement('a');
                         adminBtn.href = '/admin';
                         adminBtn.id = 'adminNavBtn';
-                        // Uses your existing CSS to make it perfectly orange and hoverable!
                         adminBtn.className = 'header-btn btn-orange-invert ready';
                         adminBtn.innerText = '[ ADMIN OVERRIDE ]';
-                        adminBtn.style.marginLeft = '15px'; // Gives it space from the profile button
+                        adminBtn.style.marginLeft = '15px'; 
                         headerLeft.appendChild(adminBtn);
                     }
                 }
+
             } else {
                 accountButtons.forEach(btn => {
-                    btn.classList.add('ready'); // Drops the default green button
+                    btn.classList.add('ready'); 
                 });
             }
         } catch (error) {
             console.error("Failed to verify auth status:", error);
-            // Fallback: Drop the default green buttons even if the server lags
             accountButtons.forEach(btn => btn.classList.add('ready'));
         }
     }

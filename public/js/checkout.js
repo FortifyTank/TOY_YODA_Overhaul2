@@ -1,6 +1,31 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
     let equippedAddress = null;
+    let alertTimer;
+    function showCheckoutAlert(message, type = 'error') {
+        const sysAlert = document.getElementById('systemAlert');
+        const sysMsg = document.getElementById('systemAlertMessage');
+        const sysIcon = document.querySelector('.alert-icon');
+        if (!sysAlert) return alert(message); // Fallback
+
+        sysMsg.innerText = message; 
+        
+        if (type === 'success') {
+            sysAlert.classList.add('alert-success');
+            sysIcon.innerText = '[✓]';
+        } else {
+            sysAlert.classList.remove('alert-success');
+            sysIcon.innerText = '[!]';
+        }
+
+        sysAlert.classList.add('active');
+        clearTimeout(alertTimer);
+        alertTimer = setTimeout(() => sysAlert.classList.remove('active'), 5000);
+    }
+
+    document.getElementById('systemAlertOkBtn')?.addEventListener('click', () => {
+        document.getElementById('systemAlert').classList.remove('active');
+    });
     // 1. Get DOM Elements
     const addressContainer = document.getElementById('checkoutAddressContainer');
     const itemsContainer = document.getElementById('checkoutItemsContainer');
@@ -99,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 5. Place Order Button Event - The Real Engine!
     placeOrderBtn.addEventListener('click', async () => {
         if (!equippedAddress) {
-            alert("> ERROR: No deployment destination locked.");
+            showCheckoutAlert("> ERROR: NO DEPLOYMENT DESTINATION LOCKED.");
             return;
         }
 
@@ -112,13 +137,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    
-                    // THE FIX: Added item._id so it successfully grabs the MongoDB ID!
                     cart: cart.map(item => ({ 
                         productId: item._id || item.id || item.productId, 
                         quantity: item.quantity 
                     })),
-                    
                     address: equippedAddress
                 })
             });
@@ -126,22 +148,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             const result = await response.json();
 
             if (response.ok) {
-                // ORDER SUCCESSFUL!
-                alert(`> SYSTEM: PAYMENT SECURED.\n> ORDER NUMBER: ${result.orderNumber}`);
+                // SUCCESS: Show the GREEN custom popup!
+                showCheckoutAlert(`> SYSTEM: PAYMENT SECURED.\n> ORDER NUMBER: ${result.orderNumber}`, 'success');
                 
                 // Empty the cart
                 localStorage.removeItem('toy_yoda_cart');
                 
-                // Warp back to profile logistics so they can see their order history!
-                window.location.href = '/profile#logistics'; 
+                // Delay the warp by 3.5 seconds so they can see the success box!
+                setTimeout(() => {
+                    window.location.href = '/profile#logistics'; 
+                }, 3500);
+
             } else {
-                alert(`> ERROR: ${result.error}`);
+                // ERROR: Show the RED custom popup
+                showCheckoutAlert(`> ERROR: ${result.error}`);
                 placeOrderBtn.innerText = '[ PROCEED TO PAYMENT ]';
                 placeOrderBtn.disabled = false;
             }
         } catch (error) {
             console.error("Transmission Error:", error);
-            alert("> FATAL ERROR: CONNECTION TO SERVER LOST.");
+            // ERROR: Show the RED custom popup
+            showCheckoutAlert("> FATAL ERROR: CONNECTION TO SERVER LOST.");
             placeOrderBtn.innerText = '[ PROCEED TO PAYMENT ]';
             placeOrderBtn.disabled = false;
         }

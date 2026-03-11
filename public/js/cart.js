@@ -207,9 +207,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (proceedCheckoutBtn) {
-        proceedCheckoutBtn.addEventListener('click', () => window.location.href = '/checkout');
+        proceedCheckoutBtn.addEventListener('click', () => {
+            if (cart.length === 0) {
+                showSystemAlert("> REQUEST DENIED: NO ITEMS IN CART.");
+            } else {
+                window.location.href = '/checkout';
+            }
+        });
     }
-
     // Boot UI on load
     updateCartUI();
 });

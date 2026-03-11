@@ -58,7 +58,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Rajdhani', sans-serif; 
-    text-transform: uppercase; 
+    text-transform: none; 
 }
 
 body {
@@ -111,6 +111,18 @@ body:not(.crt-theme) {
 /* =========================================
    3. UTILITY CLASSES (D.R.Y. Architecture)
 ========================================= */
+/*Capslock Only*/
+h1, h2, h3, h4, h5, h6, 
+.tac-btn, 
+.nav-link, 
+.tactical-tabs, 
+.greeble {
+    text-transform: uppercase;
+}
+
+.text-upper {
+    text-transform: uppercase;
+}
 /* Text Colors */
 .text-amber { color: var(--amber-accent) !important; }
 .text-cyan { color: var(--term-cyan) !important; }
@@ -127,6 +139,7 @@ body:not(.crt-theme) {
 .text-xxl { font-size: 2.5rem; }
 .text-sm { font-size: 0.9rem; }
 .qty-lg { font-size: 1.5rem; }
+.text-normal-case { text-transform: none !important; }
 
 /* Flexbox Layouts */
 .flex-between { display: flex; width: 100%; justify-content: space-between; align-items: center; }
@@ -451,10 +464,21 @@ input:-webkit-autofill:focus { border-color: var(--amber-accent) !important; }
 .system-alert-box.active { top: 40px; }
 
 .alert-icon { color: var(--term-red); font-size: 2rem; font-weight: bold; animation: blink 1s infinite; }
-.alert-message { color: var(--term-pink); font-size: 1.3rem; font-weight: bold; letter-spacing: 1px; }
+/* NEW: Added white-space and line-height so the box can hold multiple lines of text! */
+.alert-message { color: var(--term-pink); font-size: 1.3rem; font-weight: bold; letter-spacing: 1px; white-space: pre-line; line-height: 1.4; } 
 
 .system-alert-box .tac-btn { border-color: var(--term-red); color: var(--term-red); margin-left: 20px; padding: 6px 15px; }
 .system-alert-box .tac-btn:hover { background: var(--term-red); color: #000; box-shadow: 0 0 15px rgba(255, 42, 42, 0.6); }
+
+/* NEW: The Green "Success" Modifier */
+.system-alert-box.alert-success {
+    border-color: var(--term-green);
+    box-shadow: inset 0 0 15px rgba(0, 255, 102, 0.2), 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+.system-alert-box.alert-success .alert-icon { color: var(--term-green); }
+.system-alert-box.alert-success .alert-message { color: var(--term-text); }
+.system-alert-box.alert-success .tac-btn { border-color: var(--term-green); color: var(--term-green); }
+.system-alert-box.alert-success .tac-btn:hover { background: var(--term-green); color: #000; box-shadow: var(--green-glow); }
 
 /* --- 6B. BOOT & WARP FADES --- */
 .boot-overlay {
