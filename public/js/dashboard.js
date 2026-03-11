@@ -57,6 +57,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     
                     btn.classList.add('ready'); 
                 });
+
+                if (data.role === 'admin') {
+                    const headerLeft = document.querySelector('.header-left');
+                    // Check if it already exists so we don't spawn duplicates
+                    if (headerLeft && !document.getElementById('adminNavBtn')) {
+                        const adminBtn = document.createElement('a');
+                        adminBtn.href = '/admin';
+                        adminBtn.id = 'adminNavBtn';
+                        // Uses your existing CSS to make it perfectly orange and hoverable!
+                        adminBtn.className = 'header-btn btn-orange-invert ready';
+                        adminBtn.innerText = '[ ADMIN OVERRIDE ]';
+                        adminBtn.style.marginLeft = '15px'; // Gives it space from the profile button
+                        headerLeft.appendChild(adminBtn);
+                    }
+                }
             } else {
                 accountButtons.forEach(btn => {
                     btn.classList.add('ready'); // Drops the default green button

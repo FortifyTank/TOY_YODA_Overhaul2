@@ -38,21 +38,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitForgeBtn = document.getElementById('submitForgeBtn');
     const addNewToyBtn = document.getElementById('addNewToyBtn');
 
+    // --- TAB SWITCHERS (Upgraded for 3 Tabs) ---
+    // 1. Grab the new Analytics DOM Elements
+    const tabAnalytics = document.getElementById('tabAnalytics');
+    const analyticsView = document.getElementById('analyticsView');
+    const refreshAnalyticsBtn = document.getElementById('refreshAnalyticsBtn');
+    
+    // 2. Array-based Tab Switcher
+    const mainTabs = [
+        { btn: tabLogistics, view: logisticsView },
+        { btn: tabArmory, view: armoryView },
+        { btn: tabAnalytics, view: analyticsView }
+    ];
+
     let adminOrdersCache = [];
     let armoryCache = [];
     let isArchiveMode = false; 
 
     // --- TAB SWITCHERS ---
-    if (tabLogistics && tabArmory) {
-        tabLogistics.addEventListener('click', () => {
-            tabLogistics.classList.add('active'); tabArmory.classList.remove('active');
-            logisticsView.classList.remove('hidden-content'); armoryView.classList.add('hidden-content');
-        });
-        tabArmory.addEventListener('click', () => {
-            tabArmory.classList.add('active'); tabLogistics.classList.remove('active');
-            armoryView.classList.remove('hidden-content'); logisticsView.classList.add('hidden-content');
-        });
-    }
+    mainTabs.forEach(tab => {
+        if (tab.btn) {
+            tab.btn.addEventListener('click', () => {
+                mainTabs.forEach(t => {
+                    t.btn?.classList.remove('active');
+                    t.view?.classList.add('hidden-content');
+                });
+                tab.btn.classList.add('active');
+                tab.view.classList.remove('hidden-content');
+            });
+        }
+    });
 
     const subTabs = [
         { btn: subTabRequests, container: requestsContainer },
@@ -90,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cancelledContainer.innerHTML = cancelled.length ? cancelled.map(buildOrderCard).join('') : '<p class="text-muted text-center mt-30">> NO CANCELLED ORDERS.</p>';
 
             attachOrderEvents();
+            updateAnalyticsPanel();
         } catch (err) { requestsContainer.innerHTML = '<p class="text-pink text-center mt-30">> ERROR: ACCESS DENIED OR SYSTEM FAILURE.</p>'; }
     }
 
@@ -285,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 categories.map(c => `<option value="${c}">${c}</option>`).join('');
             
             renderArmory();
+            updateAnalyticsPanel();
         } catch (err) {
             console.error("Database Fetch Failed:", err);
             armoryContainer.innerHTML = `<p class="text-pink text-center mt-30">> SYSTEM HALT: ${err.message}</p>`;
@@ -615,6 +632,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitForgeBtn.innerText = isEditing ? '[ SAVE CHANGES ]' : '[ CREATE PRODUCT ]';
                 submitForgeBtn.disabled = false;
             }
+        });
+    }
+
+    // ==========================================
+    // ANALYTICS ENGINE
+    // ==========================================
+    function updateAnalyticsPanel() {
+        if (!document.getElementById('analyticsView')) return;
+
+        // --- NEW: TIME FILTER LOGIC ---
+        const timeFilter = document.getElementById('revenueTimeFilter')?.value || 'LIFETIME';
+        const now = new Date();
+        let cutoffDate = new Date(0); // The beginning of time (Lifetime)
+
+        if (timeFilter === 'YEARLY') {
+            cutoffDate = new Date(now.getFullYear(), 0, 1); // Jan 1st of this year
+        } else if (timeFilter === 'QUARTERLY') {
+            const quarterMonth = Math.floor(now.getMonth() / 3) * 3;
+            cutoffDate = new Date(now.getFullYear(), quarterMonth, 1); // Start of current quarter
+        } else if (timeFilter === 'MONTHLY') {
+            cutoffDate = new Date(now.getFullYear(), now.getMonth(), 1); // 1st of this month
+        }
+
+        // Filter the revenue based ONLY on when the order was placed
+        const timeFilteredOrders = adminOrdersCache.filter(o => {
+            const placedAt = new Date(o.timeline.placedAt);
+            return placedAt >= cutoffDate;
+        });
+
+        // 1. REVENUE MATH (Applies the Time Filter)
+        const delivered = timeFilteredOrders.filter(o => o.status === 'DELIVERED');
+        const active = timeFilteredOrders.filter(o => ['PENDING', 'PREPARING', 'ON DELIVERY'].includes(o.status));
+        
+        const totalRev = delivered.reduce((sum, o) => sum + o.totalAmount, 0);
+        const projectedRev = active.reduce((sum, o) => sum + o.totalAmount, 0);
+        
+        document.getElementById('statRevenue').innerText = `₱${totalRev.toLocaleString()}`;
+        document.getElementById('statProjected').innerText = `₱${projectedRev.toLocaleString()}`;
+
+        // 2. ORDERS COUNT (Always shows Current Active workload)
+        const allDelivered = adminOrdersCache.filter(o => o.status === 'DELIVERED');
+        document.getElementById('statPending').innerText = adminOrdersCache.filter(o => o.status === 'PENDING').length;
+        document.getElementById('statPrepared').innerText = adminOrdersCache.filter(o => o.status === 'PREPARING').length;
+        document.getElementById('statTransit').innerText = adminOrdersCache.filter(o => o.status === 'ON DELIVERY').length;
+        document.getElementById('statDelivered').innerText = allDelivered.length;
+        document.getElementById('statCancelled').innerText = adminOrdersCache.filter(o => o.status === 'CANCELLED').length;
+
+        // 3. INVENTORY COUNT (Always shows Current Warehouse stock)
+        const activeProducts = armoryCache.filter(p => !p.isArchived);
+        document.getElementById('statTotalProducts').innerText = activeProducts.length;
+        document.getElementById('statHealthy').innerText = activeProducts.filter(p => p.avail_inventory > 5).length;
+        document.getElementById('statLow').innerText = activeProducts.filter(p => p.avail_inventory > 0 && p.avail_inventory <= 5).length;
+        document.getElementById('statOut').innerText = activeProducts.filter(p => p.avail_inventory === 0).length;
+    }
+
+    // Attach Event Listeners
+    const revenueTimeFilter = document.getElementById('revenueTimeFilter');
+    if (revenueTimeFilter) {
+        revenueTimeFilter.addEventListener('change', updateAnalyticsPanel);
+    }
+
+    if (refreshAnalyticsBtn) {
+        refreshAnalyticsBtn.addEventListener('click', () => {
+            refreshAnalyticsBtn.innerText = '[ REFRESHING... ]';
+            loadAdminOrders();
+            fetchArmoryData();
+            setTimeout(() => refreshAnalyticsBtn.innerText = '[ REFRESH DATA ]', 500);
         });
     }
 

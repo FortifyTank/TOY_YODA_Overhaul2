@@ -87,6 +87,11 @@ app.get('/checkout', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
 });
 
+// Route for the Dedicated Product Page
+app.get('/product', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'product.html'));
+});
+
 // Fetch the User's Order History
 app.get('/api/orders', async (req, res) => {
     try {
@@ -114,6 +119,19 @@ app.get('/api/products', async (req, res) => {
         res.json(products); 
     } catch (err) {
         res.status(500).json({ error: "Failed to load database" });
+    }
+});
+
+// Fetch a SINGLE product by its SKU for the View Details page
+app.get('/api/products/sku/:sku', async (req, res) => {
+    try {
+        // Find one toy that matches the SKU and is NOT archived
+        const product = await Product.findOne({ sku: req.params.sku, isArchived: { $ne: true } });
+        if (!product) return res.status(404).json({ error: "> CLASSIFIED: PRODUCT NOT FOUND." });
+        
+        res.json(product);
+    } catch (err) {
+        res.status(500).json({ error: "> SYSTEM FAILURE" });
     }
 });
 

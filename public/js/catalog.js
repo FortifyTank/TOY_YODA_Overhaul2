@@ -189,8 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // OPTIMIZED: No more inline styles on the wrapper or img!
             const cardHTML = `
-                <div class="product-card cyber-panel">
-                    <a href="#" class="product-link">
+                <article class="product-card cyber-panel panel-interactive panel-hover-bg-yellow">
+                    <a href="/product?sku=${product.sku}" class="product-link">
                         <div class="product-image-wrapper">
                             ${leftBadgeHTML + rightBadgesHTML}
                             <img src="${product.imageString}" alt="${product.name}" class="product-image">
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${product.inStock ? '[ ADD TO CART ]' : '[ OUT OF STOCK ]'}
                         </button>
                     </div>
-                </div>
+                </article> 
             `;
             container.innerHTML += cardHTML;
         });

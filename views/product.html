@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toy Yoda | View Product</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="crt-theme">
+    
+    <div class="top-command-bar">
+        <header class="global-header">
+            <div class="header-left">
+                <a href="/login" class="clearance header-btn">[ LOG IN ]</a>
+            </div>
+            <div class="header-logo">
+                <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
+            </div>
+            <div class="header-right">
+                <span class="cart-status header-btn">[ CART: 0 ]</span> 
+            </div>
+        </header>
+        <nav class="global-nav">
+            <div class="nav-status-light"></div> 
+            <a href="/products" class="nav-link">> RETURN TO CATALOG</a>
+        </nav>
+    </div>
+
+    <main class="product-view-layout mt-30">
+        
+        <div class="cyber-panel product-view-img-box panel-hover-glow">
+            <img src="/images/default-placeholder.png" id="prodImage" class="product-view-img" alt="Product Image">
+        </div>
+
+        <div class="product-view-details" style="height: 100%;">
+            <div>
+                <div class="border-dashed-dim pb-10">
+                    <h2 class="text-cyan text-lg" id="prodCategory">> LOADING CATEGORY...</h2>
+                    <h1 class="text-white text-xxl mt-5" id="prodName">DECRYPTING DATA...</h1>
+                    <p class="text-muted mt-5" id="prodSku">SKU: ---</p>
+                </div>
+
+                <div class="price-container mt-15 mb-15">
+                    <span class="text-amber font-bold text-xxl" id="prodPrice">₱0</span>
+                    <span class="old-price-strike text-lg ml-10 hidden-content" id="prodOldPrice">₱0</span>
+                </div>
+
+                <div class="cyber-panel p-20 mb-20 desc-scrollbox tac-scroll">
+                    <p class="product-view-desc" id="prodDesc">Awaiting description payload...</p>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <div class="flex-between align-end mb-15">
+                    <div class="text-muted">AVAILABLE STOCK: <span id="prodStock" class="text-white font-bold">0</span></div>
+                    
+                    <div class="customer-qty-wrapper">
+                        <button class="qty-adjust-btn" id="btnSubQty">-</button>
+                        <div class="qty-display-box">
+                            <span class="text-muted text-sm mb-2">QTY</span>
+                            <span class="text-lg font-bold text-white line-height-1" id="displayQty">1</span>
+                        </div>
+                        <button class="qty-adjust-btn" id="btnAddQty">+</button>
+                    </div>
+                </div>
+
+                <button class="tac-btn tac-btn--xl tac-btn--full mt-20" id="addToCartBtn">[ ADD TO CART ]</button>
+            </div>
+        </div>
+
+    </main>
+
+    <section class="dashboard-container mt-30">
+        <h3 class="section-title">> CUSTOMER REVIEWS</h3>
+        <div class="cyber-panel p-30 text-center text-muted">
+            <p>> REVIEWS AND FORUM INTEGRATION PENDING NEXT UPDATE...</p>
+        </div>
+    </section>
+
+    <section class="dashboard-container mt-30">
+        <h3 class="section-title">> RELATED PRODUCTS</h3>
+        <div class="product-grid" id="relatedProductsContainer">
+            <p class="text-muted">> SCANNING DATABASE...</p>
+        </div>
+    </section>
+
+    <div id="cartOverlay" class="cart-overlay"></div>
+    <div id="cartDrawer" class="cart-drawer cyber-panel">
+        <div class="cart-header">
+            <h3>// YOUR CART</h3>
+            <button id="closeCartBtn" class="close-btn ghost-btn">[ X ]</button>
+        </div>
+        <div id="cartItemsContainer" class="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>TOTAL ESTIMATE:</span>
+                <span id="cartTotalDisplay" class="text-amber">₱0</span>
+            </div>
+            <button id="proceedCheckoutBtn" class="tac-btn tac-btn--full tac-btn--lg">[ PROCEED TO CHECKOUT ]</button>
+            <button id="clearCartBtn" class="tac-btn tac-btn--full tac-btn--ghost mt-10">[ CLEAR CART ]</button>
+        </div>
+    </div>
+
+    <div id="systemAlert" class="system-alert-box">
+        <div class="alert-icon">[!]</div>
+        <div class="alert-message" id="systemAlertMessage">> SYSTEM WARNING</div>
+        <button class="tac-btn" id="systemAlertOkBtn">[ ACKNOWLEDGE ]</button>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/cart.js"></script>
+    <script src="/js/product.js"></script>
+</body>
+</html>

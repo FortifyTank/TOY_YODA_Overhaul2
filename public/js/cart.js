@@ -108,25 +108,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. CART DATA OPERATIONS (Global Window Functions)
     // ==========================================
     
-    window.addToCart = function(product) {
+    window.addToCart = function(product, qtyToAdd = 1) {
         const existingItem = cart.find(item => item.sku === product.sku);
         
         if (existingItem) {
-            if (existingItem.quantity < product.avail_inventory) {
-                existingItem.quantity += 1;
+            // Check if adding this amount goes over the max stock
+            if (existingItem.quantity + qtyToAdd <= product.avail_inventory) {
+                existingItem.quantity += qtyToAdd;
             } else {
-                // UX UPDATE: Clearer, friendlier terminology
                 showSystemAlert(`> NOT ENOUGH STOCK: ONLY ${product.avail_inventory} AVAILABLE.`);
                 return; 
             }
         } else {
+            // New item check
+            if (qtyToAdd > product.avail_inventory) {
+                showSystemAlert(`> NOT ENOUGH STOCK: ONLY ${product.avail_inventory} AVAILABLE.`);
+                return;
+            }
             cart.push({
-                _id: product._id, // <-- THE FIX: Now saving the Database ID!
+                _id: product._id, 
                 sku: product.sku,
                 name: product.name,
                 price: product.price,
                 image: product.imageString,
-                quantity: 1,
+                quantity: qtyToAdd, // Uses the custom amount!
                 maxStock: product.avail_inventory
             });
         }

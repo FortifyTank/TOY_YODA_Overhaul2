@@ -38,6 +38,7 @@
                 <div class="tactical-tabs border-none p-0">
                     <button class="tab-btn active" id="tabLogistics">[ MANAGE ORDERS ]</button>
                     <button class="tab-btn" id="tabArmory">[ MANAGE PRODUCTS ]</button>
+                    <button class="tab-btn" id="tabAnalytics">[ MANAGE ANALYTICS ]</button> 
                 </div>
             </div>
 
@@ -89,6 +90,60 @@
                     <p class="text-muted text-center mt-30">> SCANNING DATABASE...</p>
                 </div>
             </div>
+
+            <div id="analyticsView" class="hidden-content">
+                
+                <div class="flex-between mb-20 pb-10 border-dashed-dim">
+                    <h3 class="text-lg text-white">> SUMMARY</h3>
+                    <button class="tac-btn tac-btn--ghost text-sm btn-lime-invert" id="refreshAnalyticsBtn">[ REFRESH DATA ]</button>
+                </div>
+
+                <div class="grid-auto-fit">
+                    
+                    <div class="cyber-panel p-30">
+                        <div class="flex-between mb-15 border-dashed-dim pb-10">
+                            <h4 class="text-white">// FINANCIAL OVERVIEW</h4>
+                            <select id="revenueTimeFilter" class="tactical-dropdown select-sm">
+                                <option value="LIFETIME">LIFETIME</option>
+                                <option value="YEARLY">THIS YEAR</option>
+                                <option value="QUARTERLY">THIS QUARTER</option>
+                                <option value="MONTHLY">THIS MONTH</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-15">
+                            <span class="text-muted">> TOTAL REVENUE (DELIVERED):</span>
+                            <div class="text-green font-bold mt-5 text-xxl glow-green" id="statRevenue">₱0</div>
+                        </div>
+                        <div class="mt-20 pt-15 border-top-dashed">
+                            <span class="text-muted">> PROJECTED (IN PROGRESS):</span>
+                            <div class="text-amber text-lg font-bold mt-5" id="statProjected">₱0</div>
+                        </div>
+                    </div>
+
+                    <div class="cyber-panel p-30">
+                        <h4 class="text-orange mb-15 border-dashed-dim pb-10">// ORDERS</h4>
+                        <div class="flex-between mb-12 text-lg"><span class="text-muted">> REQUESTS:</span> <span class="text-cyan font-bold" id="statPending">0</span></div>
+                        <div class="flex-between mb-12 text-lg"><span class="text-muted">> PREPARED:</span> <span class="text-orange font-bold" id="statPrepared">0</span></div>
+                        <div class="flex-between mb-12 text-lg"><span class="text-muted">> IN TRANSIT:</span> <span class="text-lime font-bold" id="statTransit">0</span></div>
+                        <div class="flex-between mb-12 text-lg border-dashed-dim pb-12"><span class="text-muted">> DELIVERED:</span> <span class="text-green font-bold" id="statDelivered">0</span></div>
+                        <div class="flex-between mt-12 text-lg"><span class="text-muted">> CANCELLED:</span> <span class="text-red font-bold" id="statCancelled">0</span></div>
+                    </div>
+
+                    <div class="cyber-panel p-30">
+                        <h4 class="text-pink mb-15 border-dashed-dim pb-10">// INVENTORY</h4>
+                        <div class="flex-between mb-12 text-lg"><span class="text-muted">> TOTAL ACTIVE PRODUCTS:</span> <span class="text-white font-bold" id="statTotalProducts">0</span></div>
+                        <div class="flex-between mb-12 text-lg"><span class="text-muted">> DECENT STOCK (>5):</span> <span class="text-cyan font-bold" id="statHealthy">0</span></div>
+                        <div class="flex-between mb-12 text-lg"><span class="text-muted">> LOW STOCK (1-5):</span> <span class="text-orange font-bold" id="statLow">0</span></div>
+                        <div class="flex-between mt-12 pt-12 text-lg border-top-dashed">
+                            <span class="text-muted">> OUT OF STOCK:</span> <span class="text-red font-bold" id="statOut">0</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            
         </div>
     </main>
 
@@ -108,7 +163,7 @@
     <div id="forgeOverlay" class="forge-overlay"></div>
     <div id="forgeDrawer" class="forge-drawer cyber-panel">
         <div class="forge-header flex-between">
-            <h3 class="text-orange text-lg" id="forgeTitle" style="color: var(--term-orange); text-shadow: 0 0 10px rgba(229,168,35,0.4);">// NEW PRODUCT</h3>
+            <h3 class="forge-title" id="forgeTitle">// NEW PRODUCT</h3>
             <button class="ghost-btn close-modal-btn btn-orange-invert" id="closeForgeBtn">[ X ]</button>
         </div>
         
@@ -144,7 +199,7 @@
             </div>
             <div class="forge-group">
                 <label class="forge-label">> UPLOAD PRODUCT IMAGE</label>
-                <input type="file" id="forgeImageFile" class="tac-input forge-input" accept="image/*" style="padding: 10px;">
+                <input type="file" id="forgeImageFile" class="tac-input forge-input" accept="image/*">
                 <input type="hidden" id="forgeExistingImage">
                 <div class="text-sm text-cyan mt-5" id="currentImageDisplay"></div>
             </div>
