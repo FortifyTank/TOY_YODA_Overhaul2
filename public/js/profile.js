@@ -42,34 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalOverlay = document.getElementById('orderModalOverlay');
     const modalContent = document.getElementById('modalContent');
 
-    let alertTimer;
-    
-    // Custom Profile Alert Engine
-    function showProfileAlert(message, type = 'error') {
-        const sysAlert = document.getElementById('systemAlert');
-        const sysMsg = document.getElementById('systemAlertMessage');
-        const sysIcon = document.querySelector('.alert-icon');
-        if (!sysAlert) return alert(message); // Fallback
-
-        sysMsg.innerText = message; 
-        
-        if (type === 'success') {
-            sysAlert.classList.add('alert-success');
-            sysIcon.innerText = '[✓]';
-        } else {
-            sysAlert.classList.remove('alert-success');
-            sysIcon.innerText = '[!]';
-        }
-
-        sysAlert.classList.add('active');
-        clearTimeout(alertTimer);
-        alertTimer = setTimeout(() => sysAlert.classList.remove('active'), 5000);
-    }
-
-    document.getElementById('systemAlertOkBtn')?.addEventListener('click', () => {
-        document.getElementById('systemAlert').classList.remove('active');
-    });
-
     // ==========================================
     // 3. CORE DATA LOADERS (API FETCHES)
     // ==========================================
@@ -421,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!editingAddressId && window.userAddressesCache) {
                 const isDuplicate = window.userAddressesCache.some(addr => addr.label.toUpperCase() === newLabel);
                 if (isDuplicate) {
-                    showProfileAlert("> ERROR: DEPLOYMENT LABEL ALREADY EXISTS. CHOOSE A UNIQUE NAME.");
+                    showSystemAlert("> ERROR: DEPLOYMENT LABEL ALREADY EXISTS. CHOOSE A UNIQUE NAME.");
                     return; // Kills the function so it doesn't save!
                 }
             }
@@ -437,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // THE NEW VALIDATION CHECK
             if (!addressData.label || !addressData.addressLine || !addressData.barangay || !addressData.city || !addressData.province || !addressData.zipCode) {
-                showProfileAlert("> ERROR: ALL LOCATION PARAMETERS MUST BE COMPLETED.");
+                showSystemAlert("> ERROR: ALL LOCATION PARAMETERS MUST BE COMPLETED.");
                 return; // Stops the form from saving!
             }
 
@@ -457,24 +429,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    saveBtn.innerText = '[ SAVED SECURELY ]';
-                    saveBtn.style.color = 'var(--term-green)';
-                    window.userAddressesCache = data.user.addresses; // Update cache
+                    showSystemAlert("> SHIPPING ADDRESS SECURED.", "success");
+                    window.userAddressesCache = data.user.addresses; 
                     renderAddressCards(data.user.addresses);
-
-                    setTimeout(() => {
-                        saveBtn.innerText = '[ SAVE LOGISTICS ]';
-                        saveBtn.style.color = '';
-                        logisticsForm.reset(); 
-                        toggleAddressForm(); 
-                    }, 1000);
+    
+                    // Reset instantly without a timer!
+                    saveBtn.innerText = '[ SAVE ADDRESS ]';
+                    logisticsForm.reset(); 
+                    toggleAddressForm(); 
                 } else {
-                    showProfileAlert("> ERROR: COULD NOT SECURE LOGISTICS DATA.");
-                    saveBtn.innerText = '[ SAVE LOGISTICS ]';
+                    showSystemAlert("> ERROR: COULD NOT SECURE ADDRESS DATA.");
+                    saveBtn.innerText = '[ SAVE ADDRESS ]';
                 }
             } catch (err) {
-                showProfileAlert("> FATAL ERROR: CONNECTION LOST.");
-                saveBtn.innerText = '[ SAVE LOGISTICS ]';
+                showSystemAlert("> FATAL ERROR: CONNECTION LOST.");
+                saveBtn.innerText = '[ SAVE ADDRESS ]';
             }
         });
     }
@@ -498,16 +467,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    savePhoneBtn.innerText = '[ SECURED ]';
-                    savePhoneBtn.style.color = 'var(--term-green)';
+                    showSystemAlert("> PHONE NUMBER SECURED.", "success");
                     document.getElementById('profilePhone').innerText = newPhone.toUpperCase();
-                    
-                    setTimeout(() => {
-                        savePhoneBtn.innerText = '[ SAVE NUMBER ]';
-                        savePhoneBtn.style.color = '';
-                        newPhoneInput.value = ''; 
-                        document.getElementById('togglePhoneBtn').click(); 
-                    }, 1500);
+    
+                    // Reset instantly without a timer!
+                    savePhoneBtn.innerText = '[ SAVE NUMBER ]';
+                    newPhoneInput.value = ''; 
+                    document.getElementById('togglePhoneBtn').click(); 
                 }
             } catch (err) {
                 savePhoneBtn.innerText = '[ ERROR ]';
@@ -533,14 +499,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    showProfileAlert("> SECURITY: PASSWORD UPDATED SUCCESSFULLY.", "success");
+                    showSystemAlert("> SECURITY: PASSWORD UPDATED SUCCESSFULLY.", "success");
                     oldPassInput.value = '';
                     newPassInput.value = '';
                 } else {
-                    showProfileAlert("> ERROR: AUTHENTICATION FAILED. INCORRECT CURRENT PASSWORD.");
+                    showSystemAlert("> ERROR: AUTHENTICATION FAILED. INCORRECT CURRENT PASSWORD.");
                 }
             } catch (err) {
-                showProfileAlert("> FATAL ERROR: CONNECTION LOST.");
+                showSystemAlert("> FATAL ERROR: CONNECTION LOST.");
             } finally {
                 // This ensures the button ALWAYS resets, even if it fails!
                 savePassBtn.innerText = '[ UPDATE PASSWORD ]';

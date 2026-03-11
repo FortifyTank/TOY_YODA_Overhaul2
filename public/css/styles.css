@@ -129,8 +129,11 @@ h1, h2, h3, h4, h5, h6,
 .text-green { color: var(--term-green) !important; }
 .text-red { color: var(--term-red) !important; }
 .text-muted { color: var(--term-muted) !important; }
-.text-regular { color: var(--term-text); font-size: 1rem; }
 .text-white { color: var(--term-text) !important; }
+.text-amber { color: var(--amber-accent) !important; }
+.text-lime { color: var(--term-lime) !important; }
+.text-orange { color: var(--term-orange) !important; }
+.text-regular { color: var(--term-text); font-size: 1rem; }
 
 /* Text Alignment & Size */
 .text-center { text-align: center; }

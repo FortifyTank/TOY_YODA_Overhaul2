@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. STATE & DOM ELEMENTS
     // ==========================================
     let cart = JSON.parse(localStorage.getItem('toy_yoda_cart')) || [];
-    let alertTimer;
     
     const cartStatusElements = document.querySelectorAll('.cart-status');
     const cartOverlay = document.getElementById('cartOverlay');
@@ -22,18 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 2. UI & ALERT UTILITIES
     // ==========================================
-    
-    // Displays user-friendly popup warnings
-    function showSystemAlert(message) {
-        if (!systemAlert) return;
-        systemAlertMessage.innerText = message;
-        systemAlert.classList.add('active'); 
-
-        clearTimeout(alertTimer);
-        alertTimer = setTimeout(() => {
-            systemAlert.classList.remove('active');
-        }, 7000); 
-    }
 
     // Flashes the cart button and triggers a drawer redraw
     function updateCartUI(animate = false) {
@@ -198,13 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeCartBtn) closeCartBtn.addEventListener('click', closeCart);
     if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
     if (clearCartBtn) clearCartBtn.addEventListener('click', clearCart);
-
-    if (systemAlertOkBtn) {
-        systemAlertOkBtn.addEventListener('click', () => {
-            systemAlert.classList.remove('active'); 
-            clearTimeout(alertTimer); 
-        });
-    }
 
     if (proceedCheckoutBtn) {
         proceedCheckoutBtn.addEventListener('click', () => {

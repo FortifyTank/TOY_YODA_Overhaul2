@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let adminOrdersCache = [];
     let armoryCache = [];
     let isArchiveMode = false; 
-    let alertTimer;
 
     // --- TAB SWITCHERS ---
     mainTabs.forEach(tab => {
@@ -246,6 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await fetch(`/api/admin/orders/${order._id}/status`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: newStatus })
                 });
+                showSystemAlert("> ORDER STATUS UPDATED.", "success");
                 modalOverlay.classList.remove('active'); loadAdminOrders();
             });
         }
@@ -282,9 +282,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.shiftKey) { 
                 refreshBtn.innerText = '[ SPAWNING DATA... ]';
                 await fetch('/api/admin/spawn-test', { method: 'POST' });
-                refreshBtn.innerText = '[ REFRESH DATA ]';
+            } else {
+                refreshBtn.innerText = '[ REFRESHING... ]';
             }
-            loadAdminOrders();
+            await loadAdminOrders();
+            refreshBtn.innerText = '[ REFRESH DATA ]'; // Resets exactly when done!
         });
     }
     
@@ -415,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     await fetch(`/api/admin/products/${productId}/archive`, { method: 'POST' });
                     fetchArmoryData(); 
-                } catch (err) { showAdminAlert("> ERROR MODIFYING ARCHIVE STATE"); }
+                } catch (err) { showSystemAlert("> ERROR MODIFYING ARCHIVE STATE"); }
             });
         });
 
@@ -462,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const inputVal = document.getElementById(`stock-input-${id}`).value;
                 const qty = parseInt(inputVal);
                 
-                if (isNaN(qty) || qty <= 0) return showAdminAlert("> INVALID QUANTITY.");
+                if (isNaN(qty) || qty <= 0) return showSystemAlert("> INVALID QUANTITY.");
                 
                 const adjustment = mode === 'add' ? qty : -Math.abs(qty); 
                 btn.innerText = '[ ... ]';
@@ -480,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const id = btn.getAttribute('data-id');
                     const product = armoryCache.find(p => p._id === id);
-                    if (!product) return showAdminAlert("> ERROR: PRODUCT NOT FOUND IN CACHE");
+                    if (!product) return showSystemAlert("> ERROR: PRODUCT NOT FOUND IN CACHE");
 
                     document.getElementById('forgeTitle').innerText = '// EDIT PRODUCT';
                     document.getElementById('forgeId').value = product._id;
@@ -506,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     forgeOverlay.classList.add('active');
                     forgeDrawer.classList.add('active');
                 } catch(err) {
-                    showAdminAlert("> UI ERROR: " + err.message);
+                    showSystemAlert("> UI ERROR: " + err.message);
                 }
             });
         });
@@ -515,7 +517,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (armorySearch) armorySearch.addEventListener('input', renderArmory);
     if (armoryCategoryFilter) armoryCategoryFilter.addEventListener('change', renderArmory);
     if (armorySort) armorySort.addEventListener('change', renderArmory);
-    if (refreshArmoryBtn) refreshArmoryBtn.addEventListener('click', fetchArmoryData);
+    if (refreshArmoryBtn) {
+        refreshArmoryBtn.addEventListener('click', async () => {
+            refreshArmoryBtn.innerText = '[ REFRESHING... ]';
+            await fetchArmoryData();
+            refreshArmoryBtn.innerText = '[ REFRESH DATA ]';
+        });
+    }
     
     if (toggleArchiveModeBtn) {
         toggleArchiveModeBtn.addEventListener('click', () => {
@@ -553,7 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 forgeOverlay.classList.add('active');
                 forgeDrawer.classList.add('active');
             } catch(err) {
-                showAdminAlert("> UI ERROR: " + err.message);
+                showSystemAlert("> UI ERROR: " + err.message);
             }
         });
     }
@@ -578,10 +586,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const oldPrice = Number(document.getElementById('forgeOldPrice').value);
 
             if (!name || !sku || !category || !price) {
-                return showAdminAlert("> ERROR: MISSING CRITICAL DATA FIELDS.");
+                return showSystemAlert("> ERROR: MISSING CRITICAL DATA FIELDS.");
             }
             if (oldPrice > 0 && oldPrice <= price) {
-                return showAdminAlert("> ERROR: OLD PRICE MUST BE GREATER THAN CURRENT PRICE.");
+                return showSystemAlert("> ERROR: OLD PRICE MUST BE GREATER THAN CURRENT PRICE.");
             }
 
             submitForgeBtn.innerText = '[ TRANSMITTING... ]';
@@ -615,20 +623,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const url = isEditing ? `/api/admin/products/${id}/edit` : '/api/admin/products';
                 
-                // CRITICAL: When sending FormData, you DO NOT set the 'Content-Type' header. 
-                // The browser will automatically set it to 'multipart/form-data' with the correct boundary!
                 const res = await fetch(url, {
                     method: 'POST', 
                     body: formData
                 });
-                
+    
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'System Error');
 
+                showSystemAlert(isEditing ? "> PRODUCT UPDATED." : "> NEW PRODUCT FORGED.", "success");
+    
                 closeForge();
-                fetchArmoryData(); 
+                fetchArmoryData();
             } catch (err) {
-                showAdminAlert("> " + err.message.toUpperCase());
+                showSystemAlert("> " + err.message.toUpperCase());
             } finally {
                 submitForgeBtn.innerText = isEditing ? '[ SAVE CHANGES ]' : '[ CREATE PRODUCT ]';
                 submitForgeBtn.disabled = false;
@@ -695,39 +703,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (refreshAnalyticsBtn) {
-        refreshAnalyticsBtn.addEventListener('click', () => {
+        refreshAnalyticsBtn.addEventListener('click', async () => {
             refreshAnalyticsBtn.innerText = '[ REFRESHING... ]';
-            loadAdminOrders();
-            fetchArmoryData();
-            setTimeout(() => refreshAnalyticsBtn.innerText = '[ REFRESH DATA ]', 500);
+            await loadAdminOrders();
+            await fetchArmoryData();
+            refreshAnalyticsBtn.innerText = '[ REFRESH DATA ]';
         });
     }
-
-    // Popup function
-    function showAdminAlert(message, type = 'error') {
-        const sysAlert = document.getElementById('systemAlert');
-        const sysMsg = document.getElementById('systemAlertMessage');
-        const sysIcon = document.querySelector('.alert-icon');
-        if (!sysAlert) return alert(message); // Fallback
-
-        sysMsg.innerText = message; 
-        
-        if (type === 'success') {
-            sysAlert.classList.add('alert-success');
-            sysIcon.innerText = '[✓]';
-        } else {
-            sysAlert.classList.remove('alert-success');
-            sysIcon.innerText = '[!]';
-        }
-
-        sysAlert.classList.add('active');
-        clearTimeout(alertTimer);
-        alertTimer = setTimeout(() => sysAlert.classList.remove('active'), 5000);
-    }
-
-    document.getElementById('systemAlertOkBtn')?.addEventListener('click', () => {
-        document.getElementById('systemAlert').classList.remove('active');
-    });
 
     async function secureAdminBoot() {
         try {
