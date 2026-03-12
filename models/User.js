@@ -6,10 +6,9 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true }, 
     role: { type: String, default: 'customer' }, 
     
-    // Logistics
     phone: { type: String, default: 'UNREGISTERED' }, 
     
-    // CHANGED: Now an Array of objects so users can have multiple addresses!
+    // now an array of objects so users can have multiple addresses
     addresses: [{
         label: { type: String, default: 'HOME' }, 
         addressLine: { type: String, default: '' },
@@ -18,7 +17,7 @@ const userSchema = new mongoose.Schema({
         province: { type: String, default: '' },
         zipCode: { type: String, default: '' },
         country: { type: String, default: 'Philippines' },
-        isEquipped: { type: Boolean, default: false } // Tracks the active loadout
+        isEquipped: { type: Boolean, default: false } // tracks active loadout
     }],
     
     isArchived: { type: Boolean, default: false },

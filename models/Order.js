@@ -40,7 +40,7 @@ const orderSchema = new mongoose.Schema({
 
     paymongoReference: { type: String },
 
-    // ADDED: The Granular Tactical Timeline
+    // timeline of order status changes
     timeline: {
         placedAt: { type: Date, default: Date.now },
         preparingAt: { type: Date },

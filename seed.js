@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const Product = require('./models/Product');
 
-// The Unbreakable Classic String
+// The Unbreakable Classic String If You Alter This Earth Will Be Consumed By Unicron
 const dbURI = "mongodb://playofgamer10_db_user:CHbeLY5tbk1CPx6q@ac-ir6m09r-shard-00-00.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-01.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-02.5npf8nj.mongodb.net:27017/?ssl=true&authSource=admin&retryWrites=true&w=majority";
 
 const seedProducts = [
-    // --- PRE-ARCHIVED TEST ITEM ---
+    // --- test item ---
     { sku: "TEST-000", name: "DEFECTIVE PROTOTYPE", description: "Recalled due to laser malfunction.", price: 9999, old_price: 0, avail_inventory: 0, category: "CLASSIFIED", tags: ["recalled"], imageString: "/images/default-placeholder.png", isArchived: true },
     
     // --- STAR WARS ---
@@ -22,7 +22,7 @@ const seedProducts = [
     { sku: "MG-004", name: "METAL GEAR RAY KIT", description: "Amphibious anti-Metal Gear weapon.", price: 5500, old_price: 6000, avail_inventory: 1, category: "METAL GEAR", tags: ["mecha", "marines", "kojima"], imageString: "/images/products/MG-001.jpg" },
     { sku: "MG-005", name: "CARDBOARD BOX PROP", description: "Authentic sneaking cardboard box.", price: 500, old_price: 1000, avail_inventory: 0, category: "METAL GEAR", tags: ["stealth", "joke", "prop", "box"], imageString: "/images/products/MG-001.jpg" }, // 50% OFF Deep Discount Test
 
-    // --- POKÉMON ---
+    // --- POKEMON ---
     { sku: "PK-001", name: "CHARIZARD VMAX ETB", description: "Sealed ETB containing 10 packs.", price: 2800, old_price: 0, avail_inventory: 0, category: "POKÉMON", tags: ["tcg", "cards", "charizard"], imageString: "/images/products/PK-001.jpg" },
     { sku: "PK-002", name: "151 BOOSTER BOX (JAPANESE)", description: "Sealed booster box.", price: 8500, old_price: 9500, avail_inventory: 8, category: "POKÉMON", tags: ["tcg", "cards", "sealed", "import"], imageString: "/images/products/PK-001.jpg" },
     { sku: "PK-003", name: "LIFE-SIZE PIKACHU PLUSH", description: "1:1 Scale officially licensed plush.", price: 3500, old_price: 0, avail_inventory: 4, category: "POKÉMON", tags: ["plush", "pikachu", "soft"], imageString: "/images/products/PK-001.jpg" },

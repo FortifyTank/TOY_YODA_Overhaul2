@@ -1,21 +1,21 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');           // NEW: Password scrambler
-const session = require('express-session'); // NEW: Digital wristband for logged-in users
-const multer = require('multer');           // NEW: File uploading engine
-const fs = require('fs');                   // Node's built-in file system module
+const bcrypt = require('bcrypt');
+const session = require('express-session');
+const multer = require('multer');
+const fs = require('fs');
 
-// --- MULTER STORAGE ENGINE ---
+// multer storage engine 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const dir = './public/images/products';
-        // Automatically create the folder if it doesn't exist
+        // creates folder if it doesnt exist 
         if (!fs.existsSync(dir)){ fs.mkdirSync(dir, { recursive: true }); }
         cb(null, dir);
     },
     filename: function (req, file, cb) {
-        // Renames the file to "SKU-Timestamp.extension" to prevent overwriting
+        // renames file to "SKU-Timestamp.extension" so it doesnt overwrite
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const ext = path.extname(file.originalname);
         cb(null, req.body.sku + '-' + uniqueSuffix + ext); 
@@ -23,84 +23,83 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Import your Database Models
+// import DB models
 const Product = require('./models/Product');
 const User = require('./models/User');
 const Order = require('./models/Order');
 
-// Initialize the Express application
+// initializes express 
 const app = express();
 const PORT = 3000;
 
-// --- DATABASE CONNECTION ---
+// database connection
 const dbURI = "mongodb://playofgamer10_db_user:CHbeLY5tbk1CPx6q@ac-ir6m09r-shard-00-00.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-01.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-02.5npf8nj.mongodb.net:27017/?ssl=true&authSource=admin&retryWrites=true&w=majority";
 
 mongoose.connect(dbURI, { dbName: "toy_yoda" })
     .then(() => console.log(`> DATABASE: MONGODB SECURED AND CONNECTED`))
     .catch((err) => console.log(`> DATABASE ERROR: CONNECTION FAILED`, err));
-// ---------------------------
 
-// --- MIDDLEWARE ---
+// middleware
 app.use(express.static(path.join(__dirname, 'public')));
 
-// NEW: Tells Express how to read data sent from your frontend forms
+// tells express how to read data sent from frontend forms
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// NEW: Configures the Session (The "Logged In" state)
+// configures session (logged in state)
 app.use(session({
-    secret: 'tactical_toy_yoda_key_99', // A secret key to encrypt cookies
+    secret: 'tactical_toy_yoda_key_99', // secret key to encrypt cookies
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to false for localhost, true if using HTTPS
+    cookie: { secure: false } // set to false for localhost, true if using HTTPS
 }));
 
-// --- ROUTES (The Controller Logic will go here eventually) ---
+// == IMPORTANT routes ==
 
-// 1. Root Route: Now serves the Dashboard (home.html) as the landing page
+// route for dashboard 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'home.html'));
 });
 
-// 2. Login Route: Dedicated path for the Checkpoint (index.html)
+// route for logging in
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-// 3. Keep the /home alias so your existing navigation links don't break
-app.get('/home', (req, res) => {
+// route for home when the user has logged in
+app.get('/home', (req, res) => { 
     res.sendFile(path.join(__dirname, 'views', 'home.html'));
 });
 
-// Route for the Catalog (products.html)
+// route for product catalogue
 app.get('/products', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'products.html'));
 });
 
-// Route for the Profile
+// route for user profile
 app.get('/profile', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'profile.html'));
 });
 
-// Route for the Checkout Page
+//route for checkout page
 app.get('/checkout', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
 });
 
-// Route for the Dedicated Product Page
+// route for dedicated product page
 app.get('/product', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'product.html'));
 });
 
-// Fetch the User's Order History
+// fetches user's order history for profile page
 app.get('/api/orders', async (req, res) => {
     try {
         if (!req.session.userId) return res.status(401).json({ error: "> UNAUTHORIZED" });
 
-        // Fetch all orders belonging to this user, sorted by newest first
+        // fetches all orders belonging to current user sorted by newest first
         const orders = await Order.find({ user: req.session.userId })
             .sort({ createdAt: -1 })
-            .populate('items.product', 'imageString'); // Grabs the image from the Product database!
+            .populate('items.product', 'imageString'); // grabs image from product database!
 
         res.json(orders);
     } catch (err) {
@@ -109,12 +108,12 @@ app.get('/api/orders', async (req, res) => {
     }
 });
 
-// --- DATA API ROUTES ---
+// == data API ==
 
-// Get all active products from the database (Hides Archived)
+// gets all products that are not archived for catalog page
 app.get('/api/products', async (req, res) => {
     try {
-        // ONLY fetch toys where isArchived is false or doesn't exist
+        // ONLY fetch toys where isArchived is false or doesnt exist
         const products = await Product.find({ isArchived: { $ne: true } }); 
         res.json(products); 
     } catch (err) {
@@ -122,10 +121,10 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// Fetch a SINGLE product by its SKU for the View Details page
+// fetches a single product by its SKU for the View Details page
 app.get('/api/products/sku/:sku', async (req, res) => {
     try {
-        // Find one toy that matches the SKU and is NOT archived
+        // finds one toy that matches the SKU and is NOT archived
         const product = await Product.findOne({ sku: req.params.sku, isArchived: { $ne: true } });
         if (!product) return res.status(404).json({ error: "> CLASSIFIED: PRODUCT NOT FOUND." });
         
@@ -135,9 +134,9 @@ app.get('/api/products/sku/:sku', async (req, res) => {
     }
 });
 
-// --- AUTHENTICATION ROUTES ---
+// -== authentication == 
 
-// 1. REGISTRATION ROUTE
+// registration
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -157,8 +156,6 @@ app.post('/api/register', async (req, res) => {
         });
         await newUser.save();
 
-        // FIX: Removed the auto-login session assignment here.
-        // Tell the frontend it was successful so it can show the popup.
         res.status(201).json({ message: "> REGISTRATION SUCCESSFUL. PLEASE LOG IN." });
 
     } catch (error) {
@@ -167,29 +164,29 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// 2. LOGIN ROUTE (NEW)
+// logging in
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find the user by email, ENSURING they are not archived/deleted
+        // finds user by email address ensurinbg they are not archived/deleted
         const user = await User.findOne({ email: email, isArchived: { $ne: true } });
         if (!user) {
             return res.status(400).json({ error: "> ERROR: ACCOUNT NOT FOUND OR DEACTIVATED" });
         }
 
-        // Compare the typed password with the hashed password in the database
+        // compares typed password with the hashed password in the database
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ error: "> ERROR: INVALID CREDENTIALS" });
         }
 
-        // Give the user their session "wristband"
+        // gives session wristband to user
         req.session.userId = user._id;
         req.session.username = user.username;
         req.session.role = user.role;
 
-        // Send the warp signal to the frontend!
+        // sends warp signal to frontend
         res.json({ message: "Login successful", redirect: "/home?warp=true" });
 
     } catch (err) {
@@ -198,9 +195,9 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// 3. AUTHENTICATION STATUS ROUTE (NEW)
+// authetication status 
 app.get('/api/auth/status', (req, res) => {
-    // If they have a digital wristband (session)...
+    // checks if user has digital wristband
     if (req.session && req.session.userId) {
         res.json({ 
             loggedIn: true, 
@@ -208,32 +205,31 @@ app.get('/api/auth/status', (req, res) => {
             role: req.session.role 
         });
     } else {
-        // If they don't...
         res.json({ loggedIn: false });
     }
 });
 
-// 4. LOGOUT ROUTE (NEW)
+// logging out
 app.post('/api/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             return res.status(500).json({ error: "Failed to logout" });
         }
-        res.clearCookie('connect.sid'); // Wipes the cookie from the browser
+        res.clearCookie('connect.sid'); // wipes cookie from browser
         res.json({ message: "Logout successful" });
     });
 });
 
-// --- PROFILE DATA ROUTES ---
+//  == profile data ==
 
-// Fetch the user's full dossier
+// fetches user's dossier data to populate profile page (except password ofc)
 app.get('/api/profile', async (req, res) => {
     try {
         if (!req.session.userId) {
             return res.status(401).json({ error: "> UNAUTHORIZED ACCESS" });
         }
         
-        // Find the user by ID, and explicitly exclude their password from the payload
+        // finds user by ID and explicitly excludes their password from the payload
         const user = await User.findById(req.session.userId).select('-password'); 
         
         if (!user) return res.status(404).json({ error: "> CITIZEN NOT FOUND" });
@@ -245,7 +241,7 @@ app.get('/api/profile', async (req, res) => {
     }
 });
 
-// 2. Update User Data (Phone, Addresses, Equipping, Deleting, Editing)
+// updating user data (phone, address, etc.)
 app.post('/api/profile/update', async (req, res) => {
     try {
         if (!req.session.userId) return res.status(401).json({ error: "> UNAUTHORIZED ACCESS" });
@@ -255,34 +251,34 @@ app.post('/api/profile/update', async (req, res) => {
         const user = await User.findById(req.session.userId);
         if (!user) return res.status(404).json({ error: "> CITIZEN NOT FOUND" });
 
-        // A. Update Phone
+        // update mobile no. 
         if (phone) user.phone = phone;
 
-        // B. Add New Address
+        // add new address 
         if (newAddress) {
             newAddress.isEquipped = user.addresses.length === 0; // Auto-equip if it's the first one
             user.addresses.push(newAddress);
         }
 
-        // C. Equip an Address
+        // equip address
         if (equipAddressId) {
             user.addresses.forEach(addr => {
                 addr.isEquipped = (addr._id.toString() === equipAddressId);
             });
         }
 
-        // D. Delete an Address
+        // delete existing address
         if (deleteAddressId) {
             user.addresses = user.addresses.filter(addr => addr._id.toString() !== deleteAddressId);
-            // Auto-equip the top one if they deleted their equipped address
+            // auto-equip the top one if they deleted their equipped address
             if (user.addresses.length > 0 && !user.addresses.find(a => a.isEquipped)) {
                 user.addresses[0].isEquipped = true;
             }
         }
 
-        // E. Edit an Existing Address
+        // edit exsiting address
         if (editAddressId && editAddressData) {
-            const addrToEdit = user.addresses.id(editAddressId); // Mongoose helper to find by ID inside an array
+            const addrToEdit = user.addresses.id(editAddressId); // mongoose helper to find by ID inside array
             if (addrToEdit) {
                 addrToEdit.label = editAddressData.label;
                 addrToEdit.addressLine = editAddressData.addressLine;
@@ -306,7 +302,7 @@ app.post('/api/profile/update', async (req, res) => {
     }
 });
 
-// 3. Secure Password Change Route
+// password change
 app.post('/api/profile/password', async (req, res) => {
     try {
         if (!req.session.userId) return res.status(401).json({ error: "> UNAUTHORIZED" });
@@ -314,11 +310,11 @@ app.post('/api/profile/password', async (req, res) => {
         const { oldPassword, newPassword } = req.body;
         const user = await User.findById(req.session.userId);
 
-        // Verify old password
+        // verify old password
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) return res.status(400).json({ error: "> INVALID CURRENT PASSWORD" });
 
-        // Hash and save new password
+        // hash and save new password
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPassword, salt);
         await user.save();
@@ -332,24 +328,23 @@ app.post('/api/profile/password', async (req, res) => {
 
 app.post('/checkout', async (req, res) => {
     try {
-        // 1. Extract payload from the frontend
+        // extract payload from the frontend
         const { cart, address } = req.body;
         
-        // Ensure user is actually logged in 
+        // ensure user is actually logged in 
         const userId = req.session.userId; 
         if (!userId) return res.status(401).json({ error: "Unauthorized: Please log in." });
         if (!cart || cart.length === 0) return res.status(400).json({ error: "Cart is empty." });
 
-        // 2. Secure Server-Side Math
         let subtotal = 0;
         let validatedItems = [];
 
-        /// Loop through the frontend cart and cross-reference with the real database
+        /// loops through the frontend cart and cross-reference with the real database
         for (let item of cart) {
             const realProduct = await Product.findById(item.productId);
-            if (!realProduct) continue; // Skip if they tried to buy a deleted toy
+            if (!realProduct) continue; // skips if user tries to buy a deleted toy
 
-            // NEW SECURITY CHECK: Prevent buying more than what is in the database
+            // prevents user buying more than what is in the database
             if (realProduct.avail_inventory < item.quantity) {
                 return res.status(400).json({ error: `Insufficient stock for ${realProduct.name}.` });
             }
@@ -361,41 +356,39 @@ app.post('/checkout', async (req, res) => {
                 product: realProduct._id,
                 name: realProduct.name,
                 quantity: item.quantity,
-                priceAtPurchase: realProduct.price // Locks in the price!
+                priceAtPurchase: realProduct.price
             });
 
-            // ==========================================
-            // NEW: INVENTORY DEDUCTION ENGINE
-            // ==========================================
-            // 1. Subtract the purchased amount from the database
+            // inventory deduction 
+           
+            // subtracts purchased amount from database
             realProduct.avail_inventory -= item.quantity;
 
-            // 2. Auto-update the UI tags based on the new stock levels
+            // auto-updates UI tags based on the new stock levels
             if (realProduct.avail_inventory <= 0) {
                 realProduct.inStock = false;
                 realProduct.inventoryStatus = 'SOLD OUT';
             } else if (realProduct.avail_inventory <= 5) {
-                realProduct.inventoryStatus = 'LOW STOCK'; // Adds the orange ribbon if stock is getting low
+                realProduct.inventoryStatus = 'LOW STOCK'; // adds an orange ribbon warning if stock is getting low
             } else {
                 realProduct.inventoryStatus = 'IN STOCK';
             }
 
-            // 3. Save the updated toy back to MongoDB
+            // save updated toy back to MongoDB
             await realProduct.save();
         }
 
-        // Calculate the official shipping fee
+        // calculate the official shipping fee
         let shippingFee = subtotal <= 10000 ? subtotal * 0.10 : 0;
         let totalAmount = subtotal + shippingFee;
 
-        // 3. Generate the Tactical Order Number (e.g., OR-030626-X7A9)
-        // Gets today's date as DDMMYY
+       
         const dateStr = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'}).replace(/\//g, '');
-        // Generates 4 random alphanumeric characters
+        // to generate 4 random alphanumeric characters
         const randomCode = Math.random().toString(36).substring(2, 6).toUpperCase(); 
         const orderNumber = `OR-${dateStr}-${randomCode}`;
 
-        // 4. Construct the Final Order Document
+        // final order document to be saved in db
         const newOrder = new Order({
             orderNumber,
             user: userId,
@@ -409,10 +402,10 @@ app.post('/checkout', async (req, res) => {
             timeline: { placedAt: new Date() }
         });
 
-        // 5. Save to MongoDB
+        // saves to MongoDB
         await newOrder.save();
 
-        // Send the success signal back to the frontend!
+        // send the success message back to the frontend
         res.status(200).json({ 
             message: "Order successfully logged.", 
             orderId: newOrder._id,
@@ -427,20 +420,20 @@ app.post('/checkout', async (req, res) => {
 
 // --- ADMIN ROUTES ---
 
-// 1. Serve the Admin Dashboard
+// admin dashboard route
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });
 
-// 2. Fetch ALL Orders (Admin Clearance Required)
+// feteches ALL orders (needs admin clearannce)
 app.get('/api/admin/orders', async (req, res) => {
     try {
-        // SECURITY CHECK: Kick them out if they aren't an admin!
+        // security check: non-admins will be decapitated
         if (!req.session.userId || req.session.role !== 'admin') {
             return res.status(403).json({ error: "> CLASSIFIED: ADMIN CLEARANCE REQUIRED." });
         }
 
-        // Fetch EVERY order in the database, newest first
+        // fetches EVERY order in the database sorted by newest first
         const allOrders = await Order.find({})
             .sort({ createdAt: -1 })
             .populate('user', 'username email') // Grabs the buyer's info
@@ -453,7 +446,7 @@ app.get('/api/admin/orders', async (req, res) => {
     }
 });
 
-// 3. Update Order Status & Specific Timestamps (With Time Travel Rollback)
+// updates order status + timestamps based on the new status
 app.post('/api/admin/orders/:id/status', async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -466,7 +459,7 @@ app.post('/api/admin/orders/:id/status', async (req, res) => {
         const now = new Date();
         if (!order.timeline) order.timeline = {}; 
         
-        // TIMELINE ROLLBACK LOGIC
+        // logic for rollback and forward of timestamps based on changes in status
         if (status === 'PENDING') {
             order.timeline.preparingAt = null;
             order.timeline.shippedAt = null;
@@ -474,18 +467,18 @@ app.post('/api/admin/orders/:id/status', async (req, res) => {
         } 
         else if (status === 'PREPARING') {
             if (!order.timeline.preparingAt) order.timeline.preparingAt = now;
-            order.timeline.shippedAt = null; // Erases future data if moved backwards!
+            order.timeline.shippedAt = null; // erases future data if moved backwards
             order.timeline.deliveredAt = null;
         } 
         else if (status === 'ON DELIVERY') {
             if (!order.timeline.shippedAt) order.timeline.shippedAt = now;
-            order.timeline.deliveredAt = null; // Erases future data
+            order.timeline.deliveredAt = null; // erases future data
         } 
         else if (status === 'DELIVERED') {
             if (!order.timeline.deliveredAt) order.timeline.deliveredAt = now;
         }
 
-        order.timeline.updatedAt = now; // Always stamp the last time it was touched
+        order.timeline.updatedAt = now; // always stamp the last time it was touched
         await order.save();
         
         res.json({ message: "> STATUS UPDATED TO: " + status });
@@ -494,7 +487,7 @@ app.post('/api/admin/orders/:id/status', async (req, res) => {
     }
 });
 
-// 4. Cancel Order & Timestamp
+// cancel order + timestamp
 app.post('/api/admin/orders/:id/cancel', async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -515,7 +508,7 @@ app.post('/api/admin/orders/:id/cancel', async (req, res) => {
 
         order.status = 'CANCELLED';
         if (!order.timeline) order.timeline = {};
-        order.timeline.cancelledAt = new Date(); // LOG THE CANCELLATION TIME!
+        order.timeline.cancelledAt = new Date(); // LOG CANCELLATION TIME!!
         await order.save();
 
         res.json({ message: "> ORDER CANCELLED. INVENTORY RESTORED." });
@@ -532,7 +525,7 @@ app.post('/api/admin/spawn-test', async (req, res) => {
         const product = await Product.findOne({});
         if (!product) return res.status(400).send("No products exist to create orders.");
 
-        // CHANGED: Now spawns 5 PENDING requests so they all land in Tab 1!
+        //spawns 5 PENDING requests so they all land in Tab 1
         const statuses = ['PENDING', 'PENDING', 'PENDING', 'PENDING', 'PENDING'];
         
         for (let stat of statuses) {
@@ -558,7 +551,7 @@ app.post('/api/admin/spawn-test', async (req, res) => {
     }
 });
 
-// 4. Cancel Order & REVERT INVENTORY
+// cancel order + restore invetory
 app.post('/api/admin/orders/:id/cancel', async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -567,13 +560,13 @@ app.post('/api/admin/orders/:id/cancel', async (req, res) => {
         if (!order) return res.status(404).json({ error: "Order not found" });
         if (order.status === 'CANCELLED') return res.status(400).json({ error: "Already cancelled." });
 
-        // Loop through the receipt and ADD the stock back to the warehouse!
+        // loop through the receipt and returns the stock back to the warehouse
         for (let item of order.items) {
             const product = await Product.findById(item.product);
             if (product) {
-                product.avail_inventory += item.quantity; // The Mathematical Revert!
+                product.avail_inventory += item.quantity; 
                 
-                // Fix the tags
+                // fixes tags
                 product.inStock = true; 
                 product.inventoryStatus = product.avail_inventory <= 5 ? 'LOW STOCK' : 'IN STOCK';
                 await product.save();
@@ -589,12 +582,12 @@ app.post('/api/admin/orders/:id/cancel', async (req, res) => {
     }
 });
 
-// 5. Fetch ALL Products for Armory (Includes Archived)
+// fetches all products for armoury (includes archived)
 app.get('/api/admin/products', async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
         
-        // Fetch everything, sort alphabetically by name
+        // fetches everything and sorts alphabetically
         const products = await Product.find({}).sort({ name: 1 });
         res.json(products);
     } catch (err) {
@@ -602,7 +595,7 @@ app.get('/api/admin/products', async (req, res) => {
     }
 });
 
-// 6. Toggle Product Archive State (Soft Delete)
+// toggle product archive state (soft deletion)
 app.post('/api/admin/products/:id/archive', async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -610,9 +603,9 @@ app.post('/api/admin/products/:id/archive', async (req, res) => {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ error: "Product not found" });
 
-        // Flip the boolean! If true, make it false. If false, make it true.
+        // if true, makes it false. if false, makes it true
         product.isArchived = !product.isArchived; 
-        product.last_modified = new Date(); // STAMP THE TIME!
+        product.last_modified = new Date(); // STAMP THE TIME!!!!
         await product.save();
 
         res.json({ message: `> PRODUCT ${product.isArchived ? 'ARCHIVED' : 'RESTORED'}` });
@@ -621,7 +614,7 @@ app.post('/api/admin/products/:id/archive', async (req, res) => {
     }
 });
 
-// 7. Quick Stock Adjustment
+// stock adjustment
 app.post('/api/admin/products/:id/stock', async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -630,14 +623,14 @@ app.post('/api/admin/products/:id/stock', async (req, res) => {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ error: "Product not found" });
 
-        // Apply math, prevent negative stock
+        // prevents negative stock
         product.avail_inventory = Math.max(0, product.avail_inventory + adjustment);
         
-        // Auto-fix tags
+        // auto-fixes the tags
         product.inStock = product.avail_inventory > 0;
         product.inventoryStatus = product.avail_inventory === 0 ? 'SOLD OUT' : (product.avail_inventory <= 5 ? 'LOW STOCK' : 'IN STOCK');
         
-        product.last_modified = new Date(); // STAMP THE TIME!
+        product.last_modified = new Date(); // STAMP THE TIME!!!
         
         await product.save();
         res.json({ message: "> STOCK UPDATED", stock: product.avail_inventory });
@@ -646,7 +639,7 @@ app.post('/api/admin/products/:id/stock', async (req, res) => {
     }
 });
 
-// 8. ADD NEW PRODUCT (Now with Multer File Upload)
+// adding new product
 app.post('/api/admin/products', upload.single('imageFile'), async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -654,7 +647,7 @@ app.post('/api/admin/products', upload.single('imageFile'), async (req, res) => 
         const { sku, name, category, price, old_price, description, tags, existingImage } = req.body;
         const tagsArray = tags ? tags.split(',').map(tag => tag.trim()) : [];
         
-        // If they uploaded a new file, use that path. Otherwise, use the existing/placeholder path.
+        // if they upload a new file, use that path. otherwise, use placeholder path.
         const imagePath = req.file ? `/images/products/${req.file.filename}` : (existingImage || '/images/default-placeholder.png');
 
         const newProduct = new Product({
@@ -672,7 +665,7 @@ app.post('/api/admin/products', upload.single('imageFile'), async (req, res) => 
     }
 });
 
-// 9. EDIT PRODUCT (Now with Multer File Upload)
+// product edit
 app.post('/api/admin/products/:id/edit', upload.single('imageFile'), async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -683,11 +676,11 @@ app.post('/api/admin/products/:id/edit', upload.single('imageFile'), async (req,
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ error: "Product not found" });
 
-        // If a new file was uploaded, update the path. Otherwise, keep the old one.
+        // if a new file was uploaded, update the path. otherwise, keep the old one
         if (req.file) {
             product.imageString = `/images/products/${req.file.filename}`;
         } else if (existingImage) {
-            product.imageString = existingImage; // Keeps existing path if no new file is chosen
+            product.imageString = existingImage; // keeps the existing path if no new file is chosen
         }
 
         product.sku = sku;
@@ -709,7 +702,7 @@ app.post('/api/admin/products/:id/edit', upload.single('imageFile'), async (req,
     }
 });
 
-// --- IGNITE SERVER ---
+// --- server status ---
 app.listen(PORT, () => {
     console.log(`\n> =======================================`);
     console.log(`> SYSTEM ONLINE: TOY_YODA SERVER ACTIVE`);
