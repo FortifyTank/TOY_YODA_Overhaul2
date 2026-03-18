@@ -1332,3 +1332,99 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
     display: flex; flex-direction: column; justify-content: center; align-items: center;
     border: 1px solid var(--term-muted); background: rgba(255, 255, 255, 0.05); padding: 0 15px; min-width: 80px;
 }
+
+/* for the email links in the abt page lol */
+.comms-link {
+    position: relative;
+    text-decoration: none;
+    color: var(--term-cyan);
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    padding: 0 10px;
+    flex-shrink: 0;
+    min-width: 200px;
+    text-align: right;
+}
+
+.comms-link::before, .comms-link::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    height: 100%;
+    border: 2px solid var(--amber-accent);
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.comms-link::before { left: -5px; border-right: none; }
+.comms-link::after { right: -5px; border-left: none; }
+
+.comms-link:hover { color: var(--term-text); text-shadow: var(--cyan-glow); }
+.comms-link:hover::before { opacity: 1; left: 0; }
+.comms-link:hover::after { opacity: 1; right: 0; }
+
+/* overriding some classes for the abt page */
+.about-dossier .data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px dashed var(--border-dim);
+    gap: 20px;
+}
+
+.about-dossier .data-label {
+    width: 280px;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+.about-dossier .data-value {
+    flex-grow: 1;
+    text-align: left;
+    color: var(--term-text);
+    font-size: 1.4rem;
+}
+
+/* more about page bs */
+.reveal-stage {
+    position: relative;
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 50px;
+    background: rgba(0,0,0,0.2);
+}
+
+.central-logo {
+    z-index: 5;
+    transform: scale(0.5);
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+    transition: transform 0.1s ease-out;
+    margin-top: -300px;
+}
+
+.reveal-char {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: auto;
+    height: 130%;
+    z-index: 10;
+    transition: transform 0.1s ease-out;
+    filter: drop-shadow(var(--cyan-glow));
+}
+
+.left-wing {
+    top: 30%;
+    left: 0.5%;
+}
+.right-wing { right: 0.5%; }
+
+.about-content-wrapper {
+    position: relative;
+    z-index: 1; 
+}

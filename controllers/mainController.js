@@ -13,6 +13,7 @@ const mainController = {
     getCheckoutPage: (req, res) => res.sendFile(path.join(__dirname, '../views/checkout.html')),
     getProductDetailPage: (req, res) => res.sendFile(path.join(__dirname, '../views/product.html')),
     getAdminPage: (req, res) => res.sendFile(path.join(__dirname, '../views/admin.html')),
+    getAboutPage: (req, res) => res.sendFile(path.join(__dirname, '../views/about.html')),
 
     // authetnication
     postRegister: async (req, res) => {
@@ -176,7 +177,8 @@ const mainController = {
         } catch (err) {
             res.status(500).json({ error: "Forge Failed" });
         }
-    }
+    },
+    
 };
 
 module.exports = mainController;

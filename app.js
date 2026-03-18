@@ -41,6 +41,7 @@ app.get('/home', mainController.getHome);
 app.get('/products', mainController.getProductsPage);
 app.get('/profile', mainController.getProfilePage);
 app.get('/checkout', mainController.getCheckoutPage);
+app.get('/about', mainController.getAboutPage);
 
 // for API
 app.post('/api/register', mainController.postRegister);

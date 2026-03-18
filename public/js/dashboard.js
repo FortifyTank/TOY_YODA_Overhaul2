@@ -75,3 +75,30 @@ document.addEventListener("DOMContentLoaded", () => {
     handleBootAnimation();
     checkAuthStatus();
 });
+
+/* for the about page bs */
+
+window.addEventListener('scroll', () => {
+    const scrollVal = window.scrollY;
+
+    const moveAmount = scrollVal * 1.5; 
+
+    const leftChar = document.querySelector('.left-wing');
+    const rightChar = document.querySelector('.right-wing');
+    const logo = document.querySelector('.central-logo');
+
+    if (leftChar && rightChar) {
+        leftChar.style.transform = `translateY(-50%) translateX(-${moveAmount}px)`;
+        rightChar.style.transform = `translateY(-50%) translateX(${moveAmount}px)`;
+        
+        const opacity = 1 - (scrollVal / 500);
+        leftChar.style.opacity = opacity > 0 ? opacity : 0;
+        rightChar.style.opacity = opacity > 0 ? opacity : 0;
+    }
+
+    if (logo) {
+
+        const logoScale = 0.5 - (scrollVal / 2000);
+        logo.style.transform = `scale(${logoScale > 0.2 ? logoScale : 0.2})`;
+    }
+});

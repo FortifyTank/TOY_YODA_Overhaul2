@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Toy Yoda</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="crt-theme"> <div class="top-command-bar">
+        <header class="global-header">
+            <div class="header-left">
+                <a href="/login" class="clearance header-btn">[ LOG IN ]</a>
+            </div>
+            <div class="header-logo">
+                <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
+            </div>
+            <div class="header-right">
+                <div class="header-search">
+                    <input type="text" class="tac-input" id="searchInput" placeholder="SEARCH DOSSIER...">
+                </div>
+                <span class="cart-status header-btn">[ CART: 0 ]</span> 
+            </div>
+        </header>
+        <nav class="global-nav">
+            <div class="nav-status-light"></div> 
+            <a href="/home" class="nav-link">> OVERVIEW</a>
+            <a href="/products" class="nav-link">> CATALOG</a>
+            <a href="#" class="nav-link active">> ABOUT_US</a> <a href="#" class="nav-link">> FORUM</a>
+        </nav>
+    </div>
+
+    <main class="dashboard-container mt-30">
+
+        <div class="reveal-stage">
+            <div class="central-logo">
+                <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="reveal-logo">
+            </div>
+
+            <img src="/images/soyjak_left.png" class="reveal-char left-wing" alt="Character Left">
+            <img src="/images/soyjak_right.png" class="reveal-char right-wing" alt="Character Right">
+        </div>
+
+        <div class="about-content-wrapper">
+            <h2 class="section-title text-xxl mb-20">> BEEP BOOP</h2>
+        </div>
+
+        <div class="cyber-panel p-30 panel-hover-glow">
+            <div class="grid-auto-fit gap-20">
+                <div>
+                    <h3 class="text-amber mb-12 tracking-widest">// OVERVIEW</h3>
+                    <p class="text-regular mb-20">
+                        we sell toys n stuff <br>
+                        tell your friends at the playground
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-divider"></div>
+
+            <h3 class="text-amber mb-20 tracking-widest">// THE IMPERIAL HIGH COMMAND</h3>
+
+            <div class="about-dossier">
+
+                <div class="data-row">
+                    <span class="data-label">EMPEROR OF THE GALAXY</span>
+                    <span class="data-value">Matt</span>
+                    <a href="mailto:matthew_drew_fabregas@dlsu.edu.ph" class="comms-link">INITIATE SECURE TRANSMISSION</a>
+                </div>
+                
+                <div class="data-row">
+                    <span class="data-label">COMMANDER OF THE IMPERIAL ARMY</span>
+                    <span class="data-value">Roy</span>
+                    <a href="mailto:roy_sandoval@dlsu.edu.ph" class="comms-link">INITIATE SECURE TRANSMISSION</a>
+                </div>
+
+                <div class="data-row">
+                    <span class="data-label">COMMANDER OF THE IMPERIAL NAVY</span>
+                    <span class="data-value">Tophi</span>
+                    <a href="mailto:tophi_miranda@dlsu.edu.ph" class="comms-link">INITIATE SECURE TRANSMISSION</a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="cartOverlay" class="cart-overlay"></div>
+    <div id="cartDrawer" class="cart-drawer cyber-panel">
+        <div class="cart-header">
+            <h3>// YOUR CART</h3>
+            <button id="closeCartBtn" class="close-btn ghost-btn">[ X ]</button>
+        </div>
+        <div id="cartItemsContainer" class="cart-items"></div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/cart.js"></script>
+    <script src="/js/alerts.js"></script>
+</body>
+</html>
