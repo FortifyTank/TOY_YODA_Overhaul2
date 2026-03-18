@@ -57,6 +57,7 @@ app.post('/api/profile/update', mainController.updateProfile);
 app.get('/api/orders', mainController.getUserOrders);
 
 // admin API
+app.get('/admin', isAdmin, mainController.getAdminPage);
 app.get('/api/admin/orders', isAdmin, mainController.adminGetOrders);
 app.post('/api/admin/orders/:id/status', isAdmin, mainController.adminUpdateStatus);
 app.post('/api/admin/products', isAdmin, upload.single('imageFile'), mainController.adminAddProduct);
