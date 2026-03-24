@@ -135,6 +135,10 @@ app.get('/api/products', async (req, res) => {
             } else {
                 p.averageRating = '0.0';
             }
+
+            // THE FAILSAFE FIX: Force the server to mathematically check the inventory
+            // just in case the 'inStock' tag is missing from older database entries!
+            p.inStock = p.avail_inventory > 0; 
         });
 
         res.json(products); 
