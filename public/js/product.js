@@ -35,6 +35,161 @@ document.addEventListener('DOMContentLoaded', async () => {
             oldPriceEl.classList.remove('hidden-content');
         }
 
+        // ==========================================
+        // REVIEWS ENGINE
+        // ==========================================
+        const productId = product._id;
+        const reviewsList = document.getElementById('reviewsListContainer');
+        const avgStarDisplay = document.getElementById('avgStarRating');
+        const totalCountDisplay = document.getElementById('totalReviewCount');
+        const reviewFormContainer = document.getElementById('reviewFormContainer');
+        const submitReviewForm = document.getElementById('submitReviewForm');
+        const starWidget = document.getElementById('starInputWidget');
+        const scoreInput = document.getElementById('reviewScore');
+        const openReviewBtn = document.getElementById('openReviewFormBtn');
+        const cancelReviewBtn = document.getElementById('cancelReviewBtn');
+
+        // 1. Load existing reviews from the database
+        async function loadReviews() {
+            try {
+                const res = await fetch(`/api/products/${productId}/reviews`);
+                const data = await res.json();
+
+                // Update the bottom summary
+                avgStarDisplay.innerText = data.average || '0.0';
+                totalCountDisplay.innerText = data.total || '0';
+
+                // Update the TOP summary
+                const topStars = document.getElementById('topStars');
+                const topReviewCount = document.getElementById('topReviewCount');
+
+                if (data.reviews.length === 0) {
+                    reviewsList.innerHTML = '<p class="text-muted">> NO REVIEWS YET. BE THE FIRST.</p>';
+                    if (topStars) topStars.innerText = '☆☆☆☆☆';
+                    if (topReviewCount) topReviewCount.innerText = '(0 REVIEWS)';
+                } else {
+                    // Rounds the average to the nearest whole star for the visual display
+                    const avg = Math.round(data.average); 
+                    if (topStars) topStars.innerText = '★'.repeat(avg) + '☆'.repeat(5 - avg);
+                    if (topReviewCount) topReviewCount.innerText = `(${data.total} REVIEWS)`;
+                    
+                    // Renders the review cards at the bottom
+                    reviewsList.innerHTML = data.reviews.map(rev => `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div>
+                                    <span class="text-cyan font-bold">${rev.username}</span>
+                                    <span class="review-date ml-10">${new Date(rev.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <div class="review-stars">${'★'.repeat(rev.rating)}${'☆'.repeat(5 - rev.rating)}</div>
+                            </div>
+                            <div class="review-body">${rev.comment}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                reviewsList.innerHTML = '<p class="text-red">> ERROR LOADING REVIEWS.</p>';
+            }
+        }
+
+        // Add the Smooth Scroll Click Event
+        document.getElementById('topStarDisplay')?.addEventListener('click', () => {
+            document.getElementById('reviewsListContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // 2. Make the 5-Star input clickable
+        if (starWidget) {
+            const stars = starWidget.querySelectorAll('span');
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    const value = star.getAttribute('data-value');
+                    scoreInput.value = value;
+                    // Light up the stars up to the one clicked
+                    stars.forEach(s => {
+                        if (s.getAttribute('data-value') <= value) s.classList.add('active');
+                        else s.classList.remove('active');
+                    });
+                });
+            });
+        }
+
+        if (openReviewBtn) {
+            openReviewBtn.addEventListener('click', () => {
+                reviewFormContainer.classList.add('active'); // Slides form down
+                openReviewBtn.classList.add('hidden-content'); // Hides the button
+            });
+        }
+
+        if (cancelReviewBtn) {
+            cancelReviewBtn.addEventListener('click', () => {
+                reviewFormContainer.classList.remove('active'); // Slides form up
+                openReviewBtn.classList.remove('hidden-content'); // Shows button again
+            });
+        }
+
+        // 3. Handle the Submit Button
+        if (submitReviewForm) {
+            submitReviewForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const rating = scoreInput.value;
+                const comment = document.getElementById('reviewText').value;
+
+                if (!rating) return showSystemAlert("> PLEASE SELECT A STAR RATING.");
+
+                const btn = document.getElementById('submitReviewBtn');
+                btn.innerText = '[ SUBMITTING... ]';
+
+                try {
+                    const res = await fetch(`/api/products/${productId}/reviews`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ rating, comment })
+                    });
+                    const result = await res.json();
+
+                    if (res.ok) {
+                        showSystemAlert(result.message, 'success');
+                        reviewFormContainer.classList.remove('active'); // Hide the form smoothly
+                        submitReviewForm.reset(); // Clear the text
+                        
+                        // We intentionally leave the 'openReviewBtn' hidden here 
+                        // so they cannot try to submit a second review!
+                        
+                        loadReviews(); // Refresh the list
+                    } else {
+                        showSystemAlert(result.error);
+                        btn.innerText = '[ PUBLISH REVIEW ]'; // Only reset button text on error
+                    }
+                } catch (err) {
+                    showSystemAlert("> CONNECTION ERROR.");
+                    btn.innerText = '[ PUBLISH REVIEW ]';
+                }
+            });
+        }
+
+        // 4. Security Check: Did they buy it?
+        async function checkReviewEligibility() {
+            try {
+                const res = await fetch('/api/orders'); 
+                if (res.ok) {
+                    const orders = await res.json();
+                    const canReview = orders.some(o => 
+                        o.status === 'DELIVERED' && 
+                        o.items.some(item => item.product._id === productId)
+                    );
+                    
+                    if (canReview) {
+                        // Reveal the BUTTON instead of the form!
+                        openReviewBtn.classList.remove('hidden-content');
+                    }
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        // Ignite the functions!
+        loadReviews();
+        checkReviewEligibility();
+
         // 3. Configure Quantity Buttons
         const btnAdd = document.getElementById('btnAddQty');
         const btnSub = document.getElementById('btnSubQty');

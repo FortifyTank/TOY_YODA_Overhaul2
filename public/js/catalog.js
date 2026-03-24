@@ -187,7 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentPriceFormatted = `₱${product.price.toLocaleString()}`;
             const oldPriceFormatted = product.onSale ? `₱${product.old_price.toLocaleString()}` : '';
 
-            // OPTIMIZED: No more inline styles on the wrapper or img!
+            // 1. Create the Star Badge HTML
+            const starText = product.reviewCount > 0 ? `[ ★ ${product.averageRating} ]` : `[ ☆ 0.0 ]`;
+            const starBadgeHTML = `<div class="text-amber font-bold text-sm mt-5 mb-5">${starText} <span class="text-muted">(${product.reviewCount || 0})</span></div>`;
+
+            // 2. Inject it under the product-name!
             const cardHTML = `
                 <article class="product-card cyber-panel panel-interactive panel-hover-bg-yellow">
                     <a href="/product?sku=${product.sku}" class="product-link">
@@ -199,6 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="product-info">
                             <span class="product-category">> ${product.category}</span>
                             <h3 class="product-name">${product.name}</h3>
+                            
+                            ${starBadgeHTML}
+                            
                             <div class="price-container">
                                 <span class="product-price">${currentPriceFormatted}</span>
                                 ${product.onSale ? `<span class="old-price-strike">${oldPriceFormatted}</span>` : ''}

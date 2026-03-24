@@ -114,8 +114,23 @@ app.get('/api/orders', async (req, res) => {
 // gets all products that are not archived for catalog page
 app.get('/api/products', async (req, res) => {
     try {
-        // ONLY fetch toys where isArchived is false or doesnt exist
-        const products = await Product.find({ isArchived: { $ne: true } }); 
+        // .lean() makes the data easier to modify before sending it to the frontend
+        const products = await Product.find({ isArchived: { $ne: true } }).lean(); 
+        const reviews = await Review.find(); // Fetch all reviews
+
+        // Loop through each product and attach its average rating
+        products.forEach(p => {
+            const pReviews = reviews.filter(r => r.product.toString() === p._id.toString());
+            p.reviewCount = pReviews.length;
+            
+            if (p.reviewCount > 0) {
+                const sum = pReviews.reduce((acc, rev) => acc + rev.rating, 0);
+                p.averageRating = (sum / p.reviewCount).toFixed(1);
+            } else {
+                p.averageRating = '0.0';
+            }
+        });
+
         res.json(products); 
     } catch (err) {
         res.status(500).json({ error: "Failed to load database" });
@@ -131,6 +146,72 @@ app.get('/api/products/sku/:sku', async (req, res) => {
         
         res.json(product);
     } catch (err) {
+        res.status(500).json({ error: "> SYSTEM FAILURE" });
+    }
+});
+
+// ==========================================
+// REVIEWS ENGINE
+// ==========================================
+
+// 1. Fetch reviews and calculate average for a specific product
+app.get('/api/products/:id/reviews', async (req, res) => {
+    try {
+        const reviews = await Review.find({ product: req.params.id }).sort({ createdAt: -1 });
+        
+        // Calculate the average star rating on the fly!
+        let average = 0;
+        if (reviews.length > 0) {
+            const sum = reviews.reduce((acc, rev) => acc + rev.rating, 0);
+            average = (sum / reviews.length).toFixed(1); // e.g., 4.2
+        }
+
+        res.json({ reviews, average, total: reviews.length });
+    } catch (err) {
+        res.status(500).json({ error: "> ERROR FETCHING REVIEWS" });
+    }
+});
+
+// 2. Submit a new review (Must be a Verified Buyer)
+app.post('/api/products/:id/reviews', async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const productId = req.params.id;
+        const { rating, comment } = req.body;
+
+        if (!userId) return res.status(401).json({ error: "> UNAUTHORIZED: PLEASE LOG IN" });
+        if (!rating || rating < 1 || rating > 5) return res.status(400).json({ error: "> INVALID RATING" });
+        if (!comment) return res.status(400).json({ error: "> COMMENT REQUIRED" });
+
+        // THE SECURITY LOCK: Did this user actually buy and receive this exact product?
+        const verifiedPurchase = await Order.findOne({
+            user: userId,
+            status: 'DELIVERED',
+            'items.product': productId
+        });
+
+        if (!verifiedPurchase) {
+            return res.status(403).json({ error: "> RESTRICTED: ONLY VERIFIED BUYERS CAN REVIEW THIS ITEM." });
+        }
+
+        // Create and save the review
+        const newReview = new Review({
+            user: userId,
+            username: req.session.username,
+            product: productId,
+            rating: Number(rating),
+            comment: comment.trim()
+        });
+
+        await newReview.save();
+        res.status(201).json({ message: "> REVIEW SECURED AND PUBLISHED", review: newReview });
+
+    } catch (err) {
+        // Catch the MongoDB duplicate index error (User trying to review twice)
+        if (err.code === 11000) {
+            return res.status(400).json({ error: "> ERROR: YOU HAVE ALREADY REVIEWED THIS ITEM." });
+        }
+        console.error("Review Submit Error:", err);
         res.status(500).json({ error: "> SYSTEM FAILURE" });
     }
 });

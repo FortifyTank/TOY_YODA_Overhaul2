@@ -38,6 +38,12 @@
                 <div class="border-dashed-dim pb-10">
                     <h2 class="text-cyan text-lg" id="prodCategory">> LOADING CATEGORY...</h2>
                     <h1 class="text-white text-xxl mt-5" id="prodName">DECRYPTING DATA...</h1>
+                    
+                    <div id="topStarDisplay" class="mt-5 mb-5 cursor-pointer" style="display: inline-block;">
+                        <span class="text-amber text-lg tracking-widest" id="topStars">☆☆☆☆☆</span>
+                        <span class="text-muted ml-10 text-sm" id="topReviewCount">(0 REVIEWS)</span>
+                    </div>
+
                     <p class="text-muted mt-5" id="prodSku">SKU: ---</p>
                 </div>
 
@@ -73,8 +79,52 @@
 
     <section class="dashboard-container mt-30">
         <h3 class="section-title">> CUSTOMER REVIEWS</h3>
-        <div class="cyber-panel p-30 text-center text-muted">
-            <p>> REVIEWS AND FORUM INTEGRATION PENDING NEXT UPDATE...</p>
+        
+        <div class="cyber-panel p-30">
+            
+            <div class="flex-between border-dashed-dim pb-15 mb-20 align-start">
+                <div>
+                    <span class="text-xxl text-amber font-bold" id="avgStarRating">0.0</span>
+                    <span class="text-muted text-lg"> / 5.0 ( <span id="totalReviewCount">0</span> Reviews )</span>
+                </div>
+                
+                <button id="openReviewFormBtn" class="tac-btn tac-btn--md btn-orange-invert mt-0 mb-12 hidden-content">[ WRITE A REVIEW ]</button>
+            </div>
+            
+            <div id="reviewFormContainer" class="review-slide-drawer">
+                <div class="review-form-inner p-30 mb-30">
+                    <h4 class="text-amber mb-15">SUBMIT YOUR REVIEW</h4>
+                    
+                    <form id="submitReviewForm">
+                        <div class="input-group mb-15">
+                            <label>> RATING</label>
+                            <div class="star-rating-input" id="starInputWidget">
+                                <span data-value="1">★</span>
+                                <span data-value="2">★</span>
+                                <span data-value="3">★</span>
+                                <span data-value="4">★</span>
+                                <span data-value="5">★</span>
+                            </div>
+                            <input type="hidden" id="reviewScore" required>
+                        </div>
+                        
+                        <div class="input-group mb-20">
+                            <label>> COMMENT</label>
+                            <textarea id="reviewText" class="tac-input" rows="3" required placeholder="What did you think about this product?"></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-10 justify-end mt-10">
+                            <button type="button" class="tac-btn tac-btn--ghost" id="cancelReviewBtn">[ CANCEL ]</button>
+                            <button type="submit" class="tac-btn btn-solid-green" id="submitReviewBtn">[ PUBLISH REVIEW ]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="reviewsListContainer">
+                <p class="text-muted">> LOADING REVIEWS...</p>
+            </div>
+
         </div>
     </section>
 
