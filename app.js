@@ -27,6 +27,7 @@ const upload = multer({ storage: storage });
 const Product = require('./models/Product');
 const User = require('./models/User');
 const Order = require('./models/Order');
+const Review = require('./models/Review');
 
 // initializes express 
 const app = express();

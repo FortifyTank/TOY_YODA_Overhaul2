@@ -1,0 +1,39 @@
+const mongoose = require('mongoose');
+
+const reviewSchema = new mongoose.Schema({
+    user: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User', 
+        required: true 
+    },
+    username: {
+        type: String,
+        required: true
+    },
+    product: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Product', 
+        required: true 
+    },
+    rating: { 
+        type: Number, 
+        required: true,
+        min: 1,
+        max: 5
+    },
+    comment: { 
+        type: String, 
+        required: true,
+        trim: true,
+        maxlength: 500 // Keeps reviews from being entire essays
+    },
+    createdAt: { 
+        type: Date, 
+        default: Date.now 
+    }
+});
+
+// This is a neat MongoDB trick: It prevents a user from leaving multiple reviews on the exact same product!
+reviewSchema.index({ user: 1, product: 1 }, { unique: true });
+
+module.exports = mongoose.model('Review', reviewSchema);

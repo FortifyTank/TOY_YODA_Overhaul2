@@ -86,19 +86,49 @@ document.addEventListener("DOMContentLoaded", () => {
         if (hasStarted) return; 
         hasStarted = true;
 
+        // 1. Fade out the "Press Enter" text
         startPrompt.style.transition = "opacity 0.3s ease";
         startPrompt.style.opacity = "0";
         
         setTimeout(() => {
+            const terminal = document.querySelector(".terminal-container");
+            const brandHeader = document.querySelector(".brand-header");
+            
+            // 2. Measure the exact pixel position of the logo BEFORE we change anything
+            const beforeY = brandHeader.getBoundingClientRect().top;
+            
+            // 3. Hide prompt and deploy the box (This causes the instant jump)
             startPrompt.style.display = "none";
             authBox.style.position = "relative"; 
             authBox.classList.remove("hidden");  
-            authBox.classList.add("deploying"); 
+            
+            // 4. Measure where the browser instantly snapped the logo to
+            const afterY = brandHeader.getBoundingClientRect().top;
+            const jumpDistance = beforeY - afterY; // Calculates exact pixel difference
+            
+            // 5. Instantly push the whole container down to offset the jump
+            terminal.style.transition = "none";
+            terminal.style.transform = `translate(-50%, calc(-50% + ${jumpDistance}px))`;
+            
+            // Force browser to render this invisible offset frame
+            void terminal.offsetHeight; 
+            
+            // 6. Turn on the smooth animation and slide it up to true center!
+            terminal.style.transition = "transform 0.8s cubic-bezier(0.1, 0.9, 0.2, 1)";
+            terminal.style.transform = "translate(-50%, -50%)";
 
-            setTimeout(() => authBox.classList.remove("deploying"), 600);
+            // Trigger your laser-unfold animation on the box itself
+            authBox.classList.add("deploying"); 
+            
+            // Clean up the animations after they finish
+            setTimeout(() => {
+                authBox.classList.remove("deploying");
+                terminal.style.transition = ""; // Removes inline styles so hyperspace warp still works!
+                terminal.style.transform = "";
+            }, 850);
+
         }, 300);
     };
-
     document.addEventListener("keydown", (e) => { if (e.key === "Enter") initLogin(); });
     startPrompt.addEventListener("click", initLogin);
 

@@ -47,7 +47,7 @@
     --term-lime: #bfff00;
     --term-maroon: #cc0000;
 
-    --term-red: #ff2a2a;
+    --term-red: #f73a3a;
     --term-pink: #ff6666;
     --term-maroon: #cc0000;
     --red-glow: 0 0 15px rgba(255, 42, 42, 0.4);
@@ -251,6 +251,17 @@ h1, h2, h3, h4, h5, h6,
     background-color: var(--term-red);
     color: #000000;
     box-shadow: var(--red-glow);
+}
+
+/* Tactical Red Invert Button (Perfect for Close/Cancel actions) */
+.btn-red-invert {
+    border-color: var(--term-red) !important;
+    color: var(--term-red) !important;
+}
+.btn-red-invert:hover {
+    background: var(--term-red) !important;
+    color: var(--bg-deep) !important;
+    box-shadow: 0 0 15px rgba(255, 42, 42, 0.4) !important;
 }
 
 .tac-scroll::-webkit-scrollbar { width: 6px; }
@@ -567,13 +578,27 @@ input:-webkit-autofill:focus { border-color: var(--amber-accent) !important; }
 .ui-reveal { opacity: 0; animation: revealWrapper 1s ease forwards 2s; }
 @keyframes revealWrapper { to { opacity: 1; } }
 
-.main-title {
-    font-family: 'Audiowide', cursive; font-size: 4.5rem; letter-spacing: 5px; color: #ffffff; 
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-    transform: scaleX(1.2); transform-origin: center; 
+.main-title-img {
+    /* 2. RESIZE CONTROL */
+    display: block;
+    max-width: 70%; /* Adjust this percentage to make it bigger or smaller! */
+    margin: 0 auto; /* Keeps it perfectly centered */
+    height: auto;
+    
+    /* 4. OUTER GLOW EFFECT */
+    /* Using drop-shadow instead of text-shadow gives images a clean outer glow */
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+    
+    /* 3. ORIGINAL ANIMATION */
+    transform: scaleX(1.2); 
+    transform-origin: center; 
     animation: titleStretch 1.2s ease-out forwards 2s; 
 }
-@keyframes titleStretch { to { transform: scaleX(1); } }
+
+/* Your exact original keyframes */
+@keyframes titleStretch { 
+    to { transform: scaleX(1); } 
+}
 
 .start-prompt {
     margin-top: 30px; font-size: 2rem; color: var(--amber-accent);
@@ -590,7 +615,14 @@ input:-webkit-autofill:focus { border-color: var(--amber-accent) !important; }
     box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8), 0 10px 20px rgba(0,0,0,0.5); 
     position: relative; width: 100%; 
 }
-.auth-box.hidden { opacity: 0; visibility: hidden; pointer-events: none; position: absolute; }
+
+.auth-box.hidden { 
+    opacity: 0; 
+    visibility: hidden; 
+    pointer-events: none; 
+    position: absolute; /* This keeps the logo perfectly centered! */
+}
+
 .auth-box.deploying { animation: boxDeploy 0.6s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
 
 @keyframes boxDeploy {
