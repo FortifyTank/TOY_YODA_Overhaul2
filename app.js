@@ -98,6 +98,11 @@ app.get('/community', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'community.html'));
 });
 
+// route for the about page
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'about.html'));
+});
+
 // Get User's Orders
 app.get('/api/orders', async (req, res) => {
     try {
