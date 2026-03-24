@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toy Yoda | Community</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="crt-theme">
+    
+    <div class="top-command-bar">
+        <header class="global-header">
+            <div class="header-left">
+                <a href="/login" class="clearance header-btn">[ LOG IN ]</a>
+            </div>
+            <div class="header-logo">
+                <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
+            </div>
+            <div class="header-right">
+                <span class="cart-status header-btn">[ CART: 0 ]</span> 
+            </div>
+        </header>
+        <nav class="global-nav">
+            <div class="nav-status-light"></div> 
+            <a href="/home" class="nav-link">> OVERVIEW</a>
+            <a href="/products" class="nav-link">> CATALOG</a>
+            <a href="#" class="nav-link active">> FORUM</a>
+            <a href="/about" class="nav-link">> ABOUT US</a>
+        </nav>
+    </div>
+
+    <main class="dashboard-layout mt-30 mx-auto max-w-800 p-20">
+        
+        <div class="cyber-panel flex-col h-70vh"> 
+            
+            <div class="border-dashed-dim p-10 flex-between align-center border-bottom">
+                <h2 class="text-amber m-0">> GLOBAL CHAT</h2>
+                <div class="d-flex align-center gap-10">
+                    <div class="status-dot-live"></div>
+                    <span class="text-green text-sm tracking-widest">LIVE</span>
+                </div>
+            </div>
+
+            <div id="chatWindow" class="p-10 tac-scroll flex-grow-1 flex-col gap-15 overflow-y-auto">
+                <p class="text-muted text-center mt-20">> CONNECTING TO SERVER...</p>
+            </div>
+
+            <div class="p-10 border-top bg-dark-half">
+                <form id="chatForm" class="d-flex gap-10">
+                    <input type="text" id="chatInput" class="tac-input flex-grow-1" placeholder="Type your message here..." required maxlength="300" autocomplete="off">
+                    <button type="submit" class="tac-btn btn-solid-green" id="sendChatBtn">[ SEND ]</button>
+                </form>
+            </div>
+            
+        </div>
+
+    </main>
+
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/cart.js"></script>
+    <script src="/js/community.js"></script> </body>
+</html>

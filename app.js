@@ -28,6 +28,7 @@ const Product = require('./models/Product');
 const User = require('./models/User');
 const Order = require('./models/Order');
 const Review = require('./models/Review');
+const Message = require('./models/Message');
 
 // initializes express 
 const app = express();
@@ -90,6 +91,11 @@ app.get('/checkout', (req, res) => {
 // route for dedicated product page
 app.get('/product', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'product.html'));
+});
+
+// route for community chat page
+app.get('/community', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'community.html'));
 });
 
 // Get User's Orders
@@ -213,6 +219,47 @@ app.post('/api/products/:id/reviews', async (req, res) => {
         }
         console.error("Review Submit Error:", err);
         res.status(500).json({ error: "> SYSTEM FAILURE" });
+    }
+});
+
+// ==========================================
+// COMMUNITY CHAT ENGINE
+// ==========================================
+
+// 1. Fetch the 50 most recent messages
+app.get('/api/messages', async (req, res) => {
+    try {
+        // .sort({ timestamp: -1 }) gets the newest first. 
+        // .limit(50) stops the database from crashing if there are 10,000 messages.
+        // .reverse() flips them back so the newest is at the bottom of the screen!
+        const messages = await Message.find().sort({ timestamp: -1 }).limit(50);
+        res.json(messages.reverse());
+    } catch (err) {
+        res.status(500).json({ error: "Failed to load messages." });
+    }
+});
+
+// 2. Post a new message
+app.post('/api/messages', async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const username = req.session.username;
+        const { text } = req.body;
+
+        if (!userId) return res.status(401).json({ error: "Please log in to chat." });
+        if (!text || text.trim().length === 0) return res.status(400).json({ error: "Message cannot be empty." });
+
+        const newMessage = new Message({
+            user: userId,
+            username: username,
+            text: text.trim()
+        });
+
+        await newMessage.save();
+        res.status(201).json(newMessage);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to send message." });
     }
 });
 

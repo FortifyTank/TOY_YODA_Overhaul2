@@ -164,6 +164,26 @@ h1, h2, h3, h4, h5, h6,
 /* Layout Utilities */
 .shrink-0 { flex-shrink: 0; }
 .hidden-content { display: none !important; }
+/* Layout Utilities */
+.h-100 { height: 100%; }
+.d-inline-block { display: inline-block; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-grow-1 { flex-grow: 1; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.max-w-800 { max-width: 800px; }
+
+.h-70vh { height: 70vh; }
+.overflow-y-auto { overflow-y: auto; }
+.bg-dark-half { background: rgba(0, 0, 0, 0.5); }
+
+/* Status Indicators */
+.status-dot-live {
+    width: 10px; 
+    height: 10px; 
+    background: var(--term-green); 
+    border-radius: 50%; 
+    box-shadow: 0 0 10px var(--term-green);
+}
 
 /* Glow */
 .glow-green { text-shadow: var(--green-glow); }
@@ -194,6 +214,7 @@ h1, h2, h3, h4, h5, h6,
 .pb-10 { padding-bottom: 10px; }
 .p-0 { padding: 0 !important; }
 .p-10 { padding: 10px; }
+.p-20 { padding: 20px; }
 .p-30 { padding: 30px; }
 .tracking-widest { letter-spacing: 2px; }
 .border-none { border: none !important; }
@@ -1447,4 +1468,64 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
 .review-form-inner {
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid var(--border-dim);
+}
+
+/* Tells the browser to stop scrolling 100px early so your Nav Bar doesn't cover the text! */
+html {
+    scroll-padding-top: 100px; 
+}
+
+/* =========================================
+   15. COMMUNITY CHAT UI
+========================================= */
+
+/* 1. The Container for each message (Name + Bubble) */
+.chat-message-group {
+    display: flex;
+    flex-direction: column;
+    max-width: 85%;
+    margin-bottom: 5px; /* Space between different messages */
+}
+
+/* 2. Messages from OTHER people (Left side) */
+.chat-message-other {
+    align-self: flex-start;
+    align-items: flex-start;
+    margin-left: 10px; /* Slight gap from the left wall */
+}
+
+/* 3. Messages from YOU (Right side) */
+.chat-message-self {
+    align-self: flex-end;
+    align-items: flex-end;
+    margin-right: 10px; /* Slight gap from the right wall */
+}
+
+/* 4. The actual text bubble */
+.chat-bubble {
+    width: fit-content; /* Stops the box from growing wider than the text */
+    padding: 10px 15px;
+    border: 1px solid var(--border-dim);
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.chat-message-other .chat-bubble {
+    background: rgba(0,0,0,0.4);
+    color: var(--term-text);
+    border-left: 3px solid var(--term-muted);
+}
+
+.chat-message-self .chat-bubble {
+    background: rgba(13, 35, 50, 0.6);
+    color: var(--term-cyan);
+    border-right: 3px solid var(--term-cyan);
+    text-align: left; /* Text inside always reads left-to-right */
+}
+
+.chat-meta {
+    font-size: 0.8rem;
+    color: var(--term-muted);
+    margin-bottom: 3px;
+    letter-spacing: 1px;
 }
