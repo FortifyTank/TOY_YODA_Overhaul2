@@ -321,14 +321,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. THE IMAGE BUG FIX (Added the ?. fallback)
         let itemsHTML = '';
         order.items.forEach(item => {
+            const sku = item.product?.sku || 'UNKNOWN-SKU';
+            const isDelivered = order.status === 'DELIVERED'; // Checks if the order is completed
+
             itemsHTML += `
                 <div class="item-row">
                     <img src="${item.product?.imageString || '/images/default-placeholder.png'}" class="modal-img">
                     <div class="flex-1">
-                        <div class="text-regular">${item.name}</div>
-                        <div class="text-muted text-sm">QTY: ${item.quantity}  |  ₱${item.priceAtPurchase.toLocaleString()}</div>
+                        <div class="text-cyan text-sm">> SKU: ${sku}</div>
+                        <div class="text-regular font-bold">${item.name}</div>
+                        <div class="text-muted text-sm mt-5">QTY: ${item.quantity} | ₱${item.priceAtPurchase.toLocaleString()}</div>
                     </div>
-                    <div class="text-amber font-bold">₱${(item.quantity * item.priceAtPurchase).toLocaleString()}</div>
+                    
+                    <div class="d-flex" style="flex-direction: column; gap: 10px; align-items: flex-end; justify-content: center;">
+                        <a href="/product?sku=${sku}" class="tac-btn tac-btn--ghost text-sm" style="text-decoration: none;">[ VIEW PRODUCT ]</a>
+                        
+                        ${isDelivered ? `<a href="/product?sku=${sku}&action=review" class="tac-btn btn-orange-invert text-sm" style="text-decoration: none;">[ RATE THIS ITEM ]</a>` : ''}
+                    </div>
                 </div>
             `;
         });

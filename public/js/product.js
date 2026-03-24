@@ -179,8 +179,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                     );
                     
                     if (canReview) {
-                        // Reveal the BUTTON instead of the form!
                         openReviewBtn.classList.remove('hidden-content');
+
+                        // THE CLEAN LOGIC: Check for our custom action parameter!
+                        if (urlParams.get('action') === 'review') {
+                            
+                            setTimeout(() => {
+                                reviewFormContainer.classList.add('active'); 
+                                openReviewBtn.classList.add('hidden-content'); 
+                                document.getElementById('reviewFormContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                
+                                // Optional: Clean the URL so if they refresh the page, it doesn't auto-scroll again
+                                window.history.replaceState({}, document.title, window.location.pathname + "?sku=" + sku);
+                            }, 800); 
+                        }
                     }
                 }
             } catch (err) { console.error(err); }

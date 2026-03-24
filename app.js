@@ -92,20 +92,20 @@ app.get('/product', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'product.html'));
 });
 
-// fetches user's order history for profile page
+// Get User's Orders
 app.get('/api/orders', async (req, res) => {
     try {
-        if (!req.session.userId) return res.status(401).json({ error: "> UNAUTHORIZED" });
+        const userId = req.session.userId;
+        if (!userId) return res.status(401).json({ error: "Please log in." });
 
-        // fetches all orders belonging to current user sorted by newest first
-        const orders = await Order.find({ user: req.session.userId })
-            .sort({ createdAt: -1 })
-            .populate('items.product', 'imageString'); // grabs image from product database!
+        // THE FIX: Added .populate('items.product') right after the find() command!
+        const orders = await Order.find({ user: userId })
+            .populate('items.product') 
+            .sort({ createdAt: -1 });
 
         res.json(orders);
     } catch (err) {
-        console.error("Error fetching orders:", err);
-        res.status(500).json({ error: "> FAILURE TO RETRIEVE LOGS" });
+        res.status(500).json({ error: "Failed to load orders." });
     }
 });
 
