@@ -56,76 +56,42 @@
             
         </section>
 
-        <div class="section-title">> OTHER_SYSTEMS // SECTOR_ROUTING</div>
+        <h2 class="section-title">> OTHER_SYSTEMS // SECTOR_ROUTING</h2>
+
+        <div class="system-grid">
+            <div class="system-card" onclick="window.location.href='/products?category=Star Wars'">
+                <div class="system-bg static-bg bg-sw-static"></div>
+                <div class="system-bg animated-bg bg-sw-hover"></div>
+                <div class="system-content">
+                    <span class="sector-name">[ SECTOR: STAR WARS ]</span>
+                    <button class="tac-btn btn-outline-cyan mt-10">[ INITIATE JUMP ]</button>
+                </div>
+            </div>
+
+            <div class="system-card" onclick="window.location.href='/products?category=Transformers'">
+                <div class="system-bg static-bg bg-tf-static"></div>
+                <div class="system-bg animated-bg bg-tf-hover"></div>
+                <div class="system-content">
+                    <span class="sector-name">[ SECTOR: TRANSFORMERS ]</span>
+                    <button class="tac-btn btn-outline-cyan mt-10">[ INITIATE JUMP ]</button>
+                </div>
+            </div>
+
+            <div class="system-card" onclick="window.location.href='/products?category=Marvel'">
+                <div class="system-bg static-bg bg-mv-static"></div>
+                <div class="system-bg animated-bg bg-mv-hover"></div>
+                <div class="system-content">
+                    <span class="sector-name">[ SECTOR: MARVEL ]</span>
+                    <button class="tac-btn btn-outline-cyan mt-10">[ INITIATE JUMP ]</button>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title mt-30">> NEW_ITEMS // LATEST_IMPORTS</h2>
         
-        <section class="system-grid">
-            
-            <div class="system-card cyber-panel sector-sw">
-                <div class="system-bg static-bg"></div>
-                <div class="system-bg animated-bg"></div>
-                
-                <div class="system-content">
-                    <h3 class="sector-name">[ SECTOR: STAR WARS ]</h3>
-                    <a href="#" class="tac-btn tac-btn--md">[ INITIATE JUMP ]</a>
-                </div>
-            </div>
-
-            <div class="system-card cyber-panel sector-placeholder">
-                <div class="system-bg static-bg"></div>
-                <div class="system-bg animated-bg"></div>
-                
-                <div class="system-content">
-                    <h3 class="sector-name">[ SECTOR: CYBERTRON ]</h3>
-                    <a href="#" class="tac-btn tac-btn--md">[ INITIATE JUMP ]</a>
-                </div>
-            </div>
-
-            <div class="system-card cyber-panel sector-placeholder">
-                <div class="system-bg static-bg"></div>
-                <div class="system-bg animated-bg"></div>
-                
-                <div class="system-content">
-                    <h3 class="sector-name">[ SECTOR: GOTHAM ]</h3>
-                    <a href="#" class="tac-btn tac-btn--md">[ INITIATE JUMP ]</a>
-                </div>
-            </div>
-
-        </section>
-
-        <div class="section-title">> NEW_ITEMS // LATEST_IMPORTS</div>
-        
-        <section class="bounty-grid">
-            <div class="bounty-card cyber-panel">
-                <div class="card-header">[!] CLASSIFIED</div>
-                <div class="card-image-placeholder">IMG_NO_SIGNAL</div>
-                <div class="card-details">
-                    <p>ID: SW-001</p>
-                    <p>CREDITS: ₱400.00</p>
-                </div>
-                <button class="tac-btn tac-btn--full">[ ADD TO CART ]</button>
-            </div>
-
-            <div class="bounty-card cyber-panel">
-                <div class="card-header">[!] CLASSIFIED</div>
-                <div class="card-image-placeholder">IMG_NO_SIGNAL</div>
-                <div class="card-details">
-                    <p>ID: SW-001</p>
-                    <p>CREDITS: ₱400.00</p>
-                </div>
-                <button class="tac-btn tac-btn--full">[ ADD TO CART ]</button>
-            </div>
-
-            <div class="bounty-card cyber-panel">
-                <div class="card-header">[!] CLASSIFIED</div>
-                <div class="card-image-placeholder">IMG_NO_SIGNAL</div>
-                <div class="card-details">
-                    <p>ID: SW-001</p>
-                    <p>CREDITS: ₱400.00</p>
-                </div>
-                <button class="tac-btn tac-btn--full">[ ADD TO CART ]</button>
-            </div>
-            
-            </section>
+        <div class="product-grid mb-50" id="latestImportsContainer">
+            <div class="col-span-full text-center p-20 text-muted">> SCANNING FOR LATEST IMPORTS...</div>
+        </div>
 
     </main>
 

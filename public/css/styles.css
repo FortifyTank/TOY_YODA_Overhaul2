@@ -198,6 +198,7 @@ h1, h2, h3, h4, h5, h6,
 .mb-5 { margin-bottom: 5px; }
 .mb-12 { margin-bottom: 12px; }
 .mb-20 { margin-bottom: 20px; }
+.mb-50 { margin-bottom: 50px; }
 
 .mt-auto { margin-top: auto; } 
 .mx-auto { margin-left: auto; margin-right: auto; }
@@ -711,8 +712,13 @@ input:-webkit-autofill:focus { border-color: var(--amber-accent) !important; }
 .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px 20px; }
 
 .section-title {
-    font-size: 1.2rem; color: var(--term-muted); letter-spacing: 2px;
-    margin-bottom: 15px; border-left: 3px solid var(--amber-accent); padding-left: 10px;
+    font-size: 1.2rem; 
+    font-weight: bold; /* Added Bold */
+    color: var(--term-muted); 
+    letter-spacing: 2px;
+    margin-bottom: 15px; 
+    border-left: 3px solid var(--amber-accent); 
+    padding-left: 10px;
 }
 
 .hero-banner { border: 1px solid var(--term-muted); padding: 60px 40px; text-align: center; margin-bottom: 40px; background-color: transparent; }
@@ -744,8 +750,6 @@ input:-webkit-autofill:focus { border-color: var(--amber-accent) !important; }
 .system-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-bottom: 50px; }
 .system-card { height: 420px; border: 1px solid var(--border-dim); position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; cursor: pointer; }
 
-.sector-sw .static-bg { background-image: url('/images/starwars-static.png'); }
-.sector-sw .animated-bg { background-image: url('/images/starwars-hover.png'); }
 .sector-placeholder .static-bg { background-color: var(--bg-placeholder); }
 .sector-placeholder .animated-bg { background-color: var(--bg-placeholder-hover); }
 
@@ -759,9 +763,27 @@ input:-webkit-autofill:focus { border-color: var(--amber-accent) !important; }
 .system-card:hover .animated-bg { opacity: 1; filter: grayscale(0%) brightness(0.8); transform: scale(1.05); }
 
 .system-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.sector-name { font-size: 1.8rem; color: var(--term-text); background: rgba(0,0,0,0.8); padding: 5px 15px; border: 1px solid var(--border-dim); transition: 0.3s; text-align: center; }
+.sector-name { 
+    font-size: 1.8rem; 
+    font-weight: bold; /* Added Bold */
+    color: var(--term-text); 
+    background: rgba(0,0,0,0.8); 
+    padding: 5px 15px; 
+    border: 1px solid var(--border-dim); 
+    transition: 0.3s; 
+    text-align: center; 
+}
 .system-card:hover .sector-name { color: var(--amber-accent); border-color: var(--amber-accent); }
 
+/*backgrounds*/
+.bg-sw-static { background-image: url('/images/starwars-static.png'); }
+.bg-sw-hover { background-image: url('/images/starwars-hover.png'); }
+
+.bg-tf-static { background-image: url('/images/transformers-static.png'); }
+.bg-tf-hover { background-image: url('/images/transformers-hover.png'); }
+
+.bg-mv-static { background-image: url('/images/marvel-static.png'); }
+.bg-mv-hover { background-image: url('/images/marvel-hover.png'); }
 
 /* =========================================
    9. PAGE: CATALOG & CART (products.html)
@@ -1531,98 +1553,172 @@ html {
 }
 
 /* =========================================
-   16. ABOUT US / PARALLAX PAGE
+   16. ABOUT US / SCROLL PARALLAX
 ========================================= */
 
-/* for the email links in the abt page lol */
-.comms-link {
+/* 1. THE ULTIMATE BLACK VOID OVERRIDE */
+body.about-theme {
+    --bg-crt: #000000 !important;
+    --bg-header: #000000 !important;
+    background-color: #000000 !important;
+    background-image: none !important;
+}
+
+body.about-theme::before, 
+body.about-theme::after { display: none !important; }
+
+body.about-theme .top-command-bar {
+    background: #000000 !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,1) !important; /* Pure black shadow */
+}
+
+body.about-theme .global-header { background: #000000 !important; }
+
+/* 2. THE STAGE SETTINGS */
+.scroll-track {
+    height: 500vh; /* Lengthened to 5 full screens to fit the new slide-up animations */
     position: relative;
-    text-decoration: none;
-    color: var(--term-cyan);
-    font-family: 'VT323', monospace;
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
-    padding: 0 10px;
-    flex-shrink: 0;
-    min-width: 200px;
-    text-align: right;
+    background: #000;
 }
 
-.comms-link::before, .comms-link::after {
-    content: '';
-    position: absolute;
-    width: 5px;
-    height: 100%;
-    border: 2px solid var(--amber-accent);
-    opacity: 0;
-    transition: all 0.2s ease;
-}
-
-.comms-link::before { left: -5px; border-right: none; }
-.comms-link::after { right: -5px; border-left: none; }
-
-.comms-link:hover { color: var(--term-text); text-shadow: var(--cyan-glow); }
-.comms-link:hover::before { opacity: 1; left: 0; }
-.comms-link:hover::after { opacity: 1; right: 0; }
-
-/* overriding some classes for the abt page */
-.about-dossier .data-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px dashed var(--border-dim);
-    gap: 20px;
-}
-
-.about-dossier .data-label {
-    width: 280px;
-    text-align: left;
-    flex-shrink: 0;
-}
-
-.about-dossier .data-value {
-    flex-grow: 1;
-    text-align: left;
-    color: var(--term-text);
-    font-size: 1.4rem;
-}
-
-/* Parallax Stage Setup */
-.reveal-stage {
-    position: relative;
-    height: 90vh;
+.sticky-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
-    margin-bottom: 50px;
-    background: rgba(0,0,0,0.2);
-}
-
-.central-logo {
-    z-index: 5;
-    transform: scale(0.5);
-    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
-    transition: transform 0.1s ease-out;
-    margin-top: -300px;
-}
-
-.reveal-char {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: auto;
-    height: 130%;
+    background: #000;
     z-index: 10;
-    transition: transform 0.1s ease-out;
-    filter: drop-shadow(var(--cyan-glow));
 }
 
-.left-wing { top: 30%; left: 0.5%; }
-.right-wing { right: 0.5%; }
+.anim-text {
+    position: absolute; color: #fff; font-size: 4rem; font-family: 'Audiowide', sans-serif;
+    opacity: 0; text-align: center; text-transform: uppercase; text-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
 
-.about-content-wrapper {
+.anim-logo {
+    position: absolute; width: 400px; opacity: 0; z-index: 15;
+    filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.4));
+}
+
+.anim-char {
+    position: absolute; bottom: 0; height: 85vh; opacity: 0; z-index: 20;
+}
+
+.anim-left { left: 0; transform: translateX(-100%); }
+.anim-right { right: 0; transform: translateX(100%); }
+
+/* 3. THE NEW DOSSIER CONTAINER */
+.dossier-anim-container {
+    position: absolute;
+    bottom: 18%; /* INCREASED: Pushes the entire block much higher up the screen */
+    width: 100%;
+    max-width: 1200px;
+    z-index: 25;
+    text-align: center; /* Centers all text globally inside this container */
+}
+
+/* Start the boxes hidden and pushed down by default so they don't flash on load */
+#missionAnimBox, 
+#foundersAnimBox {
+    opacity: 0;
+    transform: translateY(100px);
+    will-change: transform, opacity; 
+}
+
+/* Extracted Inline Styles for Mission Box */
+#missionAnimBox {
+    max-width: 900px; 
+    background: rgba(0,0,0,0.6); 
+    border-top: 2px solid var(--amber-accent); 
+    border-bottom: 2px solid var(--amber-accent);
+}
+#missionAnimBox h2 { font-size: 2.5rem; }
+#missionAnimBox p { font-size: 1.6rem; line-height: 1.6; }
+
+/* Extracted Inline Styles for Founders Box */
+#foundersAnimBox > h2 { 
+    font-size: 2.5rem; 
+    margin-top: 40px; 
+}
+
+/* Holographic Command Cards (The Box Design) */
+.holo-card {
+    border: 1px solid var(--border-dim);
+    background: rgba(0, 20, 30, 0.4);
+    padding: 30px 20px;
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.05);
     position: relative;
-    z-index: 1; 
+    text-align: center;
+}
+
+.holo-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--term-cyan);
+    box-shadow: 0 0 10px var(--term-cyan);
+}
+
+/* Upscaled Holo Card Fonts */
+.holo-card h3 { font-size: 2rem; }
+.holo-card p { font-size: 1.2rem; }
+.holo-card .tac-btn { 
+    font-size: 1.2rem; 
+    padding: 10px 25px; 
+}
+
+/* The Scroll Down Prompt - NO BLINKING */
+.scroll-indicator {
+    position: absolute;
+    top: 40%; /* OPTICAL CENTER: Compensates for the height of the nav bar! */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--term-muted); 
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 4px;
+    z-index: 50;
+    will-change: transform, opacity;
+}
+
+/* =========================================
+   17. PAGE: 404 ERROR
+========================================= */
+
+/* Centers the entire page content to the middle of the screen */
+.error-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #000;
+    overflow: hidden;
+}
+
+/* The giant red glowing 404 */
+.error-code {
+    color: var(--term-red);
+    font-family: 'Audiowide', sans-serif;
+    font-size: 5rem;
+    text-shadow: var(--red-glow);
+    margin-bottom: 10px;
+}
+
+/* The blinking sub-title */
+.error-title {
+    color: var(--term-pink);
+    font-size: 2rem;
+    letter-spacing: 5px;
+    margin-bottom: 30px;
+    animation: blink 1s infinite;
+}
+
+/* Upscaled description text */
+.error-desc {
+    font-size: 1.5rem;
 }

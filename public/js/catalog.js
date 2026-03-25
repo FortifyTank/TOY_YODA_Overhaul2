@@ -30,6 +30,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/products');
             allProducts = await response.json();
             generateThemeFilters(allProducts);
+
+            // --- BULLETPROOF URL JUMP PARAMETER ---
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetCategory = urlParams.get('category');
+            
+            if (targetCategory) {
+                const checkboxes = document.querySelectorAll('.theme-checkbox');
+                // Force lowercase and trim spaces to ensure a flawless match
+                const cleanTarget = targetCategory.trim().toLowerCase();
+                
+                checkboxes.forEach(cb => {
+                    const cleanValue = cb.value.trim().toLowerCase();
+                    if (cleanValue === cleanTarget) {
+                        cb.checked = true;
+                    }
+                });
+            }
+            // -----------------------------------------
+
             applyFilters(); 
         } catch (error) {
             console.error("Error loading the catalog:", error);

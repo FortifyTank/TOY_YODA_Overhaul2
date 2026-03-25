@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -32,10 +33,10 @@ const Message = require('./models/Message');
 
 // initializes express 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // database connection
-const dbURI = "mongodb://playofgamer10_db_user:CHbeLY5tbk1CPx6q@ac-ir6m09r-shard-00-00.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-01.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-02.5npf8nj.mongodb.net:27017/?ssl=true&authSource=admin&retryWrites=true&w=majority";
+const dbURI = process.env.MONGODB_URI;
 
 mongoose.connect(dbURI, { dbName: "toy_yoda" })
     .then(() => console.log(`> DATABASE: MONGODB SECURED AND CONNECTED`))
@@ -50,10 +51,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // configures session (logged in state)
 app.use(session({
-    secret: 'tactical_toy_yoda_key_99', // secret key to encrypt cookies
+    secret: process.env.SESSION_SECRET, 
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // set to false for localhost, true if using HTTPS
+    cookie: { secure: false } 
 }));
 
 // == IMPORTANT routes ==
@@ -838,6 +839,12 @@ app.post('/api/admin/products/:id/edit', upload.single('imageFile'), async (req,
     } catch (err) {
         res.status(500).json({ error: "System Error Updating Specs" });
     }
+});
+
+// --- 404 CATCH-ALL ROUTE ---
+// Must stay at the very bottom, right above app.listen!
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
 });
 
 // --- server status ---

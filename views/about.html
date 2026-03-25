@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body class="crt-theme">
+<body class="crt-theme about-theme">
     
     <div class="top-command-bar">
         <header class="global-header">
@@ -30,58 +30,55 @@
         </nav>
     </div>
 
-    <main class="dashboard-layout mt-30 mx-auto max-w-800 p-20">
+    <div class="scroll-track" id="aboutScrollTrack">
+        
+        <div class="sticky-stage">
+            <div class="scroll-indicator" id="scrollInd">SCROLL DOWN</div>
+            <div class="anim-text" id="text1">Who are we?</div>
+            <div class="anim-text" id="text2">We are...</div>
+            
+            <img src="/images/Toy_Yoda_Title.png" class="anim-logo" id="animLogo" alt="Toy Yoda">
+            <img src="/images/soyjak_left.png" class="anim-char anim-left" id="animLeft" alt="Left Character">
+            <img src="/images/soyjak_right.png" class="anim-char anim-right" id="animRight" alt="Right Character">
 
-        <div class="reveal-stage">
-            <div class="central-logo">
-                <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="reveal-logo">
-            </div>
-            <img src="/images/soyjak_left.png" class="reveal-char left-wing" alt="Character Left">
-            <img src="/images/soyjak_right.png" class="reveal-char right-wing" alt="Character Right">
-        </div>
-
-        <div class="about-content-wrapper">
-            <h2 class="text-amber m-0 mb-20">> BEEP BOOP</h2>
-        </div>
-
-        <div class="cyber-panel p-30">
-            <div class="d-flex flex-col gap-20">
-                <div>
-                    <h3 class="text-cyan mb-10 tracking-widest">// OVERVIEW</h3>
-                    <p class="text-regular mb-20 text-muted">
-                        We sell toys n stuff. <br>
-                        Tell your friends at the playground.
+            <div class="dossier-anim-container">
+                
+                <div id="missionAnimBox" class="p-30 mb-30 mx-auto">
+                    <h2 class="text-amber tracking-widest m-0 mb-15">> OUR MISSION</h2>
+                    <p class="text-muted m-0">
+                        We sell toys and collectibles. Built and engineered by Computer Systems Engineering students at De La Salle University.
                     </p>
                 </div>
-            </div>
 
-            <div class="border-dashed-dim mb-20"></div>
+                <div id="foundersAnimBox">
+                    <h2 class="text-amber tracking-widest mb-20">> OUR FOUNDERS</h2>
+                    
+                    <div class="grid-auto-fit gap-20">
+                        <div class="holo-card">
+                            <h3 class="text-cyan m-0">MATTHEW FABREGAS</h3>
+                            <p class="text-muted tracking-widest m-0 mb-20">PROJECT LEAD</p>
+                            <a href="mailto:matthew_drew_fabregas@dlsu.edu.ph" class="tac-btn btn-cyan-invert">[ EMAIL ]</a>
+                        </div>
+                        
+                        <div class="holo-card">
+                            <h3 class="text-cyan m-0">ROY SANDOVAL</h3>
+                            <p class="text-muted tracking-widest m-0 mb-20">ASSISTANT DEVELOPER</p>
+                            <a href="mailto:roy_sandoval@dlsu.edu.ph" class="tac-btn btn-cyan-invert">[ EMAIL ]</a>
+                        </div>
 
-            <h3 class="text-cyan mb-20 tracking-widest">// THE IMPERIAL HIGH COMMAND</h3>
-
-            <div class="about-dossier">
-                <div class="data-row">
-                    <span class="data-label text-muted">EMPEROR OF THE GALAXY</span>
-                    <span class="data-value font-bold">Matt</span>
-                    <a href="mailto:matthew_drew_fabregas@dlsu.edu.ph" class="comms-link">INITIATE TRANSMISSION</a>
+                        <div class="holo-card">
+                            <h3 class="text-cyan m-0">TOPHI MIRANDA</h3>
+                            <p class="text-muted tracking-widest m-0 mb-20">ALGORITHM ENGINEER</p>
+                            <a href="mailto:tophi_miranda@dlsu.edu.ph" class="tac-btn btn-cyan-invert">[ EMAIL ]</a>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="data-row">
-                    <span class="data-label text-muted">COMMANDER OF THE ARMY</span>
-                    <span class="data-value font-bold">Roy</span>
-                    <a href="mailto:roy_sandoval@dlsu.edu.ph" class="comms-link">INITIATE TRANSMISSION</a>
-                </div>
 
-                <div class="data-row border-none">
-                    <span class="data-label text-muted">COMMANDER OF THE NAVY</span>
-                    <span class="data-value font-bold">Tophi</span>
-                    <a href="mailto:tophi_miranda@dlsu.edu.ph" class="comms-link">INITIATE TRANSMISSION</a>
-                </div>
             </div>
         </div>
-    </main>
+    </div>
 
     <script src="/js/dashboard.js"></script>
     <script src="/js/cart.js"></script>
-</body>
+    <script src="/js/about.js"></script> </body>
 </html>
