@@ -718,7 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (user.role !== 'admin') {
                 // Intruder detected. Kick them out immediately.
-                window.location.href = '/products';
+                window.location.href = '/catalog';
                 return;
             }
             

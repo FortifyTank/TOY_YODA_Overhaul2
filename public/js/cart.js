@@ -197,4 +197,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Boot UI on load
     updateCartUI();
+
+    function openCart() {
+        if(cartDrawer && cartOverlay) {
+            cartDrawer.classList.add('active');
+            cartOverlay.classList.add('active');
+            // NEW: Locks the background page from scrolling
+            document.body.classList.add('no-scroll'); 
+        }
+    }
+
+    function closeCart() {
+        if(cartDrawer && cartOverlay) {
+            cartDrawer.classList.remove('active');
+            cartOverlay.classList.remove('active');
+            // NEW: Unlocks the background page
+            document.body.classList.remove('no-scroll'); 
+        }
+    }
+
 });

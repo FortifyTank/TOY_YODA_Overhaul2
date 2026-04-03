@@ -31,23 +31,25 @@ document.addEventListener('DOMContentLoaded', () => {
             allProducts = await response.json();
             generateThemeFilters(allProducts);
 
-            // --- BULLETPROOF URL JUMP PARAMETER ---
             const urlParams = new URLSearchParams(window.location.search);
-            const targetCategory = urlParams.get('category');
             
+            // 1. Existing Theme Logic
+            const targetCategory = urlParams.get('category');
             if (targetCategory) {
                 const checkboxes = document.querySelectorAll('.theme-checkbox');
-                // Force lowercase and trim spaces to ensure a flawless match
                 const cleanTarget = targetCategory.trim().toLowerCase();
-                
                 checkboxes.forEach(cb => {
-                    const cleanValue = cb.value.trim().toLowerCase();
-                    if (cleanValue === cleanTarget) {
-                        cb.checked = true;
-                    }
+                    if (cb.value.trim().toLowerCase() === cleanTarget) cb.checked = true;
                 });
             }
-            // -----------------------------------------
+
+            // 2. NEW: Global Search Receiver Logic
+            const targetSearch = urlParams.get('search');
+            if (targetSearch) {
+                searchInput.value = targetSearch; // Types the word into the search bar
+                sortDropdown.value = 'RELEVANCE'; // Auto-switches the dropdown
+                currentSort = 'RELEVANCE';
+            }
 
             applyFilters(); 
         } catch (error) {
@@ -178,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Empty State (OPTIMIZED: Using CSS Utilities)
         if (totalItems === 0) {
             resultCount.innerText = `[ SHOWING: 0 / 0 ]`;
-            container.innerHTML = '<p class="col-span-full text-center text-muted text-lg mt-30">> NO MANIFESTS MATCH CURRENT PARAMETERS.</p>';
+            container.innerHTML = '<p class="col-span-full text-center text-muted text-lg mt-30">> NO PRODUCT MATCHES CURRENT PARAMETERS.</p>';
             renderPagination(0, filteredList);
             return;
         }

@@ -93,29 +93,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // =====================================
-        // PHASE 5: STAGGERED DOSSIER SLIDE-UP
+        // PHASE 5: THE CINEMATIC DOSSIER PUSH
         // =====================================
         
-        // 1. Mission slides up smoothly starting at 55%
-        if (progress >= 0.55) {
-            let mEnter = Math.min(1, (progress - 0.55) / 0.20); 
-            let smoothM = 1 - Math.pow(1 - mEnter, 2); // Eased animation
+        // 1. MISSION ENTRY & EXIT (50% to 85% scroll)
+        if (progress >= 0.50 && progress <= 0.85) {
+            let mEnter = Math.min(1, (progress - 0.50) / 0.10); // Slides in (50-60%)
+            let mExit = 0;
+            
+            // THE FIX: Don't start the exit until 75% scroll! (Massive breathing room)
+            if (progress >= 0.75) {
+                mExit = Math.min(1, (progress - 0.75) / 0.10); // Exits (75-85%)
+            }
+            
+            let smoothM = 1 - Math.pow(1 - mEnter, 2);
+            let exitM = Math.pow(mExit, 2); 
+
             missionBox.style.opacity = mEnter;
-            missionBox.style.transform = `translateY(${100 - (smoothM * 100)}px)`; 
-        } else {
+            let dragUpDistance = window.innerHeight * 1.5; 
+            missionBox.style.transform = `translateY(${100 - (smoothM * 100) - (exitM * dragUpDistance)}px)`; 
+            
+        } else if (progress < 0.50) {
             missionBox.style.opacity = 0;
             missionBox.style.transform = `translateY(100px)`; 
+        } else {
+            missionBox.style.opacity = 1; 
+            missionBox.style.transform = `translateY(-3000px)`; 
         }
 
-        // 2. Founders delay, then slide up FASTER to "catch up" starting at 62%
-        if (progress >= 0.62) {
-            let fEnter = Math.min(1, (progress - 0.62) / 0.15); // Faster duration
-            let smoothF = 1 - Math.pow(1 - fEnter, 3); // Cubic ease for an aggressive snap-into-place
+        // 2. FOUNDERS PUSH REVEAL (Wait until 75% to start rising)
+        if (progress >= 0.75) {
+            let fEnter = Math.min(1, (progress - 0.75) / 0.10); // Enters (75-85%)
+            let smoothF = 1 - Math.pow(1 - fEnter, 2); 
+            
             foundersBox.style.opacity = fEnter;
-            foundersBox.style.transform = `translateY(${100 - (smoothF * 100)}px)`; 
+            foundersBox.style.transform = `translateY(${150 - (smoothF * 150)}px)`; 
         } else {
             foundersBox.style.opacity = 0;
-            foundersBox.style.transform = `translateY(100px)`; 
+            foundersBox.style.transform = `translateY(150px)`; 
         }
     });
 

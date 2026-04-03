@@ -75,8 +75,8 @@ app.get('/home', (req, res) => {
 });
 
 // route for product catalogue
-app.get('/products', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'products.html'));
+app.get('/catalog', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'catalog.html'));
 });
 
 // route for user profile

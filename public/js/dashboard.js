@@ -123,3 +123,22 @@ document.addEventListener("DOMContentLoaded", () => {
     handleBootAnimation();
     checkAuthStatus();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Global Search "Enter" Key Listener
+    const globalSearchInput = document.querySelector('.header-search input');
+    
+    if (globalSearchInput) {
+        globalSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevents the page from refreshing
+                const query = globalSearchInput.value.trim();
+                
+                if (query) {
+                    // Instantly warps the user to the catalog with their search term attached
+                    window.location.href = `/catalog?search=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }
+});

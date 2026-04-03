@@ -10,21 +10,26 @@
 <body class="crt-theme">
     
     <div class="top-command-bar">
+        
         <header class="global-header">
             <div class="header-left">
                 <a href="/login" class="clearance header-btn">[ LOG IN ]</a>
             </div>
             <div class="header-logo">
-                <img src="/images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
+                <img src="images/Toy_Yoda_Title.png" alt="Toy Yoda" class="nav-brand-img">
             </div>
             <div class="header-right">
+                <div class="header-search">
+                    <input type="text" class="tac-input" placeholder="SEARCH CATALOG...">
+                </div>
                 <span class="cart-status header-btn">[ CART: 0 ]</span> 
             </div>
         </header>
+
         <nav class="global-nav">
             <div class="nav-status-light"></div> 
             <a href="/home" class="nav-link">> OVERVIEW</a>
-            <a href="/products" class="nav-link">> CATALOG</a>
+            <a href="/catalog" class="nav-link">> CATALOG</a>
             <a href="#" class="nav-link active">> FORUM</a>
             <a href="/about" class="nav-link">> ABOUT US</a>
         </nav>
@@ -57,7 +62,35 @@
 
     </main>
 
+    <div id="cartOverlay" class="cart-overlay"></div>
+    
+    <div id="cartDrawer" class="cart-drawer cyber-panel">
+        <div class="cart-header">
+            <h3>// YOUR CART</h3>
+            <button id="closeCartBtn" class="tac-btn tac-btn--ghost text-sm btn-red-invert">[ X ]</button>
+        </div>
+        
+        <div id="cartItemsContainer" class="cart-items"></div>
+        
+        <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>TOTAL ESTIMATE:</span>
+                <span id="cartTotalDisplay" class="text-amber">₱0</span>
+            </div>
+            <button id="proceedCheckoutBtn" class="tac-btn tac-btn--full tac-btn--lg">[ PROCEED TO CHECKOUT ]</button>
+            <button id="clearCartBtn" class="tac-btn tac-btn--full tac-btn--ghost mt-10">[ CLEAR CART ]</button>
+        </div>
+    </div>
+
+    <div id="systemAlert" class="system-alert-box">
+        <div class="alert-icon">[!]</div>
+        <div class="alert-message" id="systemAlertMessage">> SYSTEM WARNING</div>
+        <button class="tac-btn" id="systemAlertOkBtn">[ ACKNOWLEDGE ]</button>
+    </div>
+
     <script src="/js/dashboard.js"></script>
     <script src="/js/cart.js"></script>
-    <script src="/js/community.js"></script> </body>
+    <script src="/js/alerts.js"></script>
+    <script src="/js/community.js"></script>
+    </body>
 </html>

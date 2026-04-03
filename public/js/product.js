@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sku = urlParams.get('sku');
 
     if (!sku) {
-        window.location.href = '/products';
+        window.location.href = '/catalog';
         return;
     }
 
@@ -294,6 +294,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (err) {
         alert("> CLASSIFIED: ASSET NOT FOUND.");
-        window.location.href = '/products';
+        window.location.href = '/catalog';
     }
 });

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Security check: If cart is empty, kick them back to the store
     if (cart.length === 0) {
-        window.location.href = '/products';
+        window.location.href = '/catalog';
         return;
     }
 
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 // Delay the warp by 3.5 seconds so they can see the success box!
                 setTimeout(() => {
-                    window.location.href = '/products'; 
+                    window.location.href = '/catalog'; 
                 }, 3500);
 
             } else {
