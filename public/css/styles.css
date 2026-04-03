@@ -87,7 +87,12 @@ body:not(.crt-theme) {
 .crt-theme::before {
     content: '';
     position: fixed;
-    inset: 0; 
+    /* THE FIX: Overscanning. Makes the image slightly larger than the screen 
+       so it never recalculates or jumps when the URL bar hides! */
+    top: -10vh; 
+    left: -10vw;
+    width: 120vw;
+    height: 120vh;
     background-image: url('/images/planet-bg.png'); 
     background-size: cover;
     background-position: center bottom;
@@ -954,6 +959,13 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
 .data-value { flex-grow: 1; color: var(--term-text); }
 .card-divider { border: none; border-top: 1px dashed var(--border-dim); margin: 25px 0; }
 .card-footer-actions { display: flex; justify-content: space-between; }
+/* Forces the Purchase History text to align perfectly above the View Records button */
+.card-footer-actions > div:last-child {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; 
+    text-align: right;
+}
 
 .side-panel { 
     position: absolute; width: 400px; padding: 30px; 
@@ -1066,6 +1078,12 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
 /* =========================================
    11. PAGE: CHECKPOINT / CHECKOUT
 ========================================= */
+
+/* Hides the dynamically injected Admin buttons so they don't clutter the checkout flow */
+.checkout-page .header-left > *:not(.tac-btn--danger) {
+    display: none !important;
+}
+
 .checkout-layout {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
@@ -1088,22 +1106,24 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
     
     /* 1. Brings back the intersecting, centered look */
     position: absolute;
-    top: -14px; /* Pulls the badge exactly halfway up the border */
+    top: -14px; 
     left: 50%;
     transform: translateX(-50%);
+    
+    /* THE FIX: Mathematically forbids the badge text from wrapping to a second line */
+    white-space: nowrap; 
     
     /* 2. Adds the border and the inner glow to match the box */
     border: 1px solid var(--term-green);
     box-shadow: inset 0 0 8px rgba(0, 255, 102, 0.15);
     
-    /* 3. Uses a solid dark color with a slight green tint. 
-       (It MUST be solid, otherwise the main box's border will bleed through the text!) */
+    /* 3. Uses a solid dark color with a slight green tint. */
     background-color: #0c1b1a; 
     
     color: var(--term-green);
     font-size: 0.85rem;
     font-weight: bold;
-    padding: 4px 15px; /* Gives the badge some nice thick edges */
+    padding: 4px 15px; 
     letter-spacing: 1px;
 }
 
@@ -1963,22 +1983,29 @@ body.about-theme .global-header { background: #000000 !important; }
         grid-template-columns: 1fr; 
     }
     
-    .stage-shift-right .id-card, 
-    .stage-shift-left .id-card { 
-        transform: translateX(0); opacity: 0.2; pointer-events: none; 
+    /* Shrinks the massive desktop padding to "zoom out" the profile mobile view */
+    .id-card {
+        padding: 20px !important; 
+    }
+    
+    /* Stacks the action buttons neatly on small screens so they don't squish */
+    .card-footer-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
+    /* Resets the alignment so it looks clean on mobile */
+    .card-footer-actions > div:last-child {
+        align-items: flex-start !important;
+        text-align: left !important;
     }
 
-    /* THE ROOT FIX: Absolute Centering without using Transform Math */
-    .side-panel { 
-        left: 0 !important; right: 0 !important; margin: 0 auto !important; 
-        z-index: 100; width: 95%; max-width: 450px; 
-        transform: translateY(30px); /* Sets the hidden drop-down state cleanly */
+    .card-footer-actions .tac-btn {
+        width: 100%;
     }
-
-    /* Safely triggers the animation without erasing the horizontal centering */
-    .stage-shift-right .left-panel,
-    .stage-shift-left .right-panel {
-        transform: translateY(0) !important;
+    
+    /* Gives the data values more room to breathe on phones */
+    .data-label {
+        width: 80px; 
     }
 
     /* 8. PAGINATION BUTTON FIX */
