@@ -1008,10 +1008,20 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
 .tactical-tabs { 
     display: flex; gap: 15px; border-bottom: 1px solid var(--border-dim); 
     padding-bottom: 10px; flex-shrink: 0;
+    
+    /* THE FIX: Forces horizontal swiping instead of squishing! */
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 }
+.tactical-tabs::-webkit-scrollbar { display: none; }
+
 .tab-btn { 
     background: none; border: none; color: var(--term-muted); 
     font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: color 0.2s; 
+    flex: 0 0 auto; /* Forbids shrinking */
+    white-space: nowrap; /* Forbids text wrapping */
 }
 .tab-btn:hover { color: var(--term-text); }
 .tab-btn.active { color: var(--amber-accent); text-shadow: var(--amber-glow-subtle); }
@@ -1193,6 +1203,20 @@ img.product-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; 
 /* =========================================
    13. ADMIN COMMAND CENTER (Ergonomic Overrides)
 ========================================= */
+
+/* Prevents the Restricted text from breaking into multiple lines on narrow PCs */
+.admin-theme .header-left .text-red {
+    white-space: nowrap;
+}
+
+/* Allows the sub-tabs and refresh buttons to stack neatly if space runs out */
+#logisticsView > .flex-between,
+#analyticsView > .flex-between {
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+
 /* Widen the command center */
 .admin-theme .dashboard-container { max-width: 1400px; }
 
@@ -2104,6 +2128,151 @@ body.about-theme .global-header { background: #000000 !important; }
     /* Shrinks the Title Logo slightly on mobile */
     .main-title-img {
         max-width: 85%;
+    }
+}
+
+/* =========================================
+   22. MOBILE ADMIN DASHBOARD (Read-Only Mode)
+========================================= */
+
+/* 1. Hide the warning banner on Desktop PC */
+.mobile-admin-warning { display: none; }
+
+@media (max-width: 900px) {
+    
+    /* 2. Show the warning banner on Mobile */
+    .mobile-admin-warning { 
+        display: block; 
+        border-color: var(--amber-accent); 
+    }
+    
+    /* 3. Hide complex management buttons using your EXACT Javascript classes & IDs! */
+    .view-manifest-btn,
+    .edit-toy-btn,
+    #addNewToyBtn,
+    #toggleArchiveModeBtn {
+        display: none !important;
+    }
+}
+
+/* =========================================
+   22. MOBILE ADMIN DASHBOARD (Responsive Architecture)
+========================================= */
+.mobile-admin-warning { display: none; }
+
+@media (max-width: 900px) {
+    
+    .mobile-admin-warning { 
+        display: block; 
+        border-color: var(--amber-accent); 
+    }
+    
+    /* Hides Desktop-Only Action Buttons */
+    .view-manifest-btn,
+    .edit-toy-btn,
+    #addNewToyBtn,
+    #toggleArchiveModeBtn {
+        display: none !important;
+    }
+
+    /* -----------------------------------------
+       FIX 1: "ZOOM OUT" THE DASHBOARD
+       Reduces dead space so content breathes better 
+    ----------------------------------------- */
+    .admin-theme .dashboard-container { 
+        padding: 10px; 
+    }
+    .admin-theme .dashboard-container > .cyber-panel { 
+        padding: 15px !important; 
+    }
+    .admin-theme .header-left .text-red { 
+        font-size: 1rem; 
+    }
+    
+    /* -----------------------------------------
+       FIX 3: 3-ROW VERTICAL MAIN TABS
+    ----------------------------------------- */
+    .admin-theme .dashboard-container > .cyber-panel > .flex-between:first-of-type {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+    }
+    .admin-theme .dashboard-container > .cyber-panel > .flex-between:first-of-type .tactical-tabs {
+        flex-direction: column !important;
+        border-bottom: none;
+        gap: 10px;
+    }
+    .admin-theme .dashboard-container > .cyber-panel > .flex-between:first-of-type .tab-btn {
+        border: 1px solid var(--border-dim);
+        background: rgba(0,0,0,0.4);
+        padding: 12px;
+        width: 100%;
+        text-align: center;
+        white-space: normal;
+    }
+    .admin-theme .dashboard-container > .cyber-panel > .flex-between:first-of-type .tab-btn.active {
+        border-color: var(--term-cyan);
+        background: rgba(77, 196, 255, 0.1);
+    }
+
+    /* -----------------------------------------
+       FIX 2: SWIPEABLE SUB-TABS (Grid Lock)
+    ----------------------------------------- */
+    #logisticsView > .flex-between,
+    #analyticsView > .flex-between {
+        display: grid;
+        grid-template-columns: 1fr; /* Mathematically forces width limit to allow swiping */
+        gap: 15px;
+    }
+    #logisticsView .tactical-tabs {
+        width: 100%;
+        justify-content: flex-start;
+        padding-bottom: 5px;
+    }
+    
+    /* -----------------------------------------
+       FIX 4: ARMORY CARDS (Image -> Controls -> Info)
+    ----------------------------------------- */
+    .admin-order-card {
+        flex-direction: column !important;
+    }
+    .armory-img-box {
+        border-right: none !important;
+        border-bottom: 1px dashed var(--border-dim);
+        padding: 20px;
+    }
+    .armory-data-grid {
+        /* CRITICAL: Places the stock controls ABOVE the info text! */
+        flex-direction: column-reverse !important; 
+        gap: 20px;
+        padding: 15px !important;
+    }
+    .armory-action-col {
+        min-width: 0 !important;
+        width: 100%;
+        align-items: center !important;
+        justify-content: center;
+        border-bottom: 1px dashed var(--border-dim);
+        padding-bottom: 15px;
+    }
+    .armory-stock-wrapper {
+        justify-content: center !important; /* Centers the +/- buttons */
+    }
+    
+    /* Clean up order log layout */
+    .admin-card-details {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    .admin-card-details .text-right {
+        text-align: center;
+    }
+
+    /* Ensure Analytics stretches to fill the screen */
+    .analytics-container {
+        width: 100% !important;
+        grid-template-columns: 1fr !important;
     }
 }
     
