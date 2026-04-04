@@ -37,7 +37,10 @@ const seedProducts = [
     { sku: "TF-005", name: "G1 REISSUE STARSCREAM", description: "Classic retro boxed figure.", price: 2500, old_price: 3000, avail_inventory: 5, category: "TRANSFORMERS", tags: ["decepticon", "retro", "g1", "starscream"], imageString: "/images/products/TF-001.jpg" },
 
     // --- MARVEL ---
-    { sku: "MV-001", name: "CAPTAIN AMERICA", description: "SHIELD", price: 8000, old_price: 10000, avail_inventory: 5, category: "MARVEL", tags: ["hero", "shield", "marvel"], imageString: "/images/products/TF-001.jpg" }
+    { sku: "MV-001", name: "CAPTAIN AMERICA", description: "SHIELD", price: 8000, old_price: 10000, avail_inventory: 5, category: "MARVEL", tags: ["hero", "shield", "marvel"], imageString: "/images/products/TF-001.jpg" },
+
+    // --- DC ---
+    { sku: "DC-001", name: "BATMAN", description: "BAT", price: 4000, old_price: 5000, avail_inventory: 5, category: "DC", tags: ["bat", "cool", "hero"], imageString: "/images/products/TF-001.jpg" }
 ];
 
 mongoose.connect(dbURI, { dbName: "toy_yoda" })
