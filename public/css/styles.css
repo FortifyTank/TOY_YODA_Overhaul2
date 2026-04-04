@@ -1852,6 +1852,25 @@ body.about-theme .global-header { background: #000000 !important; }
         padding: 10px 5px; 
         gap: 10px 5px;
     }
+
+    /* CHECKOUT: Stops the Abort button from stretching and scales it down for mobile */
+    .global-header .tac-btn--danger {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: start; /* Prevents it from stretching to fill the left column */
+        align-self: center;
+        font-size: 0.75rem !important;
+        padding: 6px 10px !important;
+        width: auto !important;
+        white-space: nowrap !important;
+        margin-top: 0 !important;
+    }
+    
+    /* Shrinks the back-arrow SVG icon slightly to match the smaller text */
+    .global-header .tac-btn--danger svg {
+        width: 14px;
+        height: 14px;
+    }
     
     /* Left Side */
     .header-left {
@@ -2005,6 +2024,12 @@ body.about-theme .global-header { background: #000000 !important; }
     .product-view-layout,
     .packing-slip-grid { 
         grid-template-columns: 1fr; 
+    }
+    
+    /* THE FIX: Forces the product view to maintain padding on mobile so it never touches the screen edges! */
+    .product-view-layout {
+        padding: 15px !important;
+        box-sizing: border-box;
     }
     
     /* Shrinks the massive desktop padding to "zoom out" the profile mobile view */
@@ -2167,112 +2192,210 @@ body.about-theme .global-header { background: #000000 !important; }
         border-color: var(--amber-accent); 
     }
     
-    /* Hides Desktop-Only Action Buttons */
+    /* Hides all complex data-entry buttons AND their black background containers! */
     .view-manifest-btn,
     .edit-toy-btn,
     #addNewToyBtn,
-    #toggleArchiveModeBtn {
+    #toggleArchiveModeBtn,
+    .admin-card-action { 
         display: none !important;
     }
 
     /* -----------------------------------------
-       FIX 1: "ZOOM OUT" THE DASHBOARD
-       Reduces dead space so content breathes better 
+       FIX 1: DASHBOARD ZOOM OUT & HEADER
     ----------------------------------------- */
-    .admin-theme .dashboard-container { 
-        padding: 10px; 
-    }
-    .admin-theme .dashboard-container > .cyber-panel { 
-        padding: 15px !important; 
-    }
+    .admin-theme .dashboard-container { padding: 10px; overflow-x: hidden; }
+    .admin-theme .dashboard-container > .cyber-panel { padding: 10px !important; }
+    
+    /* OVERFLOW FIX: Allows the left text to wrap instead of pushing off-screen */
     .admin-theme .header-left .text-red { 
-        font-size: 1rem; 
+        font-size: 0.85rem !important; 
+        white-space: normal !important; 
+        line-height: 1.2;
     }
     
+    /* OVERFLOW FIX: Forces the right button to shrink and wrap */
+    .admin-theme .header-right > .tac-btn {
+        grid-column: 3; grid-row: 1; justify-self: end; align-self: center;
+        font-size: 0.65rem !important; padding: 6px 8px !important;
+        width: auto !important; max-width: 90px;
+        white-space: normal !important; text-align: center; line-height: 1.1;
+    }
+
     /* -----------------------------------------
-       FIX 3: 3-ROW VERTICAL MAIN TABS
+       3-ROW VERTICAL MAIN TABS (Zoomed Out)
     ----------------------------------------- */
     .admin-theme .dashboard-container > .cyber-panel > .flex-between:first-of-type {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 20px;
+        flex-direction: column; align-items: stretch; gap: 15px;
     }
     .admin-theme .dashboard-container > .cyber-panel > .flex-between:first-of-type .tactical-tabs {
-        flex-direction: column !important;
-        border-bottom: none;
-        gap: 10px;
+        flex-direction: column !important; border-bottom: none; gap: 8px;
     }
     .admin-theme .dashboard-container > .cyber-panel > .flex-between:first-of-type .tab-btn {
-        border: 1px solid var(--border-dim);
-        background: rgba(0,0,0,0.4);
-        padding: 12px;
-        width: 100%;
-        text-align: center;
-        white-space: normal;
+        border: 1px solid var(--border-dim); background: rgba(0,0,0,0.4); padding: 10px; width: 100%; text-align: center; white-space: normal; font-size: 0.95rem;
     }
     .admin-theme .dashboard-container > .cyber-panel > .flex-between:first-of-type .tab-btn.active {
-        border-color: var(--term-cyan);
-        background: rgba(77, 196, 255, 0.1);
+        border-color: var(--term-cyan); background: rgba(77, 196, 255, 0.1);
     }
 
     /* -----------------------------------------
-       FIX 2: SWIPEABLE SUB-TABS (Grid Lock)
+       SWIPEABLE SUB-TABS & FULL WIDTH HEADERS
     ----------------------------------------- */
-    #logisticsView > .flex-between,
-    #analyticsView > .flex-between {
-        display: grid;
-        grid-template-columns: 1fr; /* Mathematically forces width limit to allow swiping */
-        gap: 15px;
+    /* Adds the Armory (Products) header to the full-width grid rule */
+    #logisticsView > .flex-between, 
+    #analyticsView > .flex-between,
+    #armoryView > .flex-between {
+        display: grid; grid-template-columns: 1fr; gap: 10px;
     }
-    #logisticsView .tactical-tabs {
+    #logisticsView .tactical-tabs { width: 100%; justify-content: flex-start; padding-bottom: 5px; }
+    #logisticsView .tactical-tabs .tab-btn { font-size: 0.85rem; } 
+
+    /* Forces Armory Search, Filters, & Refresh Button to stretch left-to-right */
+    #armoryView > .flex-between > .d-flex {
+        display: grid; grid-template-columns: 1fr; gap: 10px;
         width: 100%;
-        justify-content: flex-start;
-        padding-bottom: 5px;
     }
-    
+    #armorySearch, #armoryCategoryFilter, #armorySort, #refreshArmoryBtn {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
     /* -----------------------------------------
-       FIX 4: ARMORY CARDS (Image -> Controls -> Info)
+       ORDERS AND ARMORY CARDS (Centering & Wrapping)
     ----------------------------------------- */
+    /* Master Card Container - Reduced Padding to zoom out */
     .admin-order-card {
-        flex-direction: column !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-items: center !important; 
+        padding: 10px !important; /* Zooms out the card boundaries */
+        gap: 10px !important; 
     }
-    .armory-img-box {
-        border-right: none !important;
-        border-bottom: 1px dashed var(--border-dim);
-        padding: 20px;
-    }
-    .armory-data-grid {
-        /* CRITICAL: Places the stock controls ABOVE the info text! */
-        flex-direction: column-reverse !important; 
-        gap: 20px;
-        padding: 15px !important;
-    }
-    .armory-action-col {
-        min-width: 0 !important;
-        width: 100%;
-        align-items: center !important;
-        justify-content: center;
-        border-bottom: 1px dashed var(--border-dim);
-        padding-bottom: 15px;
-    }
-    .armory-stock-wrapper {
-        justify-content: center !important; /* Centers the +/- buttons */
-    }
-    
-    /* Clean up order log layout */
+
+    /* ORDERS: Fixes the double-padding bug and zooms out the text */
     .admin-card-details {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        text-align: left !important;
+        width: 100%;
+        padding: 0 !important; /* CRITICAL: Removes the massive empty space! */
+        gap: 5px !important;
     }
     .admin-card-details .text-right {
-        text-align: center;
+        text-align: right !important;
+    }
+    
+    /* Zooms Out Order Text */
+    .admin-card-details .text-lg, 
+    .admin-card-details .text-cyan { font-size: 0.95rem !important; }
+    .admin-card-details .text-sm, 
+    .admin-card-details .text-muted { font-size: 0.75rem !important; }
+    .admin-card-details .status-badge { font-size: 0.75rem !important; padding: 2px 5px; }
+
+    /* ARMORY: Image Left */
+    .armory-img-box {
+        width: 90px !important;
+        min-width: 90px !important;
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+    }
+    .armory-main-img {
+        width: 90px !important;
+        height: 90px !important;
     }
 
-    /* Ensure Analytics stretches to fill the screen */
+    /* ARMORY: Flattens the DOM */
+    .armory-data-grid {
+        display: contents !important; 
+    }
+
+    /* ARMORY: Info Center */
+    .armory-info-col {
+        flex: 1 1 120px !important;
+        min-width: 120px !important;
+    }
+    
+    /* Zooms Out Armory Text */
+    .armory-info-col .text-lg { font-size: 0.95rem !important; }
+    .armory-info-col .text-sm { font-size: 0.75rem !important; }
+    .armory-info-col .price-row { margin-top: 5px !important; }
+
+    /* ARMORY: Stock Controls (Right or Bottom Centered) */
+    .armory-action-col {
+        flex: 1 1 100% !important; /* Forces it to perfectly center at the bottom! */
+        border: none !important;
+        padding: 0 !important;
+        justify-content: center !important; 
+        align-items: center !important; 
+        margin-top: 5px !important; 
+    }
+
+    /* ARMORY: Form Layout */
+    .armory-stock-wrapper {
+        height: 55px !important; 
+        flex-direction: row !important; 
+        
+        /* THE FIX: Since we changed to a row, we need this to center it horizontally! */
+        justify-content: center !important; 
+        
+        align-items: center !important;
+        overflow: visible !important;
+        width: 100% !important;
+    }
+    .stock-controls-normal {
+        position: relative !important;
+        height: 100% !important; /* Fills the 55px */
+        width: 100%;
+        justify-content: center !important; 
+        align-items: stretch !important; /* Forces -, STOCK, + to perfectly match heights */
+    }
+    .stock-controls-normal.hidden {
+        display: none !important;
+    }
+    .inline-stock-form {
+        position: relative !important;
+        transform: translateX(0) !important;
+        flex-direction: row !important; 
+        flex-wrap: nowrap !important; /* Forces it to perfectly stay on 1 line */
+        justify-content: center !important;
+        align-items: stretch !important; /* Forces QTY, ADD, X to perfectly stretch to 55px */
+        gap: 8px !important;
+        height: 100% !important; /* Fills the 55px */
+        background: transparent !important;
+        display: none !important; 
+        margin-top: 0 !important; /* THE FIX: Removes the UI jump when toggling! */
+    }
+    .inline-stock-form.active {
+        display: flex !important;
+    }
+    .inline-stock-input {
+        width: 80px !important; 
+        max-width: 80px !important;
+        text-align: center;
+        margin: 0 !important;
+        padding: 0 10px !important; /* Removed vertical padding so the stretch works flawlessly */
+        font-size: 1.2rem !important;
+        height: auto !important; 
+    }
+    
+    /* THE FIX: Centers the text perfectly inside the stretched ADD/REMOVE/X buttons */
+    .inline-stock-form .tac-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 15px !important;
+    }
+
+    /* -----------------------------------------
+       ANALYTICS
+    ----------------------------------------- */
     .analytics-container {
         width: 100% !important;
         grid-template-columns: 1fr !important;
     }
 }
-    
