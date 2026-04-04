@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             // Send the data to the backend /checkout POST route
-            const response = await fetch('/checkout', {
+            const response = await fetch('/api/orders/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

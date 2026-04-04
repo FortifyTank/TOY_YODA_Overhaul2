@@ -44,7 +44,6 @@ app.use('/api/products', productRoutes);
 app.use('/api/messages', communityRoutes);
 app.use('/api/profile', userRoutes);
 app.use('/api/orders', orderRoutes);
-app.post('/checkout', require('./controllers/orderController').processCheckout);
 app.use('/api/admin', adminRoutes);
 
 // ==========================================
