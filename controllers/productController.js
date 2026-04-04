@@ -6,8 +6,12 @@ const Order = require('../models/Order');
 // 1. Get all active products for the Catalog
 exports.getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find({ isArchived: { $ne: true } }).lean(); 
+        // Removed .lean() to preserve your Mongoose Virtuals
+        const productsDoc = await Product.find({ isArchived: { $ne: true } }); 
         const reviews = await Review.find(); 
+
+        // Convert documents to objects while forcing Virtuals to stay attached
+        const products = productsDoc.map(p => p.toObject());
 
         products.forEach(p => {
             const pReviews = reviews.filter(r => r.product.toString() === p._id.toString());

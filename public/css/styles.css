@@ -2032,6 +2032,16 @@ body.about-theme .global-header { background: #000000 !important; }
         box-sizing: border-box;
     }
     
+    /* Make the Add to Cart button taller and chunkier on mobile */
+    .product-view-layout .tac-btn--full {
+        height: 60px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1.2rem !important;
+        margin-top: 10px !important;
+    }
+    
     /* Shrinks the massive desktop padding to "zoom out" the profile mobile view */
     .id-card {
         padding: 20px !important; 
