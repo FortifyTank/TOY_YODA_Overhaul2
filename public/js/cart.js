@@ -14,10 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearCartBtn = document.getElementById('clearCartBtn');
     const proceedCheckoutBtn = document.getElementById('proceedCheckoutBtn');
 
-    const systemAlert = document.getElementById('systemAlert');
-    const systemAlertMessage = document.getElementById('systemAlertMessage');
-    const systemAlertOkBtn = document.getElementById('systemAlertOkBtn');
-
     // ==========================================
     // 2. UI & ALERT UTILITIES
     // ==========================================
@@ -169,6 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if(cartDrawer && cartOverlay) {
             cartDrawer.classList.add('active');
             cartOverlay.classList.add('active');
+            // Locks the background page from scrolling
+            document.body.classList.add('no-scroll'); 
         }
     }
 
@@ -176,10 +174,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if(cartDrawer && cartOverlay) {
             cartDrawer.classList.remove('active');
             cartOverlay.classList.remove('active');
+            // Unlocks the background page
+            document.body.classList.remove('no-scroll'); 
         }
     }
 
-    // Initialization
+    function clearCart() {
+        cart = [];
+        localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
+        updateCartUI(true);
+    }
+
+    // Initialization Events
     cartStatusElements.forEach(btn => btn.addEventListener('click', openCart));
     
     if (closeCartBtn) closeCartBtn.addEventListener('click', closeCart);
@@ -195,25 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
     // Boot UI on load
     updateCartUI();
-
-    function openCart() {
-        if(cartDrawer && cartOverlay) {
-            cartDrawer.classList.add('active');
-            cartOverlay.classList.add('active');
-            // NEW: Locks the background page from scrolling
-            document.body.classList.add('no-scroll'); 
-        }
-    }
-
-    function closeCart() {
-        if(cartDrawer && cartOverlay) {
-            cartDrawer.classList.remove('active');
-            cartOverlay.classList.remove('active');
-            // NEW: Unlocks the background page
-            document.body.classList.remove('no-scroll'); 
-        }
-    }
-
 });

@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     
+    // ==========================================
+    // 1. STATE & DOM ELEMENTS
+    // ==========================================
     const chatWindow = document.getElementById('chatWindow');
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
@@ -8,7 +11,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUsername = "";
     let isFirstLoad = true;
 
-    // 1. Figure out who is logged in so we can color their messages blue!
+    // ==========================================
+    // 2. UTILITY & SECURITY
+    // ==========================================
+    // SECURITY UPGRADE: Prevents Cross-Site Scripting (XSS) Attacks in the chat!
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+
+    // ==========================================
+    // 3. DATA FETCHING & RENDERING
+    // ==========================================
+    // Figure out who is logged in so we can color their messages blue
     async function getUserData() {
         try {
             const res = await fetch('/api/profile');
@@ -21,10 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatInput.placeholder = "PLEASE LOG IN TO CHAT";
                 sendBtn.disabled = true;
             }
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("Auth check failed:", err); }
     }
 
-    // 2. Load the messages from the database
+    // Load the messages from the database
     async function loadMessages() {
         try {
             const res = await fetch('/api/messages');
@@ -42,27 +64,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isMe = msg.username === currentUsername;
                 const alignClass = isMe ? 'chat-message-self' : 'chat-message-other';
                 const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                // Route all database text through the security filter before rendering!
+                const safeText = escapeHTML(msg.text);
+                const safeUsername = escapeHTML(msg.username);
 
                 return `
                     <div class="chat-message-group ${alignClass}">
-                        <span class="chat-meta">${msg.username} | ${time}</span>
-                        <div class="chat-bubble">${msg.text}</div>
+                        <span class="chat-meta">${safeUsername} | ${time}</span>
+                        <div class="chat-bubble">${safeText}</div>
                     </div>
                 `;
             }).join('');
 
-            // ONLY scroll to the bottom if it's the first time loading, OR if they are actively at the bottom!
+            // ONLY scroll to the bottom if it's the first load, OR if they are actively at the bottom!
             if (isFirstLoad || isScrolledToBottom) {
                 chatWindow.scrollTop = chatWindow.scrollHeight;
-                isFirstLoad = false; // Turn off the flag after the first load
+                isFirstLoad = false; 
             }
 
         } catch (err) {
-            chatWindow.innerHTML = '<p class="text-red text-center mt-20">> CONNECTION ERROR.</p>';
+            // Replaced the alert with a quiet console log so it doesn't spam the UI if internet drops
+            console.error("Chat sync failed.");
         }
     }
 
-    // 3. Handle sending a new message
+    // ==========================================
+    // 4. EVENT LISTENERS
+    // ==========================================
     if (chatForm) {
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -70,6 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!text) return;
 
             sendBtn.innerText = '[ ...]';
+            
+            // UX UPGRADE: Lock the input so they can't spam enter 10 times
+            chatInput.disabled = true; 
 
             try {
                 const res = await fetch('/api/messages', {
@@ -79,22 +111,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (res.ok) {
-                    chatInput.value = ''; // Clear the input box
-                    await loadMessages(); // Instantly refresh chat
-                    chatWindow.scrollTop = chatWindow.scrollHeight; // Force scroll to bottom for your own message
+                    chatInput.value = ''; 
+                    await loadMessages(); 
+                    chatWindow.scrollTop = chatWindow.scrollHeight; 
                 } else {
                     const data = await res.json();
                     if (window.showSystemAlert) window.showSystemAlert(data.error);
                 }
             } catch (err) {
-                if (window.showSystemAlert) window.showSystemAlert("Failed to connect to server.");
+                if (window.showSystemAlert) window.showSystemAlert("> CONNECTION TO CHAT SERVER LOST.");
             } finally {
                 sendBtn.innerText = '[ SEND ]';
+                
+                // UX UPGRADE: Unlock and auto-focus the box so they can keep typing seamlessly!
+                chatInput.disabled = false;
+                chatInput.focus(); 
             }
         });
     }
 
-    // 4. Ignite the Engine
+    // ==========================================
+    // 5. BOOT SEQUENCE
+    // ==========================================
     async function initChat() {
         await getUserData();
         await loadMessages();

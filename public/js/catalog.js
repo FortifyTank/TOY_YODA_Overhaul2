@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="product-actions">
                         <button class="tac-btn tac-btn--full" 
                             ${!product.inStock ? 'disabled' : ''}
-                            onclick='addToCart(${JSON.stringify(product)})'>
+                            onclick='addToCart(${JSON.stringify(product).replace(/'/g, "&#39;")})'>
                             ${product.inStock ? '[ ADD TO CART ]' : '[ OUT OF STOCK ]'}
                         </button>
                     </div>
@@ -272,7 +272,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pages.forEach(p => {
             if (p === '...') {
-                // OPTIMIZED: Using the new CSS class
                 buttonsHTML += `<span class="pagination-ellipsis">...</span>`;
             } else {
                 buttonsHTML += `<button class="page-btn ${currentPage === p ? 'active' : ''}" data-page="${p}">[ ${p} ]</button>`;
@@ -309,12 +308,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. EVENT LISTENERS
     // ==========================================
     if (searchInput) {
+        let searchTimeout;
         searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            
+            // Immediate UI update for the dropdown change
             if (searchInput.value.length > 0 && currentSort !== 'RELEVANCE') {
                 sortDropdown.value = 'RELEVANCE'; 
                 currentSort = 'RELEVANCE';        
             }
-            applyFilters();
+            
+            // Debounce the heavy lifting (filtering and DOM redrawing)
+            searchTimeout = setTimeout(() => {
+                applyFilters();
+            }, 300);
         });
     }
 

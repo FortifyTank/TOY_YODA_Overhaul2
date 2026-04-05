@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
+    // ==========================================
+    // 1. STATE & DOM ELEMENTS
+    // ==========================================
     const urlParams = new URLSearchParams(window.location.search);
     const sku = urlParams.get('sku');
 
@@ -11,100 +14,140 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentQuantity = 1;
     let maxStock = 0;
 
+    // Main Product DOM
+    const prodImage = document.getElementById('prodImage');
+    const prodCategory = document.getElementById('prodCategory');
+    const prodName = document.getElementById('prodName');
+    const prodSku = document.getElementById('prodSku');
+    const prodDesc = document.getElementById('prodDesc');
+    const prodPrice = document.getElementById('prodPrice');
+    const prodStock = document.getElementById('prodStock');
+    const prodOldPrice = document.getElementById('prodOldPrice');
+    
+    // Reviews DOM
+    const reviewsList = document.getElementById('reviewsListContainer');
+    const avgStarDisplay = document.getElementById('avgStarRating');
+    const totalCountDisplay = document.getElementById('totalReviewCount');
+    const topStars = document.getElementById('topStars');
+    const topReviewCount = document.getElementById('topReviewCount');
+    
+    // Review Form DOM
+    const reviewFormContainer = document.getElementById('reviewFormContainer');
+    const submitReviewForm = document.getElementById('submitReviewForm');
+    const starWidget = document.getElementById('starInputWidget');
+    const scoreInput = document.getElementById('reviewScore');
+    const openReviewBtn = document.getElementById('openReviewFormBtn');
+    const cancelReviewBtn = document.getElementById('cancelReviewBtn');
+    const submitReviewBtn = document.getElementById('submitReviewBtn');
+    const reviewTextInput = document.getElementById('reviewText');
+
+    // Quantity & Cart DOM
+    const btnAdd = document.getElementById('btnAddQty');
+    const btnSub = document.getElementById('btnSubQty');
+    const displayQty = document.getElementById('displayQty');
+    const cartBtn = document.getElementById('addToCartBtn');
+    
+    const relContainer = document.getElementById('relatedProductsContainer');
+
+    // ==========================================
+    // 2. SECURITY & UTILITIES
+    // ==========================================
+    // SECURITY UPGRADE: Prevents Cross-Site Scripting (XSS) Attacks in user reviews
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+
+    // ==========================================
+    // 3. MAIN DATA FETCHING & UI
+    // ==========================================
     try {
-        // 1. Fetch the main product
         const response = await fetch(`/api/products/sku/${sku}`);
         const product = await response.json();
 
         if (!response.ok) throw new Error(product.error || "Product not found");
 
-        // 2. Populate the UI
-        document.getElementById('prodImage').src = product.imageString || '/images/default-placeholder.png';
-        document.getElementById('prodCategory').innerText = `> ${product.category}`;
-        document.getElementById('prodName').innerText = product.name.toUpperCase();
-        document.getElementById('prodSku').innerText = `SKU: ${product.sku}`;
-        document.getElementById('prodDesc').innerText = product.description || "No description provided.";
-        document.getElementById('prodPrice').innerText = `₱${product.price.toLocaleString()}`;
+        // Populate the HUD
+        prodImage.src = product.imageString || '/images/default-placeholder.png';
+        prodCategory.innerText = `> ${product.category}`;
+        prodName.innerText = product.name.toUpperCase();
+        prodSku.innerText = `SKU: ${product.sku}`;
+        prodDesc.innerText = product.description || "No description provided.";
+        prodPrice.innerText = `₱${product.price.toLocaleString()}`;
 
         maxStock = product.avail_inventory;
-        document.getElementById('prodStock').innerText = maxStock;
+        prodStock.innerText = maxStock;
 
-        const oldPriceEl = document.getElementById('prodOldPrice');
         if (product.old_price && product.old_price > product.price) {
-            oldPriceEl.innerText = `₱${product.old_price.toLocaleString()}`;
-            oldPriceEl.classList.remove('hidden-content');
+            prodOldPrice.innerText = `₱${product.old_price.toLocaleString()}`;
+            prodOldPrice.classList.remove('hidden-content');
         }
 
+        document.title = `Toy Yoda | ${product.name.toUpperCase()}`;
+
         // ==========================================
-        // REVIEWS ENGINE
+        // 4. REVIEWS ENGINE
         // ==========================================
         const productId = product._id;
-        const reviewsList = document.getElementById('reviewsListContainer');
-        const avgStarDisplay = document.getElementById('avgStarRating');
-        const totalCountDisplay = document.getElementById('totalReviewCount');
-        const reviewFormContainer = document.getElementById('reviewFormContainer');
-        const submitReviewForm = document.getElementById('submitReviewForm');
-        const starWidget = document.getElementById('starInputWidget');
-        const scoreInput = document.getElementById('reviewScore');
-        const openReviewBtn = document.getElementById('openReviewFormBtn');
-        const cancelReviewBtn = document.getElementById('cancelReviewBtn');
 
-        // 1. Load existing reviews from the database
         async function loadReviews() {
             try {
                 const res = await fetch(`/api/products/${productId}/reviews`);
                 const data = await res.json();
 
-                // Update the bottom summary
-                avgStarDisplay.innerText = data.average || '0.0';
-                totalCountDisplay.innerText = data.total || '0';
-
-                // Update the TOP summary
-                const topStars = document.getElementById('topStars');
-                const topReviewCount = document.getElementById('topReviewCount');
+                // Update summary HUDs
+                if(avgStarDisplay) avgStarDisplay.innerText = data.average || '0.0';
+                if(totalCountDisplay) totalCountDisplay.innerText = data.total || '0';
 
                 if (data.reviews.length === 0) {
-                    reviewsList.innerHTML = '<p class="text-muted">> NO REVIEWS YET. BE THE FIRST.</p>';
+                    if(reviewsList) reviewsList.innerHTML = '<p class="text-muted">> NO REVIEWS YET. BE THE FIRST.</p>';
                     if (topStars) topStars.innerText = '☆☆☆☆☆';
                     if (topReviewCount) topReviewCount.innerText = '(0 REVIEWS)';
                 } else {
-                    // Rounds the average to the nearest whole star for the visual display
                     const avg = Math.round(data.average); 
                     if (topStars) topStars.innerText = '★'.repeat(avg) + '☆'.repeat(5 - avg);
                     if (topReviewCount) topReviewCount.innerText = `(${data.total} REVIEWS)`;
                     
-                    // Renders the review cards at the bottom
-                    reviewsList.innerHTML = data.reviews.map(rev => `
-                        <div class="review-card">
-                            <div class="review-header">
-                                <div>
-                                    <span class="text-cyan font-bold">${rev.username}</span>
-                                    <span class="review-date ml-10">${new Date(rev.createdAt).toLocaleDateString()}</span>
+                    if(reviewsList) {
+                        reviewsList.innerHTML = data.reviews.map(rev => {
+                            const safeUsername = escapeHTML(rev.username);
+                            const safeComment = escapeHTML(rev.comment);
+                            return `
+                                <div class="review-card">
+                                    <div class="review-header">
+                                        <div>
+                                            <span class="text-cyan font-bold">${safeUsername}</span>
+                                            <span class="review-date ml-10">${new Date(rev.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                        <div class="review-stars">${'★'.repeat(rev.rating)}${'☆'.repeat(5 - rev.rating)}</div>
+                                    </div>
+                                    <div class="review-body">${safeComment}</div>
                                 </div>
-                                <div class="review-stars">${'★'.repeat(rev.rating)}${'☆'.repeat(5 - rev.rating)}</div>
-                            </div>
-                            <div class="review-body">${rev.comment}</div>
-                        </div>
-                    `).join('');
+                            `;
+                        }).join('');
+                    }
                 }
             } catch (err) {
-                reviewsList.innerHTML = '<p class="text-red">> ERROR LOADING REVIEWS.</p>';
+                if(reviewsList) reviewsList.innerHTML = '<p class="text-red">> ERROR LOADING REVIEWS.</p>';
             }
         }
 
-        // Add the Smooth Scroll Click Event
+        // Smooth Scroll Event
         document.getElementById('topStarDisplay')?.addEventListener('click', () => {
-            document.getElementById('reviewsListContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            reviewsList?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
 
-        // 2. Make the 5-Star input clickable
+        // 5-Star Input Logic
         if (starWidget) {
             const stars = starWidget.querySelectorAll('span');
             stars.forEach(star => {
                 star.addEventListener('click', () => {
                     const value = star.getAttribute('data-value');
                     scoreInput.value = value;
-                    // Light up the stars up to the one clicked
                     stars.forEach(s => {
                         if (s.getAttribute('data-value') <= value) s.classList.add('active');
                         else s.classList.remove('active');
@@ -113,31 +156,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
+        // Form Toggles
         if (openReviewBtn) {
             openReviewBtn.addEventListener('click', () => {
-                reviewFormContainer.classList.add('active'); // Slides form down
-                openReviewBtn.classList.add('hidden-content'); // Hides the button
+                reviewFormContainer.classList.add('active'); 
+                openReviewBtn.classList.add('hidden-content'); 
             });
         }
 
         if (cancelReviewBtn) {
             cancelReviewBtn.addEventListener('click', () => {
-                reviewFormContainer.classList.remove('active'); // Slides form up
-                openReviewBtn.classList.remove('hidden-content'); // Shows button again
+                reviewFormContainer.classList.remove('active'); 
+                openReviewBtn.classList.remove('hidden-content'); 
             });
         }
 
-        // 3. Handle the Submit Button
+        // Submit Review Event
         if (submitReviewForm) {
             submitReviewForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const rating = scoreInput.value;
-                const comment = document.getElementById('reviewText').value;
+                const comment = reviewTextInput.value;
 
                 if (!rating) return showSystemAlert("> PLEASE SELECT A STAR RATING.");
 
-                const btn = document.getElementById('submitReviewBtn');
-                btn.innerText = '[ SUBMITTING... ]';
+                submitReviewBtn.innerText = '[ SUBMITTING... ]';
 
                 try {
                     const res = await fetch(`/api/products/${productId}/reviews`, {
@@ -149,25 +192,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (res.ok) {
                         showSystemAlert(result.message, 'success');
-                        reviewFormContainer.classList.remove('active'); // Hide the form smoothly
-                        submitReviewForm.reset(); // Clear the text
-                        
-                        // We intentionally leave the 'openReviewBtn' hidden here 
-                        // so they cannot try to submit a second review!
-                        
-                        loadReviews(); // Refresh the list
+                        reviewFormContainer.classList.remove('active'); 
+                        submitReviewForm.reset(); 
+                        loadReviews(); 
                     } else {
                         showSystemAlert(result.error);
-                        btn.innerText = '[ PUBLISH REVIEW ]'; // Only reset button text on error
+                        submitReviewBtn.innerText = '[ PUBLISH REVIEW ]'; 
                     }
                 } catch (err) {
                     showSystemAlert("> CONNECTION ERROR.");
-                    btn.innerText = '[ PUBLISH REVIEW ]';
+                    submitReviewBtn.innerText = '[ PUBLISH REVIEW ]';
                 }
             });
         }
 
-        // 4. Security Check: Did they buy it?
+        // Security Check: Did they buy it?
         async function checkReviewEligibility() {
             try {
                 const res = await fetch('/api/orders'); 
@@ -178,41 +217,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                         o.items.some(item => item.product._id === productId)
                     );
                     
-                    if (canReview) {
+                    if (canReview && openReviewBtn) {
                         openReviewBtn.classList.remove('hidden-content');
 
-                        // THE CLEAN LOGIC: Check for our custom action parameter!
+                        // Auto-open logic if redirected from profile page
                         if (urlParams.get('action') === 'review') {
-                            
                             setTimeout(() => {
                                 reviewFormContainer.classList.add('active'); 
                                 openReviewBtn.classList.add('hidden-content'); 
-                                document.getElementById('reviewFormContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                
-                                // Optional: Clean the URL so if they refresh the page, it doesn't auto-scroll again
+                                reviewFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                 window.history.replaceState({}, document.title, window.location.pathname + "?sku=" + sku);
                             }, 800); 
                         }
                     }
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Review auth check failed:", err); }
         }
 
-        // Ignite the functions!
         loadReviews();
         checkReviewEligibility();
 
-        // 3. Configure Quantity Buttons
-        const btnAdd = document.getElementById('btnAddQty');
-        const btnSub = document.getElementById('btnSubQty');
-        const displayQty = document.getElementById('displayQty');
-        const cartBtn = document.getElementById('addToCartBtn');
-
+        // ==========================================
+        // 5. QUANTITY & CART ENGINE
+        // ==========================================
         if (!product.inStock || maxStock <= 0) {
             cartBtn.innerText = '[ SOLD OUT ]';
             cartBtn.disabled = true;
             cartBtn.classList.replace('tac-btn', 'tac-btn--ghost'); 
-            cartBtn.style.pointerEvents = 'none'; // Kills the hover inversion
+            cartBtn.style.pointerEvents = 'none'; 
             btnAdd.disabled = true;
             btnSub.disabled = true;
             displayQty.innerText = "0";
@@ -233,24 +265,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             cartBtn.addEventListener('click', () => {
                 if (typeof window.addToCart === 'function') {
-                    window.addToCart(product, currentQuantity); // Passes the selected amount!
+                    window.addToCart(product, currentQuantity); 
                 }
             });
         }
 
-        document.title = `Toy Yoda | ${product.name.toUpperCase()}`;
-
-        // 4. Load Related Products (Reusing Catalog logic)
+        // ==========================================
+        // 6. RELATED PRODUCTS
+        // ==========================================
         const allRes = await fetch('/api/products');
         const allProducts = await allRes.json();
         
-        // Find 4 items in the same category, excluding the one we are currently looking at
         const related = allProducts.filter(p => p.category === product.category && p.sku !== product.sku).slice(0, 4);
-        const relContainer = document.getElementById('relatedProductsContainer');
 
         if (related.length === 0) {
-            relContainer.innerHTML = '<p class="col-span-full text-muted">> NO RELATED ITEMS FOUND.</p>';
-        } else {
+            if(relContainer) relContainer.innerHTML = '<p class="col-span-full text-muted">> NO RELATED ITEMS FOUND.</p>';
+        } else if (relContainer) {
             relContainer.innerHTML = '';
             related.forEach(relProduct => {
                 let leftBadgeHTML = '';
@@ -261,6 +291,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (relProduct.onSale) rightBadgesHTML += `<div class="tactical-badge badge-sale">${relProduct.discountPercent}% OFF</div>`;
                 if (relProduct.isNew) rightBadgesHTML += `<div class="tactical-badge badge-new">NEW</div>`;
                 rightBadgesHTML += '</div>';
+
+                // Sync the star logic from catalog.js
+                const starText = relProduct.reviewCount > 0 ? `[ ★ ${relProduct.averageRating} ]` : `[ ☆ 0.0 ]`;
+                const starBadgeHTML = `<div class="text-amber font-bold text-sm mt-5 mb-5">${starText} <span class="text-muted">(${relProduct.reviewCount || 0})</span></div>`;
 
                 const cardHTML = `
                     <article class="product-card cyber-panel panel-interactive panel-hover-bg-yellow">
@@ -273,6 +307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div class="product-info">
                                 <span class="product-category">> ${relProduct.category}</span>
                                 <h3 class="product-name">${relProduct.name}</h3>
+                                ${starBadgeHTML}
                                 <div class="price-container">
                                     <span class="product-price">₱${relProduct.price.toLocaleString()}</span>
                                     ${relProduct.old_price > relProduct.price ? `<span class="old-price-strike">₱${relProduct.old_price.toLocaleString()}</span>` : ''}
@@ -282,7 +317,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="product-actions">
                             <button class="tac-btn tac-btn--full" 
                                 ${!relProduct.inStock ? 'disabled' : ''}
-                                onclick='addToCart(${JSON.stringify(relProduct)})'>
+                                onclick='addToCart(${JSON.stringify(relProduct).replace(/'/g, "&#39;")})'>
                                 ${relProduct.inStock ? '[ ADD TO CART ]' : '[ OUT OF STOCK ]'}
                             </button>
                         </div>
@@ -293,7 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
     } catch (err) {
-        alert("> CLASSIFIED: ASSET NOT FOUND.");
+        if(window.showSystemAlert) window.showSystemAlert("> CLASSIFIED: ASSET NOT FOUND.");
         window.location.href = '/catalog';
     }
 });

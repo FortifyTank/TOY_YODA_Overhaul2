@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Grabs all login buttons across the entire site instantly
     const accountButtons = document.querySelectorAll('.clearance');
+    
+    // Grabs the Global Search Bar present in the header
+    const globalSearchInput = document.querySelector('.header-search input');
 
     // ==========================================
     // 2. CORE LOGIC
@@ -114,20 +117,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Ignite the fetcher
-    loadLatestImports();
-
     // ==========================================
-    // 3. INITIALIZATION
+    // 3. EVENT LISTENERS
     // ==========================================
-    handleBootAnimation();
-    checkAuthStatus();
-});
-
-document.addEventListener('DOMContentLoaded', () => {
     // Global Search "Enter" Key Listener
-    const globalSearchInput = document.querySelector('.header-search input');
-    
     if (globalSearchInput) {
         globalSearchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -141,4 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ==========================================
+    // 4. BOOT SEQUENCE
+    // ==========================================
+    handleBootAnimation();
+    checkAuthStatus();
+    loadLatestImports();
 });

@@ -187,6 +187,78 @@ document.addEventListener('DOMContentLoaded', () => {
         isListHidden ? logisticsForm.classList.remove('active') : logisticsForm.classList.add('active');
     }
 
+    function openReceiptModal(order) {
+        document.getElementById('modalOrderTitle').innerText = `// TACTICAL RECEIPT: ${order.orderNumber}`;
+
+        // 1. THE IMAGE BUG FIX (Added the ?. fallback)
+        let itemsHTML = '';
+        order.items.forEach(item => {
+            const sku = item.product?.sku || 'UNKNOWN-SKU';
+            const isDelivered = order.status === 'DELIVERED'; // Checks if the order is completed
+
+            itemsHTML += `
+                <div class="item-row">
+                    <img src="${item.product?.imageString || '/images/default-placeholder.png'}" class="modal-img">
+                    <div class="flex-1">
+                        <div class="text-cyan text-sm">> SKU: ${sku}</div>
+                        <div class="text-regular font-bold">${item.name}</div>
+                        <div class="text-muted text-sm mt-5">QTY: ${item.quantity} | ₱${item.priceAtPurchase.toLocaleString()}</div>
+                    </div>
+                    
+                    <div class="d-flex" style="flex-direction: column; gap: 10px; align-items: flex-end; justify-content: center;">
+                        <a href="/product?sku=${sku}" class="tac-btn tac-btn--ghost text-sm" style="text-decoration: none;">[ VIEW PRODUCT ]</a>
+                        
+                        ${isDelivered ? `<a href="/product?sku=${sku}&action=review" class="tac-btn btn-orange-invert text-sm" style="text-decoration: none;">[ RATE THIS ITEM ]</a>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        // 2. THE CUSTOMER TIMELINE ENGINE
+        const t = order.timeline;
+        const formatTime = (dateObj) => dateObj ? new Date(dateObj).toLocaleString('en-GB') : '---';
+        
+        let timelineHTML = `<div class="text-muted mt-10 text-sm">> PLACED: <span class="text-regular">${formatTime(t.placedAt)}</span></div>`;
+        if (t.preparingAt) timelineHTML += `<div class="text-muted text-sm">> PACKED: <span class="text-amber">${formatTime(t.preparingAt)}</span></div>`;
+        if (t.shippedAt) timelineHTML += `<div class="text-muted text-sm">> SHIPPED: <span class="text-cyan">${formatTime(t.shippedAt)}</span></div>`;
+        if (t.deliveredAt) timelineHTML += `<div class="text-muted text-sm">> DELIVERED: <span class="text-green">${formatTime(t.deliveredAt)}</span></div>`;
+        if (t.cancelledAt) timelineHTML += `<div class="text-muted text-sm">> CANCELLED: <span class="text-red">${formatTime(t.cancelledAt)}</span></div>`;
+
+        // 3. INJECT INTO THE RECEIPT
+        modalContent.innerHTML = `
+            <div class="receipt-grid">
+                <div class="receipt-box">
+                    <div class="receipt-box-title">> ORDER STATUS</div>
+                    <div class="status-badge status-${order.status} text-lg">[ ${order.status} ]</div>
+                    
+                    <div class="mt-15 border-dashed-dim pb-10">
+                        ${timelineHTML}
+                    </div>
+                </div>
+                
+                <div class="receipt-box">
+                    <div class="receipt-box-title">> DESTINATION</div>
+                    <div class="text-green font-bold text-lg">${order.shippingAddress.label}</div>
+                    <div class="text-regular">${order.shippingAddress.addressLine}, BRGY. ${order.shippingAddress.barangay}</div>
+                    <div class="text-regular">${order.shippingAddress.city}, ${order.shippingAddress.province} ${order.shippingAddress.zipCode}</div>
+                </div>
+            </div>
+
+            <div class="receipt-box mt-15">
+                <div class="receipt-box-title">> ITEMS SECURED</div>
+                ${itemsHTML}
+            </div>
+
+            <div class="receipt-box mt-15">
+                <div class="flex-between mb-5"><span class="text-muted">SUBTOTAL:</span> <span>₱${order.subtotal.toLocaleString()}</span></div>
+                <div class="flex-between mb-12 border-dashed-dim pb-10"><span class="text-muted">SHIPPING:</span> <span>${order.shippingFee === 0 ? 'FREE' : '₱' + order.shippingFee.toLocaleString()}</span></div>
+                <div class="flex-between text-lg text-amber font-bold"><span>TOTAL:</span> <span>₱${order.totalAmount.toLocaleString()}</span></div>
+            </div>
+        `;
+        
+        modalOverlay.classList.add('active');
+    }
+
     // ==========================================
     // 5. EVENT LISTENERS
     // ==========================================
@@ -315,78 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('closeModalBtn')?.addEventListener('click', () => modalOverlay.classList.remove('active'));
 
-    function openReceiptModal(order) {
-        document.getElementById('modalOrderTitle').innerText = `// TACTICAL RECEIPT: ${order.orderNumber}`;
-
-        // 1. THE IMAGE BUG FIX (Added the ?. fallback)
-        let itemsHTML = '';
-        order.items.forEach(item => {
-            const sku = item.product?.sku || 'UNKNOWN-SKU';
-            const isDelivered = order.status === 'DELIVERED'; // Checks if the order is completed
-
-            itemsHTML += `
-                <div class="item-row">
-                    <img src="${item.product?.imageString || '/images/default-placeholder.png'}" class="modal-img">
-                    <div class="flex-1">
-                        <div class="text-cyan text-sm">> SKU: ${sku}</div>
-                        <div class="text-regular font-bold">${item.name}</div>
-                        <div class="text-muted text-sm mt-5">QTY: ${item.quantity} | ₱${item.priceAtPurchase.toLocaleString()}</div>
-                    </div>
-                    
-                    <div class="d-flex" style="flex-direction: column; gap: 10px; align-items: flex-end; justify-content: center;">
-                        <a href="/product?sku=${sku}" class="tac-btn tac-btn--ghost text-sm" style="text-decoration: none;">[ VIEW PRODUCT ]</a>
-                        
-                        ${isDelivered ? `<a href="/product?sku=${sku}&action=review" class="tac-btn btn-orange-invert text-sm" style="text-decoration: none;">[ RATE THIS ITEM ]</a>` : ''}
-                    </div>
-                </div>
-            `;
-        });
-
-        // 2. THE CUSTOMER TIMELINE ENGINE
-        const t = order.timeline;
-        const formatTime = (dateObj) => dateObj ? new Date(dateObj).toLocaleString('en-GB') : '---';
-        
-        let timelineHTML = `<div class="text-muted mt-10 text-sm">> PLACED: <span class="text-regular">${formatTime(t.placedAt)}</span></div>`;
-        if (t.preparingAt) timelineHTML += `<div class="text-muted text-sm">> PACKED: <span class="text-amber">${formatTime(t.preparingAt)}</span></div>`;
-        if (t.shippedAt) timelineHTML += `<div class="text-muted text-sm">> SHIPPED: <span class="text-cyan">${formatTime(t.shippedAt)}</span></div>`;
-        if (t.deliveredAt) timelineHTML += `<div class="text-muted text-sm">> DELIVERED: <span class="text-green">${formatTime(t.deliveredAt)}</span></div>`;
-        if (t.cancelledAt) timelineHTML += `<div class="text-muted text-sm">> CANCELLED: <span class="text-red">${formatTime(t.cancelledAt)}</span></div>`;
-
-        // 3. INJECT INTO THE RECEIPT
-        modalContent.innerHTML = `
-            <div class="receipt-grid">
-                <div class="receipt-box">
-                    <div class="receipt-box-title">> ORDER STATUS</div>
-                    <div class="status-badge status-${order.status} text-lg">[ ${order.status} ]</div>
-                    
-                    <div class="mt-15 border-dashed-dim pb-10">
-                        ${timelineHTML}
-                    </div>
-                </div>
-                
-                <div class="receipt-box">
-                    <div class="receipt-box-title">> DESTINATION</div>
-                    <div class="text-green font-bold text-lg">${order.shippingAddress.label}</div>
-                    <div class="text-regular">${order.shippingAddress.addressLine}, BRGY. ${order.shippingAddress.barangay}</div>
-                    <div class="text-regular">${order.shippingAddress.city}, ${order.shippingAddress.province} ${order.shippingAddress.zipCode}</div>
-                </div>
-            </div>
-
-            <div class="receipt-box mt-15">
-                <div class="receipt-box-title">> ITEMS SECURED</div>
-                ${itemsHTML}
-            </div>
-
-            <div class="receipt-box mt-15">
-                <div class="flex-between mb-5"><span class="text-muted">SUBTOTAL:</span> <span>₱${order.subtotal.toLocaleString()}</span></div>
-                <div class="flex-between mb-12 border-dashed-dim pb-10"><span class="text-muted">SHIPPING:</span> <span>${order.shippingFee === 0 ? 'FREE' : '₱' + order.shippingFee.toLocaleString()}</span></div>
-                <div class="flex-between text-lg text-amber font-bold"><span>TOTAL:</span> <span>₱${order.totalAmount.toLocaleString()}</span></div>
-            </div>
-        `;
-        
-        modalOverlay.classList.add('active');
-    }
-
     // ==========================================
     // 6. FORM SUBMISSIONS & DISCONNECT
     // ==========================================
@@ -491,8 +491,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Password Update
-    if (savePassBtn) {
-        savePassBtn.addEventListener('click', async () => {
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevents page reload
+            
             const oldPassInput = document.getElementById('oldPassInput');
             const newPassInput = document.getElementById('newPassInput');
             
@@ -511,6 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showSystemAlert("> SECURITY: PASSWORD UPDATED SUCCESSFULLY.", "success");
                     oldPassInput.value = '';
                     newPassInput.value = '';
+                    document.getElementById('togglePassBtn').click(); // Auto-closes the form on success!
                 } else {
                     showSystemAlert("> ERROR: AUTHENTICATION FAILED. INCORRECT CURRENT PASSWORD.");
                 }

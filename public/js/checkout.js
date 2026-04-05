@@ -1,31 +1,37 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     
+    // ==========================================
+    // 1. STATE & DOM ELEMENTS
+    // ==========================================
     let equippedAddress = null;
-    // 1. Get DOM Elements
+    const cart = JSON.parse(localStorage.getItem('toy_yoda_cart')) || [];
+
     const addressContainer = document.getElementById('checkoutAddressContainer');
     const itemsContainer = document.getElementById('checkoutItemsContainer');
     const subtotalDisplay = document.getElementById('summarySubtotal');
     const shippingDisplay = document.getElementById('summaryShipping');
     const totalDisplay = document.getElementById('summaryTotal');
     const placeOrderBtn = document.getElementById('placeOrderBtn');
-
-    // 2. Load Cart from LocalStorage
-    const cart = JSON.parse(localStorage.getItem('toy_yoda_cart')) || [];
     
-    // Security check: If cart is empty, kick them back to the store
+    // ==========================================
+    // 2. SECURITY CHECK
+    // ==========================================
+    // If cart is empty, kick them back to the store immediately
     if (cart.length === 0) {
         window.location.href = '/catalog';
         return;
     }
 
-    // 3. Fetch the User's Active Address
+    // ==========================================
+    // 3. DATA FETCHING (Profile & Address)
+    // ==========================================
     async function loadUserAddress() {
         try {
             const response = await fetch('/api/profile');
             if (response.ok) {
                 const data = await response.json();
                 
-                // NEW: Inject the Username into the HUD
+                // Inject the Username into the HUD
                 document.getElementById('checkoutUsernameDisplay').innerText = data.username.toUpperCase();
                 
                 // Find the address they marked as "Equipped"
@@ -33,7 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 if (activeAddress) {
                     equippedAddress = activeAddress;
-                    // Wrapped the text in the new checkout-address-box div!
                     addressContainer.innerHTML = `
                         <div class="checkout-address-box">
                             <p class="text-green text-lg" style="font-weight: bold;">${activeAddress.label}</p>
@@ -55,10 +60,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             addressContainer.innerHTML = `<p class="text-red">> ERROR LOADING ADDRESS.</p>`;
+            placeOrderBtn.disabled = true; // SECURITY FIX: Lock button if database fails
         }
     }
 
-    // 4. Calculate Math and Render Cart
+    // ==========================================
+    // 4. UI RENDERING (Math & Cart HTML)
+    // ==========================================
     function renderOrderSummary() {
         let subtotal = 0;
         itemsContainer.innerHTML = '';
@@ -96,7 +104,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         totalDisplay.innerText = `₱${totalAmount.toLocaleString()}`;
     }
 
-    // 5. Place Order Button Event - The Real Engine!
+    // ==========================================
+    // 5. EVENT LISTENERS (Checkout Engine)
+    // ==========================================
     placeOrderBtn.addEventListener('click', async () => {
         if (!equippedAddress) {
             showSystemAlert("> ERROR: NO DEPLOYMENT DESTINATION LOCKED.");
@@ -142,7 +152,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             console.error("Transmission Error:", error);
-            // ERROR: Show the RED custom popup
             showSystemAlert("> FATAL ERROR: CONNECTION TO SERVER LOST.");
             placeOrderBtn.innerText = '[ PROCEED TO PAYMENT ]';
             placeOrderBtn.disabled = false;
