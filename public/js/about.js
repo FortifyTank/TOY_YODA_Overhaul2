@@ -8,26 +8,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const logo = document.getElementById('animLogo');
     const leftWojak = document.getElementById('animLeft');
     const rightWojak = document.getElementById('animRight');
+    const scrollInd = document.getElementById('scrollInd');
     
     // The staggered boxes
     const missionBox = document.getElementById('missionAnimBox');
     const foundersBox = document.getElementById('foundersAnimBox');
     const techStackBox = document.getElementById('techStackAnimBox');
 
-    window.addEventListener('scroll', () => {
+    // PERFORMANCE UPGRADE: requestAnimationFrame engine
+    let ticking = false;
+
+    function updateAnimations() {
         let progress = (window.scrollY - track.offsetTop) / (track.offsetHeight - window.innerHeight);
         progress = Math.max(0, Math.min(1, progress));
 
         // =====================================
         // PHASE 0: SCROLL INDICATOR
         // =====================================
-        if (progress < 0.10) {
-            let p = progress / 0.10; 
-            scrollInd.style.opacity = 1 - p; 
-            scrollInd.style.transform = `translate(-50%, calc(-50% - ${p * 100}px))`; 
-        } else {
-            scrollInd.style.opacity = 0; 
-            scrollInd.style.transform = `translate(-50%, calc(-50% - 100px))`; 
+        if (scrollInd) {
+            if (progress < 0.10) {
+                let p = progress / 0.10; 
+                scrollInd.style.opacity = 1 - p; 
+                scrollInd.style.transform = `translate(-50%, calc(-50% - ${p * 100}px))`; 
+            } else {
+                scrollInd.style.opacity = 0; 
+                scrollInd.style.transform = `translate(-50%, calc(-50% - 100px))`; 
+            }
         }
 
         // =====================================
@@ -83,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // PHASE 5: THE DOSSIER SEQUENCE
         // =====================================
         
-        // 1. MISSION (50% to 70%)
+        // 1. MISSION
         if (progress >= 0.50 && progress <= 0.70) {
             let mEnter = Math.min(1, (progress - 0.50) / 0.10); 
             let mExit = progress >= 0.65 ? Math.min(1, (progress - 0.65) / 0.05) : 0;
@@ -99,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             missionBox.style.pointerEvents = 'none';
         }
 
-        // 2. FOUNDERS (70% to 90%)
+        // 2. FOUNDERS
         if (progress >= 0.70 && progress <= 0.90) {
             let fEnter = Math.min(1, (progress - 0.70) / 0.10); 
             let fExit = progress >= 0.85 ? Math.min(1, (progress - 0.85) / 0.05) : 0;
@@ -115,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             foundersBox.style.pointerEvents = 'none';
         }
 
-        // 3. TECH STACK (90% to End)
+        // 3. TECH STACK
         if (techStackBox) {
             if (progress >= 0.90) {
                 let tEnter = Math.min(1, (progress - 0.90) / 0.10); 
@@ -130,7 +136,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 techStackBox.style.pointerEvents = 'none';
             }
         }
+        
+        // Reset ticker once frame is drawn
+        ticking = false;
+    }
+
+    // Scroll listener just flags the request, browser handles the timing
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(updateAnimations);
+            ticking = true;
+        }
     });
 
-    window.dispatchEvent(new Event('scroll'));
+    // Run once on load to set initial state
+    updateAnimations();
 });

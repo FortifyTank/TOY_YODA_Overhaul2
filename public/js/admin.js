@@ -514,7 +514,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (armorySearch) armorySearch.addEventListener('input', renderArmory);
+    // Search Debouncing
+    if (armorySearch) {
+        let searchTimeout;
+        armorySearch.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            // Waits 300ms after the user stops typing to trigger the heavy render function
+            searchTimeout = setTimeout(() => {
+                renderArmory();
+            }, 300); 
+        });
+    }
     if (armoryCategoryFilter) armoryCategoryFilter.addEventListener('change', renderArmory);
     if (armorySort) armorySort.addEventListener('change', renderArmory);
     if (refreshArmoryBtn) {
@@ -713,25 +723,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function secureAdminBoot() {
         try {
-            const res = await fetch('/api/profile'); // Or wherever you check auth
+            const res = await fetch('/api/profile'); 
             const user = await res.json();
             
             if (user.role !== 'admin') {
-                // Intruder detected. Kick them out immediately.
                 window.location.href = '/catalog';
                 return;
             }
             
-            // If they ARE an admin, load data and fade out the black screen
             // If they ARE an admin, load data and trigger the fade
             await loadAdminOrders();
             await fetchArmoryData();
             
-            // Reusing the hyperspace fade-out class!
             const bootScreen = document.getElementById('bootOverlay');
             bootScreen.classList.add('fade-out'); 
             
-            // Wait 1200ms (1.2s) for the CSS animation to fully finish before hiding it from the screen
             setTimeout(() => bootScreen.classList.add('hidden'), 1200);
         } catch (err) {
             window.location.href = '/login';
@@ -740,6 +746,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // BOOT SEQUENCE
     secureAdminBoot();
-    loadAdminOrders();
-    fetchArmoryData();
 });
