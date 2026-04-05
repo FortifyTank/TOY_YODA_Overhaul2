@@ -1750,8 +1750,26 @@ body.about-theme .global-header { background: #000000 !important; }
 
 /* Added top positioning to the Founders box */
 #foundersAnimBox {
-    top: 5vh; /* Sets it slightly higher to make room for the large grid cards */
+    top: 5vh; 
+    padding: 0 20px; 
+    box-sizing: border-box;
 }
+
+#techStackAnimBox {
+    position: absolute; 
+    width: 100%; 
+    left: 0; 
+    padding: 0 20px; 
+    box-sizing: border-box; 
+    opacity: 0; 
+    transform: translateY(150px); 
+    pointer-events: none;
+}
+
+#techStackAnimBox h2 {
+    font-size: 2.2rem;
+}
+
 #foundersAnimBox > h2 { font-size: 2.5rem; margin-bottom: 20px; color: var(--amber-accent); }
 
 .holo-card {
@@ -1770,6 +1788,27 @@ body.about-theme .global-header { background: #000000 !important; }
     position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
     color: var(--term-muted); font-size: 1.5rem; font-weight: bold; letter-spacing: 4px;
     z-index: 50; will-change: transform, opacity;
+}
+
+/* -----------------------------------------
+    ABOUT PAGE: TECH STACK UTILITIES
+----------------------------------------- */
+/* Increases the scroll distance so all 3 animations have time to play! */
+.about-scroll-track {
+    height: 500vh !important; 
+}
+
+.tech-list {
+    list-style: none;
+    padding: 0;
+    line-height: 2.2;
+}
+
+.yellow-divider {
+    border: none;
+    border-top: 2px solid var(--term-yellow, #ffcc00); 
+    width: 100%;
+    opacity: 0.6;
 }
 
 /* =========================================
