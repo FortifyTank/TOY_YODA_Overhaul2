@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // ==========================================
-    // 1. STATE & DOM ELEMENTS
-    // ==========================================
     const urlParams = new URLSearchParams(window.location.search);
     const sku = urlParams.get('sku');
 
@@ -49,10 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const relContainer = document.getElementById('relatedProductsContainer');
 
-    // ==========================================
-    // 2. SECURITY & UTILITIES
-    // ==========================================
-    // SECURITY UPGRADE: Prevents Cross-Site Scripting (XSS) Attacks in user reviews
     function escapeHTML(str) {
         if (!str) return '';
         return str.replace(/[&<>'"]/g, 
@@ -62,16 +55,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
     }
 
-    // ==========================================
-    // 3. MAIN DATA FETCHING & UI
-    // ==========================================
     try {
         const response = await fetch(`/api/products/sku/${sku}`);
         const product = await response.json();
 
         if (!response.ok) throw new Error(product.error || "Product not found");
 
-        // Populate the HUD
         prodImage.src = product.imageString || '/images/default-placeholder.png';
         prodCategory.innerText = `> ${product.category}`;
         prodName.innerText = product.name.toUpperCase();
@@ -89,9 +78,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         document.title = `Toy Yoda | ${product.name.toUpperCase()}`;
 
-        // ==========================================
-        // 4. REVIEWS ENGINE
-        // ==========================================
         const productId = product._id;
 
         async function loadReviews() {
@@ -99,7 +85,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const res = await fetch(`/api/products/${productId}/reviews`);
                 const data = await res.json();
 
-                // Update summary HUDs
                 if(avgStarDisplay) avgStarDisplay.innerText = data.average || '0.0';
                 if(totalCountDisplay) totalCountDisplay.innerText = data.total || '0';
 
@@ -206,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Security Check: Did they buy it?
+        // security check to ensure they actually bought the thing first
         async function checkReviewEligibility() {
             try {
                 const res = await fetch('/api/orders'); 
@@ -220,7 +205,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (canReview && openReviewBtn) {
                         openReviewBtn.classList.remove('hidden-content');
 
-                        // Auto-open logic if redirected from profile page
                         if (urlParams.get('action') === 'review') {
                             setTimeout(() => {
                                 reviewFormContainer.classList.add('active'); 
@@ -237,9 +221,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadReviews();
         checkReviewEligibility();
 
-        // ==========================================
-        // 5. QUANTITY & CART ENGINE
-        // ==========================================
         if (!product.inStock || maxStock <= 0) {
             cartBtn.innerText = '[ SOLD OUT ]';
             cartBtn.disabled = true;
@@ -270,9 +251,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // ==========================================
-        // 6. RELATED PRODUCTS
-        // ==========================================
         const allRes = await fetch('/api/products');
         const allProducts = await allRes.json();
         

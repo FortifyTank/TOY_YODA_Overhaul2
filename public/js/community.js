@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // ==========================================
-    // 1. STATE & DOM ELEMENTS
-    // ==========================================
     const chatWindow = document.getElementById('chatWindow');
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
@@ -11,10 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUsername = "";
     let isFirstLoad = true;
 
-    // ==========================================
-    // 2. UTILITY & SECURITY
-    // ==========================================
-    // SECURITY UPGRADE: Prevents Cross-Site Scripting (XSS) Attacks in the chat!
     function escapeHTML(str) {
         return str.replace(/[&<>'"]/g, 
             tag => ({
@@ -27,10 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
-    // ==========================================
-    // 3. DATA FETCHING & RENDERING
-    // ==========================================
-    // Figure out who is logged in so we can color their messages blue
     async function getUserData() {
         try {
             const res = await fetch('/api/profile');
@@ -38,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 currentUsername = data.username;
             } else {
-                // If not logged in, disable the chat input
                 chatInput.disabled = true;
                 chatInput.placeholder = "PLEASE LOG IN TO CHAT";
                 sendBtn.disabled = true;
@@ -46,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) { console.error("Auth check failed:", err); }
     }
 
-    // Load the messages from the database
     async function loadMessages() {
         try {
             const res = await fetch('/api/messages');
@@ -57,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // SMART SCROLL: Are we within 150px of the bottom of the chat?
             const isScrolledToBottom = chatWindow.scrollHeight - chatWindow.clientHeight <= chatWindow.scrollTop + 150;
 
             chatWindow.innerHTML = messages.map(msg => {
@@ -77,21 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }).join('');
 
-            // ONLY scroll to the bottom if it's the first load, OR if they are actively at the bottom!
             if (isFirstLoad || isScrolledToBottom) {
                 chatWindow.scrollTop = chatWindow.scrollHeight;
                 isFirstLoad = false; 
             }
 
         } catch (err) {
-            // Replaced the alert with a quiet console log so it doesn't spam the UI if internet drops
             console.error("Chat sync failed.");
         }
     }
 
-    // ==========================================
-    // 4. EVENT LISTENERS
-    // ==========================================
     if (chatForm) {
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -100,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             sendBtn.innerText = '[ ...]';
             
-            // UX UPGRADE: Lock the input so they can't spam enter 10 times
+            // lock input to prevent spam lol
             chatInput.disabled = true; 
 
             try {
@@ -123,21 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
             } finally {
                 sendBtn.innerText = '[ SEND ]';
                 
-                // UX UPGRADE: Unlock and auto-focus the box so they can keep typing seamlessly!
                 chatInput.disabled = false;
                 chatInput.focus(); 
             }
         });
     }
 
-    // ==========================================
-    // 5. BOOT SEQUENCE
-    // ==========================================
     async function initChat() {
         await getUserData();
         await loadMessages();
         
-        // This makes the chat feel "Live" by quietly updating every 3 seconds!
         setInterval(loadMessages, 3000); 
     }
 

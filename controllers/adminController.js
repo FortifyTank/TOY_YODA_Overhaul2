@@ -1,8 +1,7 @@
-// controllers/adminController.js
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 
-// 1. Fetch All Orders (Logistics)
+// fetch all orders
 exports.getAllOrders = async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') {
@@ -19,7 +18,7 @@ exports.getAllOrders = async (req, res) => {
     }
 };
 
-// 2. Update Order Status
+// update order status
 exports.updateOrderStatus = async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -55,7 +54,7 @@ exports.updateOrderStatus = async (req, res) => {
     }
 };
 
-// 3. Cancel Order & Restore Inventory
+// cancel order n restore the inventory
 exports.cancelOrder = async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -85,7 +84,7 @@ exports.cancelOrder = async (req, res) => {
     }
 };
 
-// 4. Fetch All Products (Armory)
+// fetch all products
 exports.getAllProducts = async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -96,7 +95,7 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
-// 5. Toggle Product Archive
+// product archives
 exports.toggleArchiveProduct = async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -114,7 +113,7 @@ exports.toggleArchiveProduct = async (req, res) => {
     }
 };
 
-// 6. Quick Stock Adjustment
+// stock adjustmenets
 exports.updateStock = async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -135,7 +134,7 @@ exports.updateStock = async (req, res) => {
     }
 };
 
-// 7. Add New Product
+// add a new product
 exports.addProduct = async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -159,7 +158,7 @@ exports.addProduct = async (req, res) => {
     }
 };
 
-// 8. Edit Product
+// edit product details
 exports.editProduct = async (req, res) => {
     try {
         if (!req.session.userId || req.session.role !== 'admin') return res.status(403).json({ error: "Unauthorized" });
@@ -195,7 +194,7 @@ exports.editProduct = async (req, res) => {
     }
 };
 
-// 9. Spawn Test Orders (Developer Tool)
+// generate the test orders
 exports.spawnTestOrders = async (req, res) => {
     try {
         if (req.session.role !== 'admin') return res.status(403).send("Unauthorized");

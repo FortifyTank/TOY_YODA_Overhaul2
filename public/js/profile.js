@@ -1,9 +1,5 @@
-// public/js/profile.js
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ==========================================
-    // 1. STATE & CONSTANTS (SVGs)
-    // ==========================================
     let editingAddressId = null;
     let userOrdersCache = [];
 
@@ -13,9 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const iconHidden = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
     const iconVisible = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
 
-    // ==========================================
-    // 2. DOM ELEMENTS
-    // ==========================================
     const stage = document.querySelector('.profile-stage');
     
     // Forms & Views
@@ -42,11 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalOverlay = document.getElementById('orderModalOverlay');
     const modalContent = document.getElementById('modalContent');
 
-    // ==========================================
-    // 3. CORE DATA LOADERS (API FETCHES)
-    // ==========================================
-    
-    // Loads the User's Personal Dossier
+
     async function loadProfileData() {
         try {
             const response = await fetch('/api/profile');
@@ -61,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const safePhone = data.phone || 'UNREGISTERED';
                 document.getElementById('profilePhone').innerText = safePhone.toUpperCase();
 
-                // THE FIX: Define addresses, cache them, then render them!
                 const addresses = data.addresses || [];
                 window.userAddressesCache = addresses; 
                 renderAddressCards(addresses);
@@ -73,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Loads the Order History and Filters the Tabs
+    // order history
     async function loadOrderHistory() {
         if (!ongoingContainer || !archivedContainer) return;
 
@@ -117,9 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // 4. UI RENDERING ENGINES
-    // ==========================================
     
     function renderAddressCards(addresses) {
         const listContainer = document.getElementById('addressListContainer');
@@ -164,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
         attachAddressEventListeners(addresses);
     }
 
-    // Utility: Password Eye Reveal
     function setupProfilePasswordToggle(btnId, inputId) {
         const btn = document.getElementById(btnId);
         const input = document.getElementById(inputId);
@@ -180,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Utility: Swap Address List / Form View
     function toggleAddressForm() {
         const isListHidden = addressListView.style.display === 'none';
         addressListView.style.display = isListHidden ? 'block' : 'none';
@@ -190,11 +173,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function openReceiptModal(order) {
         document.getElementById('modalOrderTitle').innerText = `// TACTICAL RECEIPT: ${order.orderNumber}`;
 
-        // 1. THE IMAGE BUG FIX (Added the ?. fallback)
         let itemsHTML = '';
         order.items.forEach(item => {
             const sku = item.product?.sku || 'UNKNOWN-SKU';
-            const isDelivered = order.status === 'DELIVERED'; // Checks if the order is completed
+            const isDelivered = order.status === 'DELIVERED';
 
             itemsHTML += `
                 <div class="item-row">
@@ -214,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
 
-        // 2. THE CUSTOMER TIMELINE ENGINE
         const t = order.timeline;
         const formatTime = (dateObj) => dateObj ? new Date(dateObj).toLocaleString('en-GB') : '---';
         
@@ -224,7 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (t.deliveredAt) timelineHTML += `<div class="text-muted text-sm">> DELIVERED: <span class="text-green">${formatTime(t.deliveredAt)}</span></div>`;
         if (t.cancelledAt) timelineHTML += `<div class="text-muted text-sm">> CANCELLED: <span class="text-red">${formatTime(t.cancelledAt)}</span></div>`;
 
-        // 3. INJECT INTO THE RECEIPT
         modalContent.innerHTML = `
             <div class="receipt-grid">
                 <div class="receipt-box">
@@ -259,16 +239,10 @@ document.addEventListener('DOMContentLoaded', () => {
         modalOverlay.classList.add('active');
     }
 
-    // ==========================================
-    // 5. EVENT LISTENERS
-    // ==========================================
-
-    // Auto-Open Logistics from Checkout URL Hash
     if (window.location.hash === '#logistics') {
         stage.classList.add('stage-shift-right');
     }
 
-    // History Panel Tabs (UPDATED to use clean CSS class swapping)
     if (tabOngoing && tabArchived) {
         tabOngoing.addEventListener('click', () => {
             tabOngoing.classList.add('active'); tabArchived.classList.remove('active');
@@ -280,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Stage Sliding Animations
     document.getElementById('openLogisticsBtn')?.addEventListener('click', () => {
         stage.classList.replace('stage-shift-left', 'stage-shift-right') || stage.classList.add('stage-shift-right');
     });
@@ -293,7 +266,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => { stage.classList.remove('stage-shift-right', 'stage-shift-left'); });
     });
 
-    // Sub-menu Toggles (Phone vs Password)
     if (togglePhoneBtn && phoneFormSubmit) {
         togglePhoneBtn.addEventListener('click', () => {
             phoneFormSubmit.classList.toggle('active');
@@ -312,9 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Address Card Interactions
     function attachAddressEventListeners(addresses) {
-        // Equip Address
+        // Add Address
         document.querySelectorAll('.address-card').forEach(card => {
             card.addEventListener('click', async (e) => {
                 if (e.target.closest('.icon-btn')) return; 
@@ -375,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Event Delegation: Listens for clicks on any "VIEW DETAILS" button inside the side panels
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('view-details-btn')) {
             const orderId = e.target.getAttribute('data-id');
@@ -387,11 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('closeModalBtn')?.addEventListener('click', () => modalOverlay.classList.remove('active'));
 
-    // ==========================================
-    // 6. FORM SUBMISSIONS & DISCONNECT
-    // ==========================================
-    
-    // Address Submission
     if (logisticsForm) {
         logisticsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -416,10 +381,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 zipCode: document.getElementById('shipZip').value.trim()
             };
 
-            // THE NEW VALIDATION CHECK
             if (!addressData.label || !addressData.addressLine || !addressData.barangay || !addressData.city || !addressData.province || !addressData.zipCode) {
                 showSystemAlert("> ERROR: ALL LOCATION PARAMETERS MUST BE COMPLETED.");
-                return; // Stops the form from saving!
+                return;
             }
 
             const payload = editingAddressId 
@@ -442,7 +406,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.userAddressesCache = data.user.addresses; 
                     renderAddressCards(data.user.addresses);
     
-                    // Reset instantly without a timer!
                     saveBtn.innerText = '[ SAVE ADDRESS ]';
                     logisticsForm.reset(); 
                     toggleAddressForm(); 
@@ -457,7 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Phone Submission
     if (phoneFormSubmit && savePhoneBtn) {
         phoneFormSubmit.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -479,7 +441,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     showSystemAlert("> PHONE NUMBER SECURED.", "success");
                     document.getElementById('profilePhone').innerText = newPhone.toUpperCase();
     
-                    // Reset instantly without a timer!
                     savePhoneBtn.innerText = '[ SAVE NUMBER ]';
                     newPhoneInput.value = ''; 
                     document.getElementById('togglePhoneBtn').click(); 
@@ -513,20 +474,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     showSystemAlert("> SECURITY: PASSWORD UPDATED SUCCESSFULLY.", "success");
                     oldPassInput.value = '';
                     newPassInput.value = '';
-                    document.getElementById('togglePassBtn').click(); // Auto-closes the form on success!
+                    document.getElementById('togglePassBtn').click();
                 } else {
                     showSystemAlert("> ERROR: AUTHENTICATION FAILED. INCORRECT CURRENT PASSWORD.");
                 }
             } catch (err) {
                 showSystemAlert("> FATAL ERROR: CONNECTION LOST.");
             } finally {
-                // This ensures the button ALWAYS resets, even if it fails!
                 savePassBtn.innerText = '[ UPDATE PASSWORD ]';
             }
         });
     }
 
-    // Disconnect (Logout) Link
+    // logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault(); 
@@ -544,14 +504,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // 7. INITIALIZATION (BOOT SEQUENCE)
-    // ==========================================
     if (cancelAddressFormBtn) cancelAddressFormBtn.addEventListener('click', toggleAddressForm);
     setupProfilePasswordToggle('toggleOldPass', 'oldPassInput');
     setupProfilePasswordToggle('toggleNewPass', 'newPassInput');
     
-    // Trigger Data Loaders
     loadProfileData();
     loadOrderHistory();
 });

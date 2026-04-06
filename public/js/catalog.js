@@ -1,16 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // ==========================================
-    // 1. STATE MANAGEMENT
-    // ==========================================
     let allProducts = []; 
     let currentSort = 'LATEST'; 
     let currentPage = 1;
     const itemsPerPage = 16;
 
-    // ==========================================
-    // 2. DOM ELEMENTS
-    // ==========================================
     const container = document.getElementById('product-container');
     const resultCount = document.getElementById('resultCount');
     const searchInput = document.getElementById('searchInput');
@@ -22,9 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const stockCheckboxes = document.querySelectorAll('.stock-checkbox');
     const sortDropdown = document.getElementById('sortDropdown');
 
-    // ==========================================
-    // 3. INITIALIZATION
-    // ==========================================
     async function initCatalog() {
         try {
             const response = await fetch('/api/products');
@@ -33,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const urlParams = new URLSearchParams(window.location.search);
             
-            // 1. Existing Theme Logic
             const targetCategory = urlParams.get('category');
             if (targetCategory) {
                 const checkboxes = document.querySelectorAll('.theme-checkbox');
@@ -43,11 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            // 2. NEW: Global Search Receiver Logic
             const targetSearch = urlParams.get('search');
             if (targetSearch) {
-                searchInput.value = targetSearch; // Types the word into the search bar
-                sortDropdown.value = 'RELEVANCE'; // Auto-switches the dropdown
+                searchInput.value = targetSearch;
+                sortDropdown.value = 'RELEVANCE';
                 currentSort = 'RELEVANCE';
             }
 
@@ -58,9 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // 4. CORE LOGIC (Scoring & Filtering)
-    // ==========================================
     function getRelevanceScore(product, searchTerm) {
         if (!searchTerm) return 0;
         
@@ -78,15 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return score;
     }
 
-    // Automatically generates checkboxes based on what exists in the database!
     function generateThemeFilters(products) {
         const filterContainer = document.getElementById('dynamicThemeFilters');
         if (!filterContainer) return;
 
-        // 1. Extract a list of all categories, then use Set() to remove duplicates, and sort() alphabetically
         const uniqueCategories = [...new Set(products.map(p => p.category))].sort();
 
-        // 2. Build the HTML for each unique category
         let html = '';
         uniqueCategories.forEach(category => {
             html += `
@@ -97,10 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
 
-        // 3. Inject it into the sidebar
         filterContainer.innerHTML = html;
 
-        // 4. Attach the event listeners to the NEWLY created checkboxes
         document.querySelectorAll('.theme-checkbox').forEach(cb => {
             cb.addEventListener('change', applyFilters);
         });
@@ -110,23 +91,23 @@ document.addEventListener('DOMContentLoaded', () => {
         let filtered = allProducts;
         const searchTerm = searchInput.value.toLowerCase();
 
-        // A. Search Bar
+        // Search Bar
         if (searchTerm) {
             filtered = filtered.filter(p => getRelevanceScore(p, searchTerm) > 0);
         }
 
-        // B. Price Slider
+        // Price Slider
         let maxPrice = Number(priceSlider.value);
         if (maxPrice >= 15500) maxPrice = Infinity;
         filtered = filtered.filter(p => p.price <= maxPrice);
 
-        // C. Theme
+        // Theme
         const activeThemes = Array.from(document.querySelectorAll('.theme-checkbox')).filter(cb => cb.checked).map(cb => cb.value);
         if (activeThemes.length > 0) {
             filtered = filtered.filter(p => activeThemes.includes(p.category));
         }
 
-        // D. Availability
+        // Availability
         const activeStock = Array.from(stockCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
         if (activeStock.length > 0) {
             filtered = filtered.filter(p => {
@@ -137,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // E. Sorting Engine
+        // Sorting
         if (currentSort === 'RELEVANCE') {
             if (searchTerm) {
                 filtered.sort((a, b) => getRelevanceScore(b, searchTerm) - getRelevanceScore(a, searchTerm));
@@ -164,9 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProducts(filtered);
     }
 
-    // ==========================================
-    // 5. UI RENDERING
-    // ==========================================
     function renderProducts(filteredList) {
         container.innerHTML = ''; 
         
@@ -177,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const endIndex = startIndex + itemsPerPage;
         const pageItems = filteredList.slice(startIndex, endIndex);
 
-        // Empty State (OPTIMIZED: Using CSS Utilities)
         if (totalItems === 0) {
             resultCount.innerText = `[ SHOWING: 0 / 0 ]`;
             container.innerHTML = '<p class="col-span-full text-center text-muted text-lg mt-30">> NO PRODUCT MATCHES CURRENT PARAMETERS.</p>';
@@ -208,11 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentPriceFormatted = `₱${product.price.toLocaleString()}`;
             const oldPriceFormatted = product.onSale ? `₱${product.old_price.toLocaleString()}` : '';
 
-            // 1. Create the Star Badge HTML
             const starText = product.reviewCount > 0 ? `[ ★ ${product.averageRating} ]` : `[ ☆ 0.0 ]`;
             const starBadgeHTML = `<div class="text-amber font-bold text-sm mt-5 mb-5">${starText} <span class="text-muted">(${product.reviewCount || 0})</span></div>`;
 
-            // 2. Inject it under the product-name!
             const cardHTML = `
                 <article class="product-card cyber-panel panel-interactive panel-hover-bg-yellow">
                     <a href="/product?sku=${product.sku}" class="product-link">
@@ -304,21 +279,16 @@ document.addEventListener('DOMContentLoaded', () => {
         attachClickEvents(bottomPagination);
     }
 
-    // ==========================================
-    // 6. EVENT LISTENERS
-    // ==========================================
     if (searchInput) {
         let searchTimeout;
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             
-            // Immediate UI update for the dropdown change
             if (searchInput.value.length > 0 && currentSort !== 'RELEVANCE') {
                 sortDropdown.value = 'RELEVANCE'; 
                 currentSort = 'RELEVANCE';        
             }
             
-            // Debounce the heavy lifting (filtering and DOM redrawing)
             searchTimeout = setTimeout(() => {
                 applyFilters();
             }, 300);
@@ -343,6 +313,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Ignite
     initCatalog();
 });

@@ -1,8 +1,7 @@
-// controllers/orderController.js
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 
-// 1. Get a specific user's past orders
+// get user's past orders
 exports.getUserOrders = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -18,7 +17,7 @@ exports.getUserOrders = async (req, res) => {
     }
 };
 
-// 2. The Checkout Engine
+// checkout process
 exports.processCheckout = async (req, res) => {
     try {
         const { cart, address } = req.body;

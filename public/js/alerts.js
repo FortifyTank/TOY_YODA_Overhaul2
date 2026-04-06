@@ -1,7 +1,5 @@
-// public/js/alerts.js
 let alertTimer;
 
-// By attaching it to 'window', EVERY other JS file can use this function!
 window.showSystemAlert = function(message, type = 'error') {
     const sysAlert = document.getElementById('systemAlert');
     const sysMsg = document.getElementById('systemAlertMessage');
@@ -21,11 +19,9 @@ window.showSystemAlert = function(message, type = 'error') {
     sysAlert.classList.add('active');
     clearTimeout(alertTimer);
     
-    // Stays on screen for 4 seconds, then slides up
     alertTimer = setTimeout(() => sysAlert.classList.remove('active'), 4000);
 };
 
-// Global click listener for the Acknowledge button
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('systemAlertOkBtn')?.addEventListener('click', () => {
         document.getElementById('systemAlert').classList.remove('active');

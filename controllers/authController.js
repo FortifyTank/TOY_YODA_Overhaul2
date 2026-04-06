@@ -1,8 +1,7 @@
-// controllers/authController.js
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
-// 1. Register a new user
+// register new user
 exports.registerUser = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -29,7 +28,7 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-// 2. Log in a user
+// login user
 exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -55,7 +54,7 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-// 3. Check Auth Status (For the UI buttons)
+// checks auth status
 exports.checkStatus = (req, res) => {
     if (req.session && req.session.userId) {
         res.json({ 
@@ -68,7 +67,7 @@ exports.checkStatus = (req, res) => {
     }
 };
 
-// 4. Log out a user
+// user logout
 exports.logoutUser = (req, res) => {
     req.session.destroy((err) => {
         if (err) {

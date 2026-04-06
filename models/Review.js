@@ -33,7 +33,7 @@ const reviewSchema = new mongoose.Schema({
     }
 });
 
-// This is a neat MongoDB trick: It prevents a user from leaving multiple reviews on the exact same product!
+// prevents user from leaving multiple reviews on same product
 reviewSchema.index({ user: 1, product: 1 }, { unique: true });
 
 module.exports = mongoose.model('Review', reviewSchema);

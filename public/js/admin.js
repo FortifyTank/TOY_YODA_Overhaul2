@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. DOM Elements (Logistics)
     const tabLogistics = document.getElementById('tabLogistics');
     const tabArmory = document.getElementById('tabArmory');
     const logisticsView = document.getElementById('logisticsView');
@@ -23,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalContent = document.getElementById('modalContent');
     const modalContainer = document.querySelector('.tac-modal');
 
-    // 2. DOM Elements (Armory)
     const armoryContainer = document.getElementById('armoryContainer');
     const refreshArmoryBtn = document.getElementById('refreshArmoryBtn');
     const toggleArchiveModeBtn = document.getElementById('toggleArchiveModeBtn');
@@ -31,20 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const armoryCategoryFilter = document.getElementById('armoryCategoryFilter');
     const armorySort = document.getElementById('armorySort');
 
-    // 3. DOM Elements (Forge/Drawer)
     const forgeOverlay = document.getElementById('forgeOverlay');
     const forgeDrawer = document.getElementById('forgeDrawer');
     const closeForgeBtn = document.getElementById('closeForgeBtn');
     const submitForgeBtn = document.getElementById('submitForgeBtn');
     const addNewToyBtn = document.getElementById('addNewToyBtn');
 
-    // --- TAB SWITCHERS (Upgraded for 3 Tabs) ---
-    // 1. Grab the new Analytics DOM Elements
+    // tab switchers
     const tabAnalytics = document.getElementById('tabAnalytics');
     const analyticsView = document.getElementById('analyticsView');
     const refreshAnalyticsBtn = document.getElementById('refreshAnalyticsBtn');
     
-    // 2. Array-based Tab Switcher
     const mainTabs = [
         { btn: tabLogistics, view: logisticsView },
         { btn: tabArmory, view: armoryView },
@@ -55,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let armoryCache = [];
     let isArchiveMode = false; 
 
-    // --- TAB SWITCHERS ---
     mainTabs.forEach(tab => {
         if (tab.btn) {
             tab.btn.addEventListener('click', () => {
@@ -84,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- LOGISTICS (ORDERS) ENGINE ---
+    // orders engine
     async function loadAdminOrders() {
         requestsContainer.innerHTML = '<p class="text-muted text-center mt-30">> SCANNING SECURE CHANNELS...</p>';
         try {
@@ -290,7 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // --- ARMORY (PRODUCTS) ENGINE ---
     async function fetchArmoryData() {
         if (!armoryContainer) return;
         armoryContainer.innerHTML = '<p class="text-muted text-center mt-30">> ACCESSING DATABASE...</p>';
@@ -409,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function attachArmoryEvents() {
-        // 1. Soft Delete Toggle
+        // soft delte toggle
         document.querySelectorAll('.toggle-archive-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const productId = btn.getAttribute('data-id');
@@ -421,7 +414,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // 2. INLINE SLIDER LOGIC (Stock adjustments)
         document.querySelectorAll('.init-add-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
@@ -476,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // 3. Open Drawer for EDITING an existing toy
+        // editing existing product
         document.querySelectorAll('.edit-toy-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 try {
@@ -492,7 +484,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('forgePrice').value = product.price;
                     document.getElementById('forgeOldPrice').value = product.old_price || 0;
                     
-                    // NEW: File Uploader tracking
                     document.getElementById('forgeExistingImage').value = product.imageString;
                     document.getElementById('currentImageDisplay').innerText = `CURRENT DATA: ${product.imageString}`;
                     document.getElementById('forgeImageFile').value = ''; // Clears out any old file selection
@@ -514,12 +505,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Search Debouncing
     if (armorySearch) {
         let searchTimeout;
         armorySearch.addEventListener('input', () => {
             clearTimeout(searchTimeout);
-            // Waits 300ms after the user stops typing to trigger the heavy render function
+            
             searchTimeout = setTimeout(() => {
                 renderArmory();
             }, 300); 
@@ -542,7 +532,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- STATIC DRAWER LOGIC (Runs exactly once) ---
     if (addNewToyBtn) {
         addNewToyBtn.addEventListener('click', () => {
             try {
@@ -554,7 +543,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('forgePrice').value = '';
                 document.getElementById('forgeOldPrice').value = '';
                 
-                // NEW: File Uploader clear
                 document.getElementById('forgeExistingImage').value = '';
                 document.getElementById('currentImageDisplay').innerText = '> AWAITING FILE UPLOAD...';
                 document.getElementById('forgeImageFile').value = ''; 
@@ -606,7 +594,6 @@ document.addEventListener('DOMContentLoaded', () => {
             submitForgeBtn.disabled = true;
 
             try {
-                // NEW: FormData can securely package text AND physical files
                 const formData = new FormData();
                 formData.append('name', name);
                 formData.append('sku', sku);
@@ -616,12 +603,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('tags', document.getElementById('forgeTags').value);
                 formData.append('description', document.getElementById('forgeDesc').value);
 
-                // Handle the Image File
                 const fileInput = document.getElementById('forgeImageFile');
                 if (fileInput.files.length > 0) {
                     formData.append('imageFile', fileInput.files[0]); // Attach the physical image!
                 }
-                // Send the existing path fallback
+
                 const existingImage = document.getElementById('forgeExistingImage').value;
                 if (existingImage) {
                     formData.append('existingImage', existingImage);
@@ -654,33 +640,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // ANALYTICS ENGINE
-    // ==========================================
+    // analytics
     function updateAnalyticsPanel() {
         if (!document.getElementById('analyticsView')) return;
 
-        // --- NEW: TIME FILTER LOGIC ---
         const timeFilter = document.getElementById('revenueTimeFilter')?.value || 'LIFETIME';
         const now = new Date();
-        let cutoffDate = new Date(0); // The beginning of time (Lifetime)
+        let cutoffDate = new Date(0);
 
         if (timeFilter === 'YEARLY') {
-            cutoffDate = new Date(now.getFullYear(), 0, 1); // Jan 1st of this year
+            cutoffDate = new Date(now.getFullYear(), 0, 1);
         } else if (timeFilter === 'QUARTERLY') {
             const quarterMonth = Math.floor(now.getMonth() / 3) * 3;
-            cutoffDate = new Date(now.getFullYear(), quarterMonth, 1); // Start of current quarter
+            cutoffDate = new Date(now.getFullYear(), quarterMonth, 1);
         } else if (timeFilter === 'MONTHLY') {
-            cutoffDate = new Date(now.getFullYear(), now.getMonth(), 1); // 1st of this month
+            cutoffDate = new Date(now.getFullYear(), now.getMonth(), 1);
         }
 
-        // Filter the revenue based ONLY on when the order was placed
         const timeFilteredOrders = adminOrdersCache.filter(o => {
             const placedAt = new Date(o.timeline.placedAt);
             return placedAt >= cutoffDate;
         });
 
-        // 1. REVENUE MATH (Applies the Time Filter)
         const delivered = timeFilteredOrders.filter(o => o.status === 'DELIVERED');
         const active = timeFilteredOrders.filter(o => ['PENDING', 'PREPARING', 'ON DELIVERY'].includes(o.status));
         
@@ -690,7 +671,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('statRevenue').innerText = `₱${totalRev.toLocaleString()}`;
         document.getElementById('statProjected').innerText = `₱${projectedRev.toLocaleString()}`;
 
-        // 2. ORDERS COUNT (Always shows Current Active workload)
         const allDelivered = adminOrdersCache.filter(o => o.status === 'DELIVERED');
         document.getElementById('statPending').innerText = adminOrdersCache.filter(o => o.status === 'PENDING').length;
         document.getElementById('statPrepared').innerText = adminOrdersCache.filter(o => o.status === 'PREPARING').length;
@@ -698,7 +678,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('statDelivered').innerText = allDelivered.length;
         document.getElementById('statCancelled').innerText = adminOrdersCache.filter(o => o.status === 'CANCELLED').length;
 
-        // 3. INVENTORY COUNT (Always shows Current Warehouse stock)
         const activeProducts = armoryCache.filter(p => !p.isArchived);
         document.getElementById('statTotalProducts').innerText = activeProducts.length;
         document.getElementById('statHealthy').innerText = activeProducts.filter(p => p.avail_inventory > 5).length;
@@ -706,7 +685,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('statOut').innerText = activeProducts.filter(p => p.avail_inventory === 0).length;
     }
 
-    // Attach Event Listeners
     const revenueTimeFilter = document.getElementById('revenueTimeFilter');
     if (revenueTimeFilter) {
         revenueTimeFilter.addEventListener('change', updateAnalyticsPanel);
@@ -731,7 +709,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            // If they ARE an admin, load data and trigger the fade
             await loadAdminOrders();
             await fetchArmoryData();
             
@@ -744,6 +721,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // BOOT SEQUENCE
     secureAdminBoot();
 });

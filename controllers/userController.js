@@ -1,8 +1,7 @@
-// controllers/userController.js
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
-// 1. Get user profile data
+// get user profile data
 exports.getUserProfile = async (req, res) => {
     try {
         if (!req.session.userId) {
@@ -19,7 +18,7 @@ exports.getUserProfile = async (req, res) => {
     }
 };
 
-// 2. Update user profile (Addresses, Phone, etc.)
+// update profile
 exports.updateUserProfile = async (req, res) => {
     try {
         if (!req.session.userId) return res.status(401).json({ error: "> UNAUTHORIZED ACCESS" });
@@ -73,7 +72,7 @@ exports.updateUserProfile = async (req, res) => {
     }
 };
 
-// 3. Change Password
+// change password
 exports.updateUserPassword = async (req, res) => {
     try {
         if (!req.session.userId) return res.status(401).json({ error: "> UNAUTHORIZED" });

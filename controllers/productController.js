@@ -1,16 +1,13 @@
-// controllers/productController.js
 const Product = require('../models/Product');
 const Review = require('../models/Review');
 const Order = require('../models/Order');
 
-// 1. Get all active products for the Catalog
+// get all products for the catalog
 exports.getAllProducts = async (req, res) => {
     try {
-        // Removed .lean() to preserve your Mongoose Virtuals
         const productsDoc = await Product.find({ isArchived: { $ne: true } }); 
         const reviews = await Review.find(); 
 
-        // Convert documents to objects while forcing Virtuals to stay attached
         const products = productsDoc.map(p => p.toObject());
 
         products.forEach(p => {
@@ -32,7 +29,7 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
-// 2. Get a single product by SKU
+// get product by SKU
 exports.getProductBySku = async (req, res) => {
     try {
         const product = await Product.findOne({ sku: req.params.sku, isArchived: { $ne: true } });
@@ -43,7 +40,7 @@ exports.getProductBySku = async (req, res) => {
     }
 };
 
-// 3. Get reviews for a specific product
+// get product's reviews
 exports.getProductReviews = async (req, res) => {
     try {
         const reviews = await Review.find({ product: req.params.id }).sort({ createdAt: -1 });
@@ -58,7 +55,7 @@ exports.getProductReviews = async (req, res) => {
     }
 };
 
-// 4. Submit a new review (Verified Buyers Only)
+// submit new review
 exports.submitReview = async (req, res) => {
     try {
         const userId = req.session.userId;

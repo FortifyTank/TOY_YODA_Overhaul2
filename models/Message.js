@@ -14,7 +14,7 @@ const messageSchema = new mongoose.Schema({
         type: String, 
         required: true,
         trim: true,
-        maxlength: 300 // Keeps the chat moving quickly without huge paragraphs
+        maxlength: 300
     },
     timestamp: { 
         type: Date, 

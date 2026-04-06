@@ -1,8 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // ==========================================
-    // 1. STATE & CONSTANTS
-    // ==========================================
+    // state and constants
     let hasStarted = false; 
     let errorTimer; 
 
@@ -14,9 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const iconHidden = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
     const iconVisible = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
 
-    // ==========================================
-    // 2. DOM ELEMENTS
-    // ==========================================
+    // DOM elements
     const startPrompt = document.getElementById("startPrompt");
     const authBox = document.getElementById("authBox");
     const loginForm = document.getElementById("loginForm");
@@ -28,10 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const cameraRig = document.getElementById("cameraRig");
     const parallaxLayers = document.querySelectorAll(".parallax-layer");
 
-    // ==========================================
-    // 3. UTILITY FUNCTIONS
-    // ==========================================
-    
+
+    // UTIL FUNCTIONS
+
     // Password Reveal Tool
     function setupPasswordToggle(btnId, inputId) {
         const btn = document.getElementById(btnId);
@@ -67,9 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 3000); 
     };
 
-    // ==========================================
-    // 4. INITIALIZATION & UI EVENTS
-    // ==========================================
+    // initialization
     
     // Setup Password Eyes
     setupPasswordToggle("toggleRegPass", "regPassword");
@@ -81,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
         mouseX = e.pageX;
         mouseY = e.pageY;
 
-        // Only request a new frame if one isn't already pending
+        // Only request a new frame if one isnt already pending
         if (!isTicking) {
             window.requestAnimationFrame(() => {
                 const x = (window.innerWidth / 2 - mouseX) / 120;
@@ -92,18 +85,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     layer.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
                 });
                 
-                isTicking = false; // Reset the lock after drawing
+                isTicking = false;
             });
             isTicking = true; // Lock it until the frame is drawn
         }
     });
 
-    // Start Prompt Sequence
     const initLogin = () => {
         if (hasStarted) return; 
         hasStarted = true;
 
-        // 1. Fade out the "Press Enter" text
         startPrompt.style.transition = "opacity 0.3s ease";
         startPrompt.style.opacity = "0";
         
@@ -111,36 +102,36 @@ document.addEventListener("DOMContentLoaded", () => {
             const terminal = document.querySelector(".terminal-container");
             const brandHeader = document.querySelector(".brand-header");
             
-            // 2. Measure the exact pixel position of the logo BEFORE we change anything
+            // measure the exact pixel position of the logo
             const beforeY = brandHeader.getBoundingClientRect().top;
             
-            // 3. Hide prompt and deploy the box (This causes the instant jump)
+            // hide prompt and deploy the box
             startPrompt.style.display = "none";
             authBox.style.position = "relative"; 
             authBox.classList.remove("hidden");  
             
-            // 4. Measure where the browser instantly snapped the logo to
+            // measure where the browser instantly snapped the logo to
             const afterY = brandHeader.getBoundingClientRect().top;
             const jumpDistance = beforeY - afterY; // Calculates exact pixel difference
             
-            // 5. Instantly push the whole container down to offset the jump
+            // instantly push the whole container down to offset the jump
             terminal.style.transition = "none";
             terminal.style.transform = `translate(-50%, calc(-50% + ${jumpDistance}px))`;
             
             // Force browser to render this invisible offset frame
             void terminal.offsetHeight; 
             
-            // 6. Turn on the smooth animation and slide it up to true center!
+            // turn on the smooth animation and slide it up to true center
             terminal.style.transition = "transform 0.8s cubic-bezier(0.1, 0.9, 0.2, 1)";
             terminal.style.transform = "translate(-50%, -50%)";
 
-            // Trigger your laser-unfold animation on the box itself
+            // trigger your laser-unfold animation on the box itself
             authBox.classList.add("deploying"); 
             
-            // Clean up the animations after they finish
+            // clean up the animations after they finish
             setTimeout(() => {
                 authBox.classList.remove("deploying");
-                terminal.style.transition = ""; // Removes inline styles so hyperspace warp still works!
+                terminal.style.transition = "";
                 terminal.style.transform = "";
             }, 850);
 
@@ -162,11 +153,9 @@ document.addEventListener("DOMContentLoaded", () => {
         loginForm.classList.replace("hidden-form", "active-form");
     });
 
-    // ==========================================
-    // 5. FORM SUBMISSIONS
-    // ==========================================
+    // form submissions
     
-    // Login Submission (Hyperspace Trigger)
+    // Login
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = document.getElementById("loginEmail").value;
@@ -203,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Register Submission (Success Flash & Auto-Switch)
+    // Register
     registerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         

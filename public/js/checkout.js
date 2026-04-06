@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // ==========================================
-    // 1. STATE & DOM ELEMENTS
-    // ==========================================
     let equippedAddress = null;
     const cart = JSON.parse(localStorage.getItem('toy_yoda_cart')) || [];
 
@@ -13,28 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalDisplay = document.getElementById('summaryTotal');
     const placeOrderBtn = document.getElementById('placeOrderBtn');
     
-    // ==========================================
-    // 2. SECURITY CHECK
-    // ==========================================
-    // If cart is empty, kick them back to the store immediately
+    // security check: if cart is empty, kick them back to the store immediately
     if (cart.length === 0) {
         window.location.href = '/catalog';
         return;
     }
 
-    // ==========================================
-    // 3. DATA FETCHING (Profile & Address)
-    // ==========================================
     async function loadUserAddress() {
         try {
             const response = await fetch('/api/profile');
             if (response.ok) {
                 const data = await response.json();
                 
-                // Inject the Username into the HUD
                 document.getElementById('checkoutUsernameDisplay').innerText = data.username.toUpperCase();
                 
-                // Find the address they marked as "Equipped"
                 const activeAddress = data.addresses.find(addr => addr.isEquipped);
                 
                 if (activeAddress) {
@@ -60,13 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             addressContainer.innerHTML = `<p class="text-red">> ERROR LOADING ADDRESS.</p>`;
-            placeOrderBtn.disabled = true; // SECURITY FIX: Lock button if database fails
+            placeOrderBtn.disabled = true;
         }
     }
 
-    // ==========================================
-    // 4. UI RENDERING (Math & Cart HTML)
-    // ==========================================
     function renderOrderSummary() {
         let subtotal = 0;
         itemsContainer.innerHTML = '';
@@ -89,24 +75,20 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
 
-        // The 10% Shipping Rule
         let shippingFee = 0;
         if (subtotal <= 10000) {
-            shippingFee = subtotal * 0.10; // 10% fee
+            shippingFee = subtotal * 0.10; // 10% fee for orders 10k or below
         } 
-        // If subtotal > 10000, shippingFee remains 0 (Free Shipping)
+        // If subtotal > 10000,free shipping
 
         const totalAmount = subtotal + shippingFee;
 
-        // Display the math
         subtotalDisplay.innerText = `₱${subtotal.toLocaleString()}`;
         shippingDisplay.innerText = shippingFee === 0 ? "FREE" : `₱${shippingFee.toLocaleString()}`;
         totalDisplay.innerText = `₱${totalAmount.toLocaleString()}`;
     }
 
-    // ==========================================
-    // 5. EVENT LISTENERS (Checkout Engine)
-    // ==========================================
+    // checkout event listeners
     placeOrderBtn.addEventListener('click', async () => {
         if (!equippedAddress) {
             showSystemAlert("> ERROR: NO DEPLOYMENT DESTINATION LOCKED.");
@@ -117,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         placeOrderBtn.disabled = true;
 
         try {
-            // Send the data to the backend /checkout POST route
             const response = await fetch('/api/orders/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -133,19 +114,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (response.ok) {
-                // SUCCESS: Show the GREEN custom popup!
                 showSystemAlert(`> SYSTEM: PAYMENT SECURED.\n> ORDER NUMBER: ${result.orderNumber}`, 'success');
                 
-                // Empty the cart
                 localStorage.removeItem('toy_yoda_cart');
                 
-                // Delay the warp by 3.5 seconds so they can see the success box!
                 setTimeout(() => {
                     window.location.href = '/catalog'; 
                 }, 3500);
 
             } else {
-                // ERROR: Show the RED custom popup
                 showSystemAlert(`> ERROR: ${result.error}`);
                 placeOrderBtn.innerText = '[ PROCEED TO PAYMENT ]';
                 placeOrderBtn.disabled = false;
@@ -158,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Ignite the page
     loadUserAddress();
     renderOrderSummary();
 });

@@ -1,4 +1,3 @@
-// routes/adminRoutes.js
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
@@ -6,7 +5,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Set up Multer inside the route file!
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const dir = './public/images/products';
@@ -21,18 +19,15 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Admin Orders
 router.get('/orders', adminController.getAllOrders);
 router.post('/orders/:id/status', adminController.updateOrderStatus);
 router.post('/orders/:id/cancel', adminController.cancelOrder);
 router.post('/spawn-test', adminController.spawnTestOrders);
 
-// Admin Products
 router.get('/products', adminController.getAllProducts);
 router.post('/products/:id/archive', adminController.toggleArchiveProduct);
 router.post('/products/:id/stock', adminController.updateStock);
 
-// The Upload Routes
 router.post('/products', upload.single('imageFile'), adminController.addProduct);
 router.post('/products/:id/edit', upload.single('imageFile'), adminController.editProduct);
 

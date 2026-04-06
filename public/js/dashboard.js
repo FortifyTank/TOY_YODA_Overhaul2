@@ -1,38 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // ==========================================
-    // 1. STATE & DOM ELEMENTS
-    // ==========================================
     const urlParams = new URLSearchParams(window.location.search);
     const bootOverlay = document.getElementById("bootOverlay");
     
-    // Grabs all login buttons across the entire site instantly
     const accountButtons = document.querySelectorAll('.clearance');
     
-    // Grabs the Global Search Bar present in the header
     const globalSearchInput = document.querySelector('.header-search input');
 
-    // ==========================================
-    // 2. CORE LOGIC
-    // ==========================================
-    
-    // --- Global System Boot Fade-In ---
     function handleBootAnimation() {
         if (!bootOverlay) return;
         
         if (urlParams.get("warp") === "true") {
-            // Trigger cinematic fade
             bootOverlay.classList.add("fade-out");
             
-            // Instantly clean the URL so refreshing the page doesn't replay the fade
             window.history.replaceState({}, document.title, window.location.pathname);
         } else {
-            // Instantly hide the black screen
             bootOverlay.classList.add("hidden");
         }
     }
 
-    // --- Global Authentication Check ---
     async function checkAuthStatus() {
         try {
             const response = await fetch('/api/auth/status');
@@ -40,14 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.loggedIn) {
                 accountButtons.forEach(btn => {
-                    // ALWAYS act as the Profile Button, no matter what page we are on!
                     btn.innerText = `[ ${data.username} ]`;
                     btn.classList.add('logged-in');
                     btn.href = '/profile'; 
                     btn.classList.add('ready'); 
                 });
 
-                // DYNAMIC ADMIN BUTTON SPAWNER
                 if (data.role === 'admin') {
                     const headerLeft = document.querySelector('.header-left');
                     if (headerLeft && !document.getElementById('adminNavBtn')) {
@@ -72,7 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- Latest Imports Fetcher ---
     async function loadLatestImports() {
         const latestContainer = document.getElementById('latestImportsContainer');
         if (!latestContainer) return; // If we aren't on the home page, abort!
@@ -81,10 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch('/api/products');
             let products = await response.json();
 
-            // Reverse to get newest first, then grab the first 4
             const latestFour = products.reverse().slice(0, 4);
 
-            latestContainer.innerHTML = ''; // Clear the "scanning" message
+            latestContainer.innerHTML = '';
 
             latestFour.forEach(product => {
                 const currentPriceFormatted = `₱${product.price.toLocaleString()}`;
@@ -117,27 +99,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ==========================================
-    // 3. EVENT LISTENERS
-    // ==========================================
-    // Global Search "Enter" Key Listener
     if (globalSearchInput) {
         globalSearchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                e.preventDefault(); // Prevents the page from refreshing
+                e.preventDefault();
                 const query = globalSearchInput.value.trim();
                 
                 if (query) {
-                    // Instantly warps the user to the catalog with their search term attached
                     window.location.href = `/catalog?search=${encodeURIComponent(query)}`;
                 }
             }
         });
     }
 
-    // ==========================================
-    // 4. BOOT SEQUENCE
-    // ==========================================
     handleBootAnimation();
     checkAuthStatus();
     loadLatestImports();

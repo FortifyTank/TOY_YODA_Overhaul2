@@ -1,4 +1,3 @@
-// controllers/communityController.js
 const Message = require('../models/Message');
 
 exports.getMessages = async (req, res) => {

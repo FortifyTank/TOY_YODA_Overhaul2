@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // ==========================================
-    // 1. STATE & DOM ELEMENTS
-    // ==========================================
     let cart = JSON.parse(localStorage.getItem('toy_yoda_cart')) || [];
     
     const cartStatusElements = document.querySelectorAll('.cart-status');
@@ -14,11 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearCartBtn = document.getElementById('clearCartBtn');
     const proceedCheckoutBtn = document.getElementById('proceedCheckoutBtn');
 
-    // ==========================================
-    // 2. UI & ALERT UTILITIES
-    // ==========================================
-
-    // Flashes the cart button and triggers a drawer redraw
     function updateCartUI(animate = false) {
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
         
@@ -40,14 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCartDrawer();
     }
 
-    // Draws the HTML items inside the slide-out panel
     function renderCartDrawer() {
         if (!cartItemsContainer) return;
 
         cartItemsContainer.innerHTML = '';
         let totalPrice = 0;
 
-        // OPTIMIZATION: Removed inline styles, added .text-muted, .text-center, .mt-20
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = '<p class="text-muted text-center mt-20">> YOUR CART IS EMPTY.</p>';
             cartTotalDisplay.innerText = '₱0';
@@ -58,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemTotal = item.price * item.quantity;
             totalPrice += itemTotal;
 
-            // OPTIMIZATION: Zero inline styles. All handled by utility classes now!
             const itemHTML = `
                 <div class="cart-item">
                     <img src="${item.image}" alt="${item.name}" class="cart-item-img">
@@ -87,9 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cartTotalDisplay.innerText = `₱${totalPrice.toLocaleString()}`;
     }
 
-    // ==========================================
-    // 3. CART DATA OPERATIONS (Global Window Functions)
-    // ==========================================
+    // cart data ops
     
     window.addToCart = function(product, qtyToAdd = 1) {
         const existingItem = cart.find(item => item.sku === product.sku);
@@ -129,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const newQuantity = item.quantity + change;
 
             if (newQuantity > item.maxStock) {
-                // UX UPDATE: Clearer, friendlier terminology
                 showSystemAlert(`> NOT ENOUGH STOCK: ONLY ${item.maxStock} AVAILABLE.`);
                 return;
             }
@@ -156,10 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('toy_yoda_cart', JSON.stringify(cart));
         updateCartUI(true);
     }
-
-    // ==========================================
-    // 4. DRAWER CONTROLS & EVENT LISTENERS
-    // ==========================================
     
     function openCart() {
         if(cartDrawer && cartOverlay) {
@@ -174,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(cartDrawer && cartOverlay) {
             cartDrawer.classList.remove('active');
             cartOverlay.classList.remove('active');
-            // Unlocks the background page
             document.body.classList.remove('no-scroll'); 
         }
     }
@@ -202,6 +183,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Boot UI on load
     updateCartUI();
 });

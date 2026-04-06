@@ -4,17 +4,17 @@ const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
 
-// INITIALIZE EXPRESS
+// express
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// DATABASE CONNECTION
+// DB conn
 const dbURI = process.env.MONGODB_URI;
 mongoose.connect(dbURI, { dbName: "toy_yoda" })
     .then(() => console.log(`> DATABASE: MONGODB SECURED AND CONNECTED`))
     .catch((err) => console.log(`> DATABASE ERROR: CONNECTION FAILED`, err));
 
-// MIDDLEWARE
+// some middlware
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
@@ -25,9 +25,7 @@ app.use(session({
     cookie: { secure: false } 
 }));
 
-// ==========================================
-// IMPORT MVC ROUTERS
-// ==========================================
+// import MVC routers
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const communityRoutes = require('./routes/communityRoutes');
@@ -35,20 +33,15 @@ const userRoutes = require('./routes/userRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-// ==========================================
-// API TRAFFIC COPS
-// ==========================================
-app.use('/api', authRoutes); // Handles /api/login, /api/register
-app.use('/api/auth/status', require('./controllers/authController').checkStatus); // Explicit path map for the frontend
+app.use('/api', authRoutes);
+app.use('/api/auth/status', require('./controllers/authController').checkStatus);
 app.use('/api/products', productRoutes);
 app.use('/api/messages', communityRoutes);
 app.use('/api/profile', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 
-// ==========================================
-// HTML VIEW ROUTES (The Frontend)
-// ==========================================
+// html view routes
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'home.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
 app.get('/home', (req, res) => res.sendFile(path.join(__dirname, 'views', 'home.html')));
@@ -60,12 +53,12 @@ app.get('/community', (req, res) => res.sendFile(path.join(__dirname, 'views', '
 app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'views', 'about.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'views', 'admin.html')));
 
-// 404 CATCH-ALL ROUTE
+// 404 route
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
 });
 
-// SERVER STATUS
+// server status
 app.listen(PORT, () => {
     console.log(`\n> =======================================`);
     console.log(`> SYSTEM ONLINE: TOY_YODA SERVER ACTIVE`);
