@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Product = require('./models/Product');
 
-// The Unbreakable Classic String If You Alter This Earth Will Be Consumed By Unicron
 const dbURI = "mongodb://playofgamer10_db_user:CHbeLY5tbk1CPx6q@ac-ir6m09r-shard-00-00.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-01.5npf8nj.mongodb.net:27017,ac-ir6m09r-shard-00-02.5npf8nj.mongodb.net:27017/?ssl=true&authSource=admin&retryWrites=true&w=majority";
 
 const seedProducts = [

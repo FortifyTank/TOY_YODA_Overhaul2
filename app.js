@@ -62,7 +62,7 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`\n> =======================================`);
     console.log(`> SYSTEM ONLINE: TOY_YODA SERVER ACTIVE`);
-    console.log(`> ARCHITECTURE: M.V.C. UPGRADED`);
+    console.log(`> ARCHITECTURE: M.V.C.`);
     console.log(`> ACCESS POINT: http://localhost:${PORT}`);
     console.log(`> =======================================\n`);
 });
